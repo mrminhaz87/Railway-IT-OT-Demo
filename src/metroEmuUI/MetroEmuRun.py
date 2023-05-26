@@ -32,8 +32,7 @@ class UIFrame(wx.Frame):
         #wx.Frame.__init__(self, parent, id, title, style=wx.MINIMIZE_BOX | wx.STAY_ON_TOP)
         # self.SetBackgroundColour(wx.Colour(30, 40, 62))
         self.SetBackgroundColour(wx.Colour(200, 210, 200))
-
-
+        
         #self.SetTransparent(gv.gTranspPct*255//100)
         self.SetIcon(wx.Icon(gv.ICO_PATH))
         # Build UI sizer

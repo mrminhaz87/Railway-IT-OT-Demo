@@ -41,8 +41,13 @@ IMG_FD = 'img'
 ICO_PATH = os.path.join(dirpath, IMG_FD, "geoIcon.ico")
 BGIMG_PATH = os.path.join(dirpath, IMG_FD, "SampleImg.png")
 
+RAILWAY_TYPE_LINE = 'RW_L'
+RAILWAY_TYPE_CYCLE = 'RW_C'
+TRAIN_TYPE = 'Train'
 
-RAYWAY_TYPE = 'RW'
+
+gTrainImgB = os.path.join(dirpath, IMG_FD, "train.png")
+gTrainImgH = os.path.join(dirpath, IMG_FD, "trainhead2.png")
 
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.

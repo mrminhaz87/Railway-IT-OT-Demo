@@ -12,6 +12,7 @@
 # License:     YC
 #-----------------------------------------------------------------------------
 import wx
+import math
 
 from datetime import datetime
 import metroEmuGobal as gv
@@ -54,7 +55,7 @@ class PanelMap(wx.Panel):
             fromPt, toPt = trackAPts[i], trackAPts[i+1]
             dc.DrawLine(fromPt[0], fromPt[1], toPt[0], toPt[1])
         fromPt, toPt = trackAPts[0], trackAPts[-1]
-        dc.DrawLine(fromPt[0], fromPt[1], toPt[0], toPt[1])
+        if trackA['type'] == gv.RAILWAY_TYPE_CYCLE: dc.DrawLine(fromPt[0], fromPt[1], toPt[0], toPt[1])
 
 
         trackB = gv.iMapMgr.getTrackB()
@@ -85,10 +86,29 @@ class PanelMap(wx.Panel):
         dc.SetPen(self.dcDefPen)
         clashPt = None
         # Draw the train1 on the map.
+
+        dc.SetPen(wx.Pen(wx.Colour(52, 169, 129)))
         trainColor = 'RED' if self.mapMgr.trainA.emgStop else '#CE8349'
         dc.SetBrush(wx.Brush(trainColor))
+        
+        # dirList = self.mapMgr.trainA.getDirs()
+        # #bitmap = wx.Bitmap(gv.gTrainImgB)
+        # gc = wx.GraphicsContext.Create(dc)
+        # gc.SetBrush(wx.Brush(trainColor))
+        # for i, point in enumerate( self.mapMgr.trainA.getPos()):
+        #      gc.PushState()
+        #      gc.Translate(point[0], point[1])
+        #      gc.Rotate(dirList[i])
+        #      gc.DrawRectangle(-5, -5, 10, 10)
+        #      if i == 0 or i == 4:
+        #          gc.DrawBitmap(wx.Bitmap(gv.gTrainImgB), -5, -5, 10, 10)
+        # #     else:
+        # #         gc.DrawBitmap(bitmap, -5, -5, 10, 10)
+        #      gc.PopState()
         for point in self.mapMgr.trainA.getPos():
             dc.DrawRectangle(point[0]-5, point[1]-5, 10, 10)
+            
+
         # Draw the train2 on the map.
 
     #--PanelMap--------------------------------------------------------------------

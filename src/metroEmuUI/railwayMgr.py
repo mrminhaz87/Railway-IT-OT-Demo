@@ -9,7 +9,7 @@
 #
 # Created:     2019/07/29
 # Copyright:   YC @ Singtel Cyber Security Research & Development Laboratory
-# License:     YC
+# License:     
 #-----------------------------------------------------------------------------
 import wx
 import metroEmuGobal as gv
@@ -26,20 +26,28 @@ class MapMgr(object):
         self.trackA = {
             'name' : 'WE Line',
             'color': wx.Colour(52, 169, 129),
-            'points': [(50, 400), (1550, 400), (1550, 500), (50, 500)]
+            'type': gv.RAILWAY_TYPE_CYCLE,
+            'points': [(50, 200), (100, 200), (100, 600), (600, 600), (600, 800), (900, 800),
+                       (900, 400), (1550, 400), (1550, 450), (950, 450), (950, 850), (550, 850), (550, 650),
+                        (50, 650) ]
         }
-        headPosA = (50, 400)
+        headPosA = (50, 200)
         self.trainA = agent.AgentTrain(self, 0, headPosA, self.trackA['points'])
+        self.trainA.setNextPtIdx(1)
+        self.trainA.changedir()
+        #self.trainA.initDir(1)
 
         self.trackB = {
             'name' : 'NS Line',
             'color': wx.Colour(233, 0, 97),
+            'type': gv.RAILWAY_TYPE_CYCLE,
             'points': [(750, 50), (850, 50), (850, 850), (750, 850)]
         }
 
         self.trackC = {
             'name' : 'Cycler Line',
             'color': wx.Colour(255, 136, 0),
+            'type': gv.RAILWAY_TYPE_CYCLE,
             'points': [(200, 200), (1400, 200), (1400, 700), (200, 700)]
         }
 
