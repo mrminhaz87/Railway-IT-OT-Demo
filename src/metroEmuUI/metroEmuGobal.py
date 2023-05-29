@@ -44,7 +44,7 @@ BGIMG_PATH = os.path.join(dirpath, IMG_FD, "SampleImg.png")
 RAILWAY_TYPE_LINE = 'RW_L'
 RAILWAY_TYPE_CYCLE = 'RW_C'
 TRAIN_TYPE = 'Train'
-
+SENSOR_TYPE = 'SS'
 
 gTrainImgB = os.path.join(dirpath, IMG_FD, "train.png")
 gTrainImgH = os.path.join(dirpath, IMG_FD, "trainhead2.png")
@@ -53,6 +53,9 @@ gTrainImgH = os.path.join(dirpath, IMG_FD, "trainhead2.png")
 # VARIABLES are the built in data type.
 gTranspPct = 70     # Windows transparent percentage.
 gUpdateRate = 1     # main frame update rate 1 sec.
+gSensorCount = 0    # number of sensors.
+
+
 
 
 #-------<GLOBAL PARAMTERS>-----------------------------------------------------

@@ -47,24 +47,56 @@ class AgentTarget(object):
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
+class AgentSensor(AgentTarget):
+    """ Creat the sensor to show the sensor detection state."""
+    def __init__(self, parent, idx, pos, plc=None):
+        AgentTarget.__init__(self, parent, idx, pos, gv.SENSOR_TYPE)
+        # sensor unique ID -1 for auto set.
+        self.sensorID = gv.gSensorCount if idx < gv.gSensorCount else idx 
+        gv.gSensorCount += 1 
+        self.actFlag = 0    # sensor active flag.
+
+#--AgentSensor-----------------------------------------------------------------
+    def setSensorState(self, flag):
+        """ Set sensor status, flag(int) 0-OFF 1~9 ON"""
+        if flag != self.actFlag: 
+            self.actFlag = flag
+
+#--AgentSensor-----------------------------------------------------------------
+    def getSensorState(self):
+        return self.actFlag
+
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 class AgentTrain(AgentTarget):
-    """ Create a train object with its init railway array.
+    """ Create a train object with its init railway(track) array.
+
         input:  pos - The init position of the train head.
                 railwayPts - list of railway points.(train will also run under 
                 the list sequence.)
     """
-    def __init__(self, parent, idx, pos, railwayPts, railwayType=gv.RAILWAY_TYPE_LINE):
-        AgentTarget.__init__(self, parent, idx, pos, gv.TRAIN_TYPE)
+    def __init__(self, parent, trainID, initPos, railwayPts, trainLen=5, trainSpeed=10, railwayType=gv.RAILWAY_TYPE_CYCLE):
+        """ Init the train control agent object.
+        Args:
+            parent (_type_): parent object.
+            trainID (_type_): train ID.
+            pos (_type_): train initiate position. 
+            railwayPts (_type_): the track train will follow.
+            trainLen (int, optional): _description_. Defaults to 5.
+            railwayType (_type_, optional): _description_. Defaults to gv.RAILWAY_TYPE_CYCLE.
+        """
+        AgentTarget.__init__(self, parent, trainID, initPos, railwayType)
         self.railwayPts = railwayPts
         self.railwayType = railwayType
+        self.trainLen = trainLen
         # Init the train head and tail points at the horizontal position.
-        self.pos = [[pos[0] + 12*i, pos[1]] for i in range(5)]
+        self.pos = [[initPos[0] + 10*i, initPos[1]] for i in range(self.trainLen)]
         self.dirs = [0]*5
         self.traindir = 1   # follow the railway point with increase order.
         # self.pos = [pos[0]]*5
         # The train next distination index for each train body.
         self.trainDistList = [0]*len(self.pos) # distination idx for each train body.
-        self.trainSpeed = 10    # train speed: pixel/periodic loop
+        self.trainSpeed = trainSpeed    # train speed: pixel/periodic loop
         self.dockCount = 0      # time to stop in the station.
         self.emgStop = False    # emergency stop.
 
@@ -101,11 +133,6 @@ class AgentTrain(AgentTarget):
             self.trainDistList[i] = (element+self.traindir)% len(self.railwayPts)
         print(self.trainDistList)        
 
-    #def setTrainDir(self, dirVal):
-    #    self.
-
-
-
 #--AgentTrain------------------------------------------------------------------
     def checkNear(self, posX, posY, threshold):
         """ Overwrite the parent checknear function to check whether a point
@@ -115,6 +142,19 @@ class AgentTrain(AgentTarget):
             dist = math.sqrt((pos[0] - posX)**2 + (pos[1] - posY)**2)
             if dist <= threshold: return True
         return False
+
+#--AgentTrain------------------------------------------------------------------
+    def checkClashFt(self, frontTrain, threshold = 200):
+        ftTail = frontTrain.getTrainPos()[-1]
+        if self.checkNear(ftTail[0], ftTail[1], threshold):
+            if self.trainSpeed > 0:
+                ftDockCount = frontTrain.getDockCount()
+                # temp add make the behing train wait
+                self.setDockCount(ftDockCount+10)
+
+#--AgentTrain------------------------------------------------------------------
+    def getTrainPos(self, idx=None):
+        return self.pos
 
 #--AgentTrain------------------------------------------------------------------
     def getDockCount(self):
@@ -160,8 +200,6 @@ class AgentTrain(AgentTarget):
                     scale = float(self.trainSpeed)/float(dist)
                     trainPt[0] += int((nextPt[0]-trainPt[0])*scale)
                     trainPt[1] += int((nextPt[1]-trainPt[1])*scale)
-
-
 
         else:  # Train stop at the station.
             self.dockCount -= 1

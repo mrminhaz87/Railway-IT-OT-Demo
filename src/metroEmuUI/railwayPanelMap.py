@@ -81,15 +81,14 @@ class PanelMap(wx.Panel):
 
 
 #--PanelMap--------------------------------------------------------------------
-    def _drawTrains(self, dc):
+    def _drawTrains_old(self, dc):
         """ Draw the 2 trains on the map."""
         dc.SetPen(self.dcDefPen)
         clashPt = None
         # Draw the train1 on the map.
 
-        dc.SetPen(wx.Pen(wx.Colour(52, 169, 129)))
-        trainColor = 'RED' if self.mapMgr.trainA.emgStop else '#CE8349'
-        dc.SetBrush(wx.Brush(trainColor))
+        #dc.SetPen(wx.Pen(wx.Colour(52, 169, 129)))
+
         
         # dirList = self.mapMgr.trainA.getDirs()
         # #bitmap = wx.Bitmap(gv.gTrainImgB)
@@ -107,9 +106,24 @@ class PanelMap(wx.Panel):
         #      gc.PopState()
         for point in self.mapMgr.trainA.getPos():
             dc.DrawRectangle(point[0]-5, point[1]-5, 10, 10)
-            
-
         # Draw the train2 on the map.
+
+    def _drawTrains(self, dc):
+        """ Draw the 2 trains on the map."""
+        dc.SetPen(self.dcDefPen)
+        clashPt = None
+        # Draw the train1 on the map.
+
+        #dc.SetPen(wx.Pen(wx.Colour(52, 169, 129)))
+        #trainColor = 'RED' if self.mapMgr.trainA.emgStop else '#CE8349'
+        #dc.SetBrush(wx.Brush(trainColor))
+        trainDict = gv.iMapMgr.getTrains()
+        for key, val in trainDict.items(): 
+            for train in val:
+                trainColor = 'RED' if train.emgStop else 'GREEN'
+                dc.SetBrush(wx.Brush(trainColor))
+                for point in  train.getPos():
+                    dc.DrawRectangle(point[0]-5, point[1]-5, 10, 10)
 
     #--PanelMap--------------------------------------------------------------------
     def onPaint(self, event):
