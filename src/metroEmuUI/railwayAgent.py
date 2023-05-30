@@ -43,7 +43,7 @@ class AgentTarget(object):
         """
         dist = math.sqrt((self.pos[0] - posX)**2 + (self.pos[1] - posY)**2)
         return dist <= threshold
-    
+
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class AgentSensors(AgentTarget):
@@ -64,20 +64,70 @@ class AgentSensors(AgentTarget):
         return idxList
 
 #-----------------------------------------------------------------------------
-    def updateActive(self, trainObj):
-        (u,d,l,r) = trainObj.getTrainArea()
+    def updateActive(self, trainList):
         for i in range(self.sensorsCount):
+            self.stateList[i] = 0
             x, y = self.pos[i]
-            self.stateList[i] = 1 if  l <= x <= r and u <= y <= d else 0
+            for trainObj in trainList:
+                (u, d, l, r) = trainObj.getTrainArea()
+                if l <= x <= r and u <= y <= d:self.stateList[i] = 1
         
 #--AgentSensor-----------------------------------------------------------------
     def setSensorState(self, idx, state):
         """ Set sensor status, flag(int) 0-OFF 1~9 ON"""
         self.stateList[idx] = state
 
+    def getSensorState(self, idx):
+        return self.stateList[idx]
+
 #--AgentSensor-----------------------------------------------------------------
-    def getSensorState(self):
+    def getSensorsState(self):
         return self.stateList
+
+
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+class AgentSignal(AgentTarget):
+    def __init__(self, parent, tgtID, pos, dir=0, tType=gv.SINGAL_TYPE):
+        """_summary_
+        Args:
+            parent (_type_): _description_
+            tgtID (_type_): _description_
+            pos (_type_): _description_
+            dir (int, optional): _description_. Defaults to 0-up, 1-down, 2-left, 3 right.
+            tType (_type_, optional): _description_. Defaults to gv.SINGAL_TYPE.
+        """
+        super().__init__(parent, tgtID, pos, tType)
+        self.signalOn = False
+        self.dir = dir # direction on map.
+        self.triggerOnSenAgent = None
+        self.triggerOnIdx= None
+        self.triggerOffSenAgent = None
+        self.triggerOffIdx=None
+
+    def setTriggerOnSensors(self, sensorAgent, idxList):
+        self.triggerOnSenAgent = sensorAgent
+        self.triggerOnIdx = idxList
+
+    def setTriggerOffSensors(self, sensorAgent, idxList):
+        self.triggerOffSenAgent = sensorAgent
+        self.triggerOffIdx = idxList
+
+    def setState(self, state):
+        self.signalOn = state
+
+    def getState(self):
+        return self.signalOn
+
+    def updateSingalState(self):
+        if self.signalOn: 
+            if self.triggerOffSenAgent.getSensorState(self.triggerOnIdx):
+                print("turn on")
+                self.signalOn = False
+        else:
+            if self.triggerOffSenAgent.getSensorState(self.triggerOffIdx):
+                print("turn off")
+                self.signalOn =True
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

@@ -30,7 +30,7 @@ class PanelMap(wx.Panel):
         wx.Panel.__init__(self, parent, size=panelSize)
         self.SetBackgroundColour(wx.Colour(30, 40, 62))
         self.panelSize = panelSize
-        
+        self.toggle = False
         # temp init the data manager here:
         gv.iMapMgr = self.mapMgr = dataMgr.MapMgr(self)
 
@@ -40,6 +40,7 @@ class PanelMap(wx.Panel):
         # Set the panel double buffer.
         self.SetDoubleBuffered(True)  # Avoid the panel flash during update.
 
+#-----------------------------------------------------------------------------
     def _drawRailWay(self, dc):
         """ Draw the background and the railway."""
         w, h = self.panelSize
@@ -107,6 +108,7 @@ class PanelMap(wx.Panel):
             dc.DrawRectangle(point[0]-5, point[1]-5, 10, 10)
         # Draw the train2 on the map.
 
+#-----------------------------------------------------------------------------
     def _drawTrains(self, dc):
         """ Draw the 2 trains on the map."""
         dc.SetPen(self.dcDefPen)
@@ -124,6 +126,7 @@ class PanelMap(wx.Panel):
                 for point in  train.getPos():
                     dc.DrawRectangle(point[0]-5, point[1]-5, 10, 10)
 
+#-----------------------------------------------------------------------------
     def _drawSensors(self, dc):
         dc.SetPen(self.dcDefPen)
         dc.SetFont(wx.Font(7, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
@@ -131,19 +134,46 @@ class PanelMap(wx.Panel):
         for key, sensorAgent in gv.iMapMgr.getSensors().items():
             sensorId = sensorAgent.getID()
             sensorPos = sensorAgent.getPos()
-            sensorState = sensorAgent.getSensorState()
+            sensorState = sensorAgent.getSensorsState()
             dc.SetTextForeground(wx.Colour('White'))
             for i in range(sensorAgent.getSensorCount()):
                 pos = sensorPos[i]
                 dc.DrawText(sensorId+"-s"+str(i), pos[0]+3, pos[1]+3)
                 state = sensorState[i]
                 if state:
-                    color = 'YELLOW' if self.toggle else 'GREEN'
+                    color = 'YELLOW' if self.toggle else 'BLUE'
                     dc.SetBrush(wx.Brush(color))
                     dc.DrawRectangle(pos[0]-4, pos[1]-4, 8, 8)
                     dc.SetBrush(wx.Brush('GRAY'))
                 else:
                     dc.DrawRectangle(pos[0]-4, pos[1]-4, 8, 8)
+
+#-----------------------------------------------------------------------------
+    def _drawSignals(self, dc):
+        dc.SetPen(self.dcDefPen)
+        dc.SetFont(wx.Font(7, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+        dc.SetBrush(wx.Brush('Green'))
+        for key, signals in gv.iMapMgr.getSignals().items():
+            for signalAgent in signals:
+                id = signalAgent.getID()
+                pos = signalAgent.getPos()
+                state = signalAgent.getState()
+                dir = signalAgent.dir
+                color = 'RED' if state else 'GREEN'
+                dc.SetPen(wx.Pen(color, width=2, style=wx.PENSTYLE_SOLID))
+                x, y = pos[0], pos[1]
+                if dir == 0:
+                    y -= 15 
+                elif dir ==1:
+                    y += 15
+                elif dir == 2:
+                    x -= 15
+                elif dir == 3:
+                    x += 15
+                dc.DrawLine(pos[0], pos[1], x, y)
+                dc.DrawText("S"+str(id), x-10, y-25)
+                dc.SetBrush(wx.Brush(color))
+                dc.DrawRectangle(x-5, y-5, 11, 11)
 
     #--PanelMap--------------------------------------------------------------------
     def onPaint(self, event):
@@ -155,6 +185,7 @@ class PanelMap(wx.Panel):
         self._drawRailWay(dc)
         self._drawTrains(dc)
         self._drawSensors(dc)
+        self._drawSignals(dc)
 
     def updateDisplay(self, updateFlag=None):
         """ Set/Update the display: if called as updateDisplay() the function will 
@@ -163,6 +194,7 @@ class PanelMap(wx.Panel):
         """
         self.Refresh(False)
         self.Update()
+        self.toggle = not self.toggle
 
 #--PanelMap--------------------------------------------------------------------
     def periodic(self , now):

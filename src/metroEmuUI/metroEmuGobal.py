@@ -45,6 +45,8 @@ RAILWAY_TYPE_LINE = 'RW_L'
 RAILWAY_TYPE_CYCLE = 'RW_C'
 TRAIN_TYPE = 'Train'
 SENSOR_TYPE = 'SS'
+SINGAL_TYPE = "SG"
+
 
 gTrainImgB = os.path.join(dirpath, IMG_FD, "train.png")
 gTrainImgH = os.path.join(dirpath, IMG_FD, "trainhead2.png")

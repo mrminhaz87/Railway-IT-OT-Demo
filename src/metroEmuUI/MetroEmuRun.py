@@ -18,7 +18,7 @@ import metroEmuGobal as gv
 import railwayPanelMap as pnlMap
 import uiPanel as pl
 
-PERIODIC = 500      # update in every 500ms
+PERIODIC = 300      # update in every 500ms
 FRAME_SIZE = (1800, 1000)
 
 #-----------------------------------------------------------------------------

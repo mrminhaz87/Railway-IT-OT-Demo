@@ -23,8 +23,13 @@ class MapMgr(object):
         """ Init all the element on the map. All the parameters are public to 
             other module.
         """
+        self.trains = {}
+        self.sensors = {}
+        self.signals = {}
+
         self._initTT()
         self._initSensors()
+        self._initSignal()
         #headPosA = (50, 200)
         #self.trainA = agent.AgentTrain(self, 0, headPosA, self.trackA['points'])
         #self.trainA.setNextPtIdx(1)
@@ -37,8 +42,6 @@ class MapMgr(object):
             loading a config file before the how program init.(load to a gv.gxx
             parameter)
         """
-        self.trains = {}
-        self.sensors = {}
 
         # Init WE Line and the trains on it.
         self.trackA = {
@@ -107,10 +110,51 @@ class MapMgr(object):
             (1170, 200), (1270, 200), (1400, 370), (1400, 500), 
             (980, 700), (830, 700), (630, 700), (460, 700),
             (200, 700), (200, 530)
-        ]
+            ]
         self.tCsensors = agent.AgentSensors(self, 'cc', trackCsensroPos)
         self.sensors['ccline'] = self.tCsensors
 
+#-----------------------------------------------------------------------------
+    def _initSignal(self):
+        # Set all the signal on track A
+        trackASignalConfig = [
+            {'id': 'we-0', 'pos':(160, 600), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':13, 'offIdx':12 }, 
+            {'id': 'we-1', 'pos':(240, 650), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':13, 'offIdx':12 },
+            {'id': 'we-3', 'pos':(600, 660), 'dir': 3, 'tiggerS': self.tCsensors, 'onIdx':11, 'offIdx':10 },
+            {'id': 'we-4', 'pos':(550, 740), 'dir': 2, 'tiggerS': self.tCsensors, 'onIdx':11, 'offIdx':10 },
+            {'id': 'we-5', 'pos':(900, 740), 'dir': 2, 'tiggerS': self.tCsensors, 'onIdx':9, 'offIdx':8 },
+            {'id': 'we-6', 'pos':(950, 660), 'dir': 3, 'tiggerS': self.tCsensors, 'onIdx':9, 'offIdx':8 },
+            {'id': 'we-7', 'pos':(1360, 400), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':7, 'offIdx':6 },
+            {'id': 'we-8', 'pos':(1440, 450), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':7, 'offIdx':6 },
+        ]
+        self.tAsignals = []
+        for Info in trackASignalConfig:
+            signal = agent.AgentSignal(self, Info['id'], Info['pos'], dir=Info['dir'])
+            signal.setTriggerOnSensors(Info['tiggerS'], Info['onIdx'])
+            signal.setTriggerOffSensors(Info['tiggerS'], Info['offIdx'])
+            self.tAsignals.append(signal)
+        self.signals['weline'] = self.tAsignals
+        
+        # Set all the signal on trackB
+        trackBSignalConfig = [
+            {'id': 'we-0', 'pos':(160, 600), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':13, 'offIdx':12 },
+
+        ]
+        self.tAsignals = []
+        for Info in trackASignalConfig:
+            signal = agent.AgentSignal(self, Info['id'], Info['pos'], dir=Info['dir'])
+            signal.setTriggerOnSensors(Info['tiggerS'], Info['onIdx'])
+            signal.setTriggerOffSensors(Info['tiggerS'], Info['offIdx'])
+            self.tAsignals.append(signal)
+        self.signals['weline'] = self.tAsignals
+
+
+
+#-----------------------------------------------------------------------------
+    def getSignals(self):
+        return self.signals
+
+#-----------------------------------------------------------------------------
     def getSensors(self):
         return self.sensors
 
@@ -139,6 +183,7 @@ class MapMgr(object):
     def getTrackC(self):
         return self.trackC
     
+#-----------------------------------------------------------------------------
     def periodic(self , now):
         """ Periodicly call back function."""
         # update the trains position.
@@ -147,4 +192,15 @@ class MapMgr(object):
             for train in val:
                 train.updateTrainPos()
                 train.checkClashFt(frontTrain)
-                frontTrain = train
+                frontTrain = train                
+                # update the sensor state
+            if key == 'weline':
+                self.tAsensors.updateActive(val)
+            elif key == 'nsline':
+                self.tBsensors.updateActive(val)
+            elif key == 'ccline':
+                self.tCsensors.updateActive(val)
+        
+        for key, val in self.signals.items():
+            for signal in val:
+                signal.updateSingalState()
