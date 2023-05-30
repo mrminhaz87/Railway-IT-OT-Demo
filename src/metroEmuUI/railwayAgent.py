@@ -44,27 +44,40 @@ class AgentTarget(object):
         dist = math.sqrt((self.pos[0] - posX)**2 + (self.pos[1] - posY)**2)
         return dist <= threshold
     
-
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
-class AgentSensor(AgentTarget):
-    """ Creat the sensor to show the sensor detection state."""
+class AgentSensors(AgentTarget):
+    """ Creat the sensors set to show the sensors detection state."""
     def __init__(self, parent, idx, pos, plc=None):
         AgentTarget.__init__(self, parent, idx, pos, gv.SENSOR_TYPE)
-        # sensor unique ID -1 for auto set.
-        self.sensorID = gv.gSensorCount if idx < gv.gSensorCount else idx 
-        gv.gSensorCount += 1 
-        self.actFlag = 0    # sensor active flag.
+        self.sensorsCount = len(self.pos)
+        self.stateList = [0]*self.sensorsCount
 
+    def getSensorCount(self):
+        return self.sensorsCount
+
+#-----------------------------------------------------------------------------
+    def getActiveIndex(self):
+        idxList = []
+        for i, val in enumerate(self.pos):
+            if val: idxList.append(i)
+        return idxList
+
+#-----------------------------------------------------------------------------
+    def updateActive(self, trainObj):
+        (u,d,l,r) = trainObj.getTrainArea()
+        for i in range(self.sensorsCount):
+            x, y = self.pos[i]
+            self.stateList[i] = 1 if  l <= x <= r and u <= y <= d else 0
+        
 #--AgentSensor-----------------------------------------------------------------
-    def setSensorState(self, flag):
+    def setSensorState(self, idx, state):
         """ Set sensor status, flag(int) 0-OFF 1~9 ON"""
-        if flag != self.actFlag: 
-            self.actFlag = flag
+        self.stateList[idx] = state
 
 #--AgentSensor-----------------------------------------------------------------
     def getSensorState(self):
-        return self.actFlag
+        return self.stateList
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -100,16 +113,18 @@ class AgentTrain(AgentTarget):
         self.dockCount = 0      # time to stop in the station.
         self.emgStop = False    # emergency stop.
 
+#-----------------------------------------------------------------------------
     def _getDirc(self, srcPt, destPt):
         x = destPt[0] - srcPt[0]
         y = destPt[1] - srcPt[1]
         return math.pi-math.atan2(x, y) 
 
+#-----------------------------------------------------------------------------
     def setNextPtIdx(self, nextPtIdx):
         if nextPtIdx < len(self.railwayPts): 
             self.trainDistList = [nextPtIdx]*len(self.pos)
 
-
+#-----------------------------------------------------------------------------
     def initDir(self, nextPtIdx):
         if nextPtIdx < len(self.railwayPts): 
             self.trainDistList = [nextPtIdx]*len(self.pos)
@@ -118,9 +133,18 @@ class AgentTrain(AgentTarget):
                 self.dirs[i] = self._getDirc(self.pos[i], nextPt)
         print(self.dirs)
 
+#-----------------------------------------------------------------------------
     def getDirs(self):
         return self.dirs 
     
+#-----------------------------------------------------------------------------
+    def getTrainArea(self):
+        """ Get the area train covered on the map."""
+        h, t = self.pos[0], self.pos[-1]
+        left, right = min(h[0], t[0])-5, max(h[0], t[0])+5
+        up, down = min(h[1], t[1])-5, max(h[1], t[1])+5
+        return (up, down, left, right)
+
 #--AgentTrain------------------------------------------------------------------
     def changedir(self):
         """ Change the train running direction."""
@@ -144,7 +168,7 @@ class AgentTrain(AgentTarget):
         return False
 
 #--AgentTrain------------------------------------------------------------------
-    def checkClashFt(self, frontTrain, threshold = 200):
+    def checkClashFt(self, frontTrain, threshold = 40):
         ftTail = frontTrain.getTrainPos()[-1]
         if self.checkNear(ftTail[0], ftTail[1], threshold):
             if self.trainSpeed > 0:
@@ -194,7 +218,7 @@ class AgentTrain(AgentTarget):
                     # Update the next train distination if the train already get its next dist.
                     nextPtIdx = self.trainDistList[i] = (nextPtIdx + self.traindir) % len(self.railwayPts)
                     nextPt = self.railwayPts[nextPtIdx]
-                    self.dirs[i] = self._getDirc(trainPt, nextPt)
+                    #self.dirs[i] = self._getDirc(trainPt, nextPt)
                 else:
                     # Move one speed unit.
                     scale = float(self.trainSpeed)/float(dist)

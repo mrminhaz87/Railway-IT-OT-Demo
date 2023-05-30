@@ -57,7 +57,6 @@ class PanelMap(wx.Panel):
         fromPt, toPt = trackAPts[0], trackAPts[-1]
         if trackA['type'] == gv.RAILWAY_TYPE_CYCLE: dc.DrawLine(fromPt[0], fromPt[1], toPt[0], toPt[1])
 
-
         trackB = gv.iMapMgr.getTrackB()
         dc.SetPen(wx.Pen(trackB['color'], width=4, style=wx.PENSTYLE_SOLID))
         trackBPts = trackB['points']
@@ -125,6 +124,27 @@ class PanelMap(wx.Panel):
                 for point in  train.getPos():
                     dc.DrawRectangle(point[0]-5, point[1]-5, 10, 10)
 
+    def _drawSensors(self, dc):
+        dc.SetPen(self.dcDefPen)
+        dc.SetFont(wx.Font(7, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+        dc.SetBrush(wx.Brush('GRAY'))
+        for key, sensorAgent in gv.iMapMgr.getSensors().items():
+            sensorId = sensorAgent.getID()
+            sensorPos = sensorAgent.getPos()
+            sensorState = sensorAgent.getSensorState()
+            dc.SetTextForeground(wx.Colour('White'))
+            for i in range(sensorAgent.getSensorCount()):
+                pos = sensorPos[i]
+                dc.DrawText(sensorId+"-s"+str(i), pos[0]+3, pos[1]+3)
+                state = sensorState[i]
+                if state:
+                    color = 'YELLOW' if self.toggle else 'GREEN'
+                    dc.SetBrush(wx.Brush(color))
+                    dc.DrawRectangle(pos[0]-4, pos[1]-4, 8, 8)
+                    dc.SetBrush(wx.Brush('GRAY'))
+                else:
+                    dc.DrawRectangle(pos[0]-4, pos[1]-4, 8, 8)
+
     #--PanelMap--------------------------------------------------------------------
     def onPaint(self, event):
         """ Draw the whole panel by using the wx device context."""
@@ -134,7 +154,7 @@ class PanelMap(wx.Panel):
         # Draw the railway as background.
         self._drawRailWay(dc)
         self._drawTrains(dc)
-
+        self._drawSensors(dc)
 
     def updateDisplay(self, updateFlag=None):
         """ Set/Update the display: if called as updateDisplay() the function will 
