@@ -120,14 +120,14 @@ class AgentSignal(AgentTarget):
         return self.signalOn
 
     def updateSingalState(self):
-        if self.signalOn: 
-            if self.triggerOffSenAgent.getSensorState(self.triggerOnIdx):
-                print("turn on")
-                self.signalOn = False
+        if self.signalOn:
+            for idx in self.triggerOnIdx:
+                if self.triggerOffSenAgent.getSensorState(idx):
+                    self.signalOn = False
         else:
-            if self.triggerOffSenAgent.getSensorState(self.triggerOffIdx):
-                print("turn off")
-                self.signalOn =True
+            for idx in self.triggerOffIdx:
+                if self.triggerOffSenAgent.getSensorState(idx):
+                    self.signalOn =True
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -225,6 +225,18 @@ class AgentTrain(AgentTarget):
                 ftDockCount = frontTrain.getDockCount()
                 # temp add make the behing train wait
                 self.setDockCount(ftDockCount+10)
+
+
+    def CheckSignal(self, signalList):
+        for singalObj in signalList:
+            x, y = singalObj.getPos()
+            if self.checkNear(x, y, 20): 
+                if singalObj.getState():
+                    if not self.emgStop:
+                        self.emgStop = True
+                else:
+                    if self.emgStop: self.emgStop = False
+                break
 
 #--AgentTrain------------------------------------------------------------------
     def getTrainPos(self, idx=None):

@@ -7,8 +7,8 @@
 #
 # Author:      Yuancheng Liu
 #
-# Created:     2019/07/29
-# Copyright:   YC @ Singtel Cyber Security Research & Development Laboratory
+# Created:     2023/05/29
+# Copyright:   
 # License:     
 #-----------------------------------------------------------------------------
 import wx
@@ -118,14 +118,14 @@ class MapMgr(object):
     def _initSignal(self):
         # Set all the signal on track A
         trackASignalConfig = [
-            {'id': 'we-0', 'pos':(160, 600), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':13, 'offIdx':12 }, 
-            {'id': 'we-1', 'pos':(240, 650), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':13, 'offIdx':12 },
-            {'id': 'we-3', 'pos':(600, 660), 'dir': 3, 'tiggerS': self.tCsensors, 'onIdx':11, 'offIdx':10 },
-            {'id': 'we-4', 'pos':(550, 740), 'dir': 2, 'tiggerS': self.tCsensors, 'onIdx':11, 'offIdx':10 },
-            {'id': 'we-5', 'pos':(900, 740), 'dir': 2, 'tiggerS': self.tCsensors, 'onIdx':9, 'offIdx':8 },
-            {'id': 'we-6', 'pos':(950, 660), 'dir': 3, 'tiggerS': self.tCsensors, 'onIdx':9, 'offIdx':8 },
-            {'id': 'we-7', 'pos':(1360, 400), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':7, 'offIdx':6 },
-            {'id': 'we-8', 'pos':(1440, 450), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':7, 'offIdx':6 },
+            {'id': 'we-0', 'pos':(160, 600), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':(13,), 'offIdx':(12,) }, 
+            {'id': 'we-1', 'pos':(240, 650), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':(13,), 'offIdx':(12,) },
+            {'id': 'we-3', 'pos':(600, 660), 'dir': 3, 'tiggerS': self.tCsensors, 'onIdx':(11,), 'offIdx':(10,) },
+            {'id': 'we-4', 'pos':(550, 740), 'dir': 2, 'tiggerS': self.tCsensors, 'onIdx':(11,), 'offIdx':(10,) },
+            {'id': 'we-5', 'pos':(900, 740), 'dir': 2, 'tiggerS': self.tCsensors, 'onIdx':(9,), 'offIdx':(8,) },
+            {'id': 'we-6', 'pos':(950, 660), 'dir': 3, 'tiggerS': self.tCsensors, 'onIdx':(9,), 'offIdx':(8,) },
+            {'id': 'we-7', 'pos':(1360, 400), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':(7,), 'offIdx':(6,) },
+            {'id': 'we-8', 'pos':(1440, 450), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':(7,), 'offIdx':(6,) },
         ]
         self.tAsignals = []
         for Info in trackASignalConfig:
@@ -137,18 +137,37 @@ class MapMgr(object):
         
         # Set all the signal on trackB
         trackBSignalConfig = [
-            {'id': 'we-0', 'pos':(160, 600), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':13, 'offIdx':12 },
+            {'id': 'ns-0', 'pos':(300, 240), 'dir': 2, 'tiggerS': self.tCsensors, 'onIdx':(1,), 'offIdx':(0,) },
+            {'id': 'ns-2', 'pos':(400, 160), 'dir': 3, 'tiggerS': self.tCsensors, 'onIdx':(1,), 'offIdx':(0,) },
+            {'id': 'ns-3', 'pos':(700, 240), 'dir': 3, 'tiggerS': self.tCsensors, 'onIdx':(3,), 'offIdx':(2,) },
+            {'id': 'ns-4', 'pos':(1200, 160), 'dir': 3, 'tiggerS': self.tCsensors, 'onIdx':(5,), 'offIdx':(4,) },
 
         ]
-        self.tAsignals = []
-        for Info in trackASignalConfig:
+        self.tBsignals = []
+        for Info in trackBSignalConfig:
             signal = agent.AgentSignal(self, Info['id'], Info['pos'], dir=Info['dir'])
             signal.setTriggerOnSensors(Info['tiggerS'], Info['onIdx'])
             signal.setTriggerOffSensors(Info['tiggerS'], Info['offIdx'])
-            self.tAsignals.append(signal)
-        self.signals['weline'] = self.tAsignals
+            self.tBsignals.append(signal)
+        self.signals['nsline'] = self.tBsignals
 
-
+        # set all the signal on trackC
+        trackCSignalConfig = [
+            {'id': 'cc-0', 'pos':(260, 200), 'dir': 0, 'tiggerS': self.tBsensors, 'onIdx':(1, 7), 'offIdx':(0, 2) },
+            {'id': 'cc-1', 'pos':(660, 200), 'dir': 0, 'tiggerS': self.tBsensors, 'onIdx':(5,), 'offIdx':(4,) },
+            {'id': 'cc-2', 'pos':(1160, 200), 'dir': 0, 'tiggerS': self.tBsensors, 'onIdx':(3,), 'offIdx':(2,) },
+            {'id': 'cc-3', 'pos':(1400, 360), 'dir': 3, 'tiggerS': self.tAsensors, 'onIdx':(8,10), 'offIdx':(7,9) },
+            {'id': 'cc-4', 'pos':(990, 700), 'dir': 0, 'tiggerS': self.tAsensors, 'onIdx':(6,12), 'offIdx':(5,11) },
+            {'id': 'cc-5', 'pos':(640, 700), 'dir': 0, 'tiggerS': self.tAsensors, 'onIdx':(4,14), 'offIdx':(3,13) },
+            {'id': 'cc-6', 'pos':(210, 700), 'dir': 0, 'tiggerS': self.tAsensors, 'onIdx':(2, 16), 'offIdx':(1,15) },
+        ]
+        self.tCsignals = []
+        for Info in trackCSignalConfig:
+            signal = agent.AgentSignal(self, Info['id'], Info['pos'], dir=Info['dir'])
+            signal.setTriggerOnSensors(Info['tiggerS'], Info['onIdx'])
+            signal.setTriggerOffSensors(Info['tiggerS'], Info['offIdx'])
+            self.tCsignals.append(signal)
+        self.signals['ccline'] = self.tCsignals
 
 #-----------------------------------------------------------------------------
     def getSignals(self):
@@ -188,8 +207,11 @@ class MapMgr(object):
         """ Periodicly call back function."""
         # update the trains position.
         for key, val in self.trains.items():
+            
             frontTrain = val[-1]
             for train in val:
+                # Check the signal 1st 
+                train.CheckSignal(self.signals[key])
                 train.updateTrainPos()
                 train.checkClashFt(frontTrain)
                 frontTrain = train                

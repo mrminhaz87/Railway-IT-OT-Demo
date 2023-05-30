@@ -173,7 +173,7 @@ class PanelMap(wx.Panel):
                 dc.DrawLine(pos[0], pos[1], x, y)
                 dc.DrawText("S"+str(id), x-10, y-25)
                 dc.SetBrush(wx.Brush(color))
-                dc.DrawRectangle(x-5, y-5, 11, 11)
+                dc.DrawRectangle(x-5, y-5, 10, 10)
 
     #--PanelMap--------------------------------------------------------------------
     def onPaint(self, event):
