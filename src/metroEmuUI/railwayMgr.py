@@ -7,6 +7,7 @@
 #
 # Author:      Yuancheng Liu
 #
+# Version:     v0.1
 # Created:     2023/05/29
 # Copyright:   
 # License:     
@@ -30,11 +31,6 @@ class MapMgr(object):
         self._initTT()
         self._initSensors()
         self._initSignal()
-        #headPosA = (50, 200)
-        #self.trainA = agent.AgentTrain(self, 0, headPosA, self.trackA['points'])
-        #self.trainA.setNextPtIdx(1)
-        #self.trainA.changedir()
-        #self.trainA.initDir(1)
 
 #-----------------------------------------------------------------------------
     def _initTT(self):
@@ -211,7 +207,7 @@ class MapMgr(object):
             frontTrain = val[-1]
             for train in val:
                 # Check the signal 1st 
-                train.CheckSignal(self.signals[key])
+                train.checkSignal(self.signals[key])
                 train.updateTrainPos()
                 train.checkClashFt(frontTrain)
                 frontTrain = train                

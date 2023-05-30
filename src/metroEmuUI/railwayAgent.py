@@ -1,22 +1,27 @@
 #-----------------------------------------------------------------------------
-# Name:        railwayAgentPLC.py
+# Name:        railwayAgent.py
 #
-# Purpose:     This module is the agent module to init different items in the 
-#              railway system or create the interface to connect to the hardware. 
+# Purpose:     This module is the agents module to init different items in the 
+#              railway system. All the items on the Map are agent object, each 
+#              agent's update() function is a self-driven function to update the 
+#              item's state.
+# 
 # Author:      Yuancheng Liu
 #
-# Created:     2019/07/02
-# Copyright:   YC @ Singtel Cyber Security Research & Development Laboratory
-# License:     YC
+# Version:     v0.1
+# Created:     2023/05/26
+# Copyright:   
+# License:     
 #-----------------------------------------------------------------------------
+
 import math
 import metroEmuGobal as gv
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class AgentTarget(object):
-    """ Create a agent target to generate all the element in the railway system, 
-        all the other 'things' in the system will inheritance from this module.
+    """ Create a agent target to generate all the elements in the metro system, 
+        all the other 'things' in the system will be inheritance from this module.
     """
     def __init__(self, parent, tgtID, pos, tType):
         self.parent = parent
@@ -47,12 +52,13 @@ class AgentTarget(object):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class AgentSensors(AgentTarget):
-    """ Creat the sensors set to show the sensors detection state."""
-    def __init__(self, parent, idx, pos, plc=None):
+    """ The sensors set to show the sensors detection state."""
+    def __init__(self, parent, idx, pos):
         AgentTarget.__init__(self, parent, idx, pos, gv.SENSOR_TYPE)
         self.sensorsCount = len(self.pos)
-        self.stateList = [0]*self.sensorsCount
+        self.stateList = [0]*self.sensorsCount # elements state: 1-triggered, 0-not triggered.
 
+#-----------------------------------------------------------------------------
     def getSensorCount(self):
         return self.sensorsCount
 
@@ -64,32 +70,46 @@ class AgentSensors(AgentTarget):
         return idxList
 
 #-----------------------------------------------------------------------------
+    def getSensorState(self, idx):
+        return self.stateList[idx]
+
+#-----------------------------------------------------------------------------
+    def getSensorsState(self):
+        return self.stateList
+
+#-----------------------------------------------------------------------------
+    def setSensorState(self, idx, state):
+        """ Set one sensor's state with a index in the sensor list.
+            Args:
+                idx (int): sensor index.
+                state (int): 0/1
+        """
+        if idx >= self.sensorsCount: return False
+        self.stateList[idx] = state
+        return True
+
+#-----------------------------------------------------------------------------
     def updateActive(self, trainList):
+        """ Update the sensor triggered state based on the trains position.
+
+            Args:
+                trainList (list(<AgentTrain>)): _description_
+        """
         for i in range(self.sensorsCount):
             self.stateList[i] = 0
             x, y = self.pos[i]
             for trainObj in trainList:
                 (u, d, l, r) = trainObj.getTrainArea()
-                if l <= x <= r and u <= y <= d:self.stateList[i] = 1
+                if l <= x <= r and u <= y <= d: 
+                    self.stateList[i] = 1
+                    break
         
-#--AgentSensor-----------------------------------------------------------------
-    def setSensorState(self, idx, state):
-        """ Set sensor status, flag(int) 0-OFF 1~9 ON"""
-        self.stateList[idx] = state
-
-    def getSensorState(self, idx):
-        return self.stateList[idx]
-
-#--AgentSensor-----------------------------------------------------------------
-    def getSensorsState(self):
-        return self.stateList
-
-
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class AgentSignal(AgentTarget):
     def __init__(self, parent, tgtID, pos, dir=0, tType=gv.SINGAL_TYPE):
-        """_summary_
+        """ One signal object to control whether a train can pass/be-blocked at 
+            the intersection. 
         Args:
             parent (_type_): _description_
             tgtID (_type_): _description_
@@ -98,36 +118,43 @@ class AgentSignal(AgentTarget):
             tType (_type_, optional): _description_. Defaults to gv.SINGAL_TYPE.
         """
         super().__init__(parent, tgtID, pos, tType)
-        self.signalOn = False
-        self.dir = dir # direction on map.
+        self.signalOn = False # signal on (True): train stop, signal off(False): train pass  
+        self.dir = dir # signal indicator's direction on map. 0-up, 1-down, 2-left, 3-right
         self.triggerOnSenAgent = None
-        self.triggerOnIdx= None
+        self.triggerOnIdx = None
         self.triggerOffSenAgent = None
-        self.triggerOffIdx=None
+        self.triggerOffIdx = None
 
+#-----------------------------------------------------------------------------
+    def getState(self):
+        return self.signalOn
+
+#-----------------------------------------------------------------------------
     def setTriggerOnSensors(self, sensorAgent, idxList):
         self.triggerOnSenAgent = sensorAgent
         self.triggerOnIdx = idxList
 
+#-----------------------------------------------------------------------------
     def setTriggerOffSensors(self, sensorAgent, idxList):
         self.triggerOffSenAgent = sensorAgent
         self.triggerOffIdx = idxList
 
+#-----------------------------------------------------------------------------
     def setState(self, state):
         self.signalOn = state
 
-    def getState(self):
-        return self.signalOn
-
+#-----------------------------------------------------------------------------
     def updateSingalState(self):
         if self.signalOn:
             for idx in self.triggerOnIdx:
-                if self.triggerOffSenAgent.getSensorState(idx):
+                if self.triggerOffSenAgent.getSensorState(idx): 
                     self.signalOn = False
+                    break
         else:
             for idx in self.triggerOffIdx:
                 if self.triggerOffSenAgent.getSensorState(idx):
                     self.signalOn =True
+                    break
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -170,11 +197,6 @@ class AgentTrain(AgentTarget):
         return math.pi-math.atan2(x, y) 
 
 #-----------------------------------------------------------------------------
-    def setNextPtIdx(self, nextPtIdx):
-        if nextPtIdx < len(self.railwayPts): 
-            self.trainDistList = [nextPtIdx]*len(self.pos)
-
-#-----------------------------------------------------------------------------
     def initDir(self, nextPtIdx):
         if nextPtIdx < len(self.railwayPts): 
             self.trainDistList = [nextPtIdx]*len(self.pos)
@@ -186,10 +208,15 @@ class AgentTrain(AgentTarget):
 #-----------------------------------------------------------------------------
     def getDirs(self):
         return self.dirs 
-    
+
+#-----------------------------------------------------------------------------
+    def setNextPtIdx(self, nextPtIdx):
+        if nextPtIdx < len(self.railwayPts): 
+            self.trainDistList = [nextPtIdx]*len(self.pos)
+
 #-----------------------------------------------------------------------------
     def getTrainArea(self):
-        """ Get the area train covered on the map."""
+        """ Get the area train covered area on the map."""
         h, t = self.pos[0], self.pos[-1]
         left, right = min(h[0], t[0])-5, max(h[0], t[0])+5
         up, down = min(h[1], t[1])-5, max(h[1], t[1])+5
@@ -226,16 +253,12 @@ class AgentTrain(AgentTarget):
                 # temp add make the behing train wait
                 self.setDockCount(ftDockCount+10)
 
-
-    def CheckSignal(self, signalList):
+#--AgentTrain------------------------------------------------------------------
+    def checkSignal(self, signalList):
         for singalObj in signalList:
             x, y = singalObj.getPos()
-            if self.checkNear(x, y, 20): 
-                if singalObj.getState():
-                    if not self.emgStop:
-                        self.emgStop = True
-                else:
-                    if self.emgStop: self.emgStop = False
+            if self.checkNear(x, y, 20):
+                self.emgStop = singalObj.getState()
                 break
 
 #--AgentTrain------------------------------------------------------------------

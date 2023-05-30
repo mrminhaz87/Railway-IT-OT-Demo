@@ -47,6 +47,7 @@ TRAIN_TYPE = 'Train'
 SENSOR_TYPE = 'SS'
 SINGAL_TYPE = "SG"
 
+PERIODIC = 300      # update the main in every 300ms
 
 gTrainImgB = os.path.join(dirpath, IMG_FD, "train.png")
 gTrainImgH = os.path.join(dirpath, IMG_FD, "trainhead2.png")

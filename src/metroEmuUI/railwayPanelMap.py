@@ -14,11 +14,8 @@
 import wx
 import math
 
-from datetime import datetime
 import metroEmuGobal as gv
 import railwayMgr as dataMgr
-
-
 
 DEF_PNL_SIZE = (1600, 900)
 
@@ -35,7 +32,7 @@ class PanelMap(wx.Panel):
         gv.iMapMgr = self.mapMgr = dataMgr.MapMgr(self)
 
         self.Bind(wx.EVT_PAINT, self.onPaint)
-        #self.Bind(wx.EVT_LEFT_DOWN, self.onLeftClick)
+        # self.Bind(wx.EVT_LEFT_DOWN, self.onLeftClick)
         
         # Set the panel double buffer.
         self.SetDoubleBuffered(True)  # Avoid the panel flash during update.
@@ -68,7 +65,6 @@ class PanelMap(wx.Panel):
         fromPt, toPt = trackBPts[0], trackBPts[-1]
         dc.DrawLine(fromPt[0], fromPt[1], toPt[0], toPt[1])
 
-
         trackC = gv.iMapMgr.getTrackC()
         dc.SetPen(wx.Pen(trackC['color'], width=4, style=wx.PENSTYLE_SOLID))
         trackCPts = trackC['points']
@@ -87,9 +83,7 @@ class PanelMap(wx.Panel):
         clashPt = None
         # Draw the train1 on the map.
 
-        #dc.SetPen(wx.Pen(wx.Colour(52, 169, 129)))
-
-        
+        # dc.SetPen(wx.Pen(wx.Colour(52, 169, 129)))
         # dirList = self.mapMgr.trainA.getDirs()
         # #bitmap = wx.Bitmap(gv.gTrainImgB)
         # gc = wx.GraphicsContext.Create(dc)
@@ -201,6 +195,5 @@ class PanelMap(wx.Panel):
         """ periodicly call back to do needed calcualtion/panel update"""
         # Update the mapManger's periodic function.
         self.mapMgr.periodic(now)
-
         # Call the onPaint to update the map display.
         self.updateDisplay()

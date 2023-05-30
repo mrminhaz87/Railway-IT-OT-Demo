@@ -2,23 +2,23 @@
 #-----------------------------------------------------------------------------
 # Name:        MetroEmuRun.py
 #
-# Purpose:     This module is used as a sample to create the main wx frame.
+# Purpose:     This module is the main wx-frame for the metro railway and signal
+#              sysetm emulator.
 #
 # Author:      Yuancheng Liu
 #
-# Created:     2019/01/10
-# Copyright:   YC @ Singtel Cyber Security Research & Development Laboratory
-# License:     YC
+# Version:     v0.1
+# Created:     2023/05/26
+# Copyright:   
+# License:     
 #-----------------------------------------------------------------------------
-import os
-import sys
+
 import time
 import wx
 import metroEmuGobal as gv
 import railwayPanelMap as pnlMap
 import uiPanel as pl
 
-PERIODIC = 300      # update in every 500ms
 FRAME_SIZE = (1800, 1000)
 
 #-----------------------------------------------------------------------------
@@ -29,10 +29,9 @@ class UIFrame(wx.Frame):
         """ Init the UI and parameters """
         wx.Frame.__init__(self, parent, id, title, size=FRAME_SIZE)
         # No boader frame:
-        #wx.Frame.__init__(self, parent, id, title, style=wx.MINIMIZE_BOX | wx.STAY_ON_TOP)
+        # wx.Frame.__init__(self, parent, id, title, style=wx.MINIMIZE_BOX | wx.STAY_ON_TOP)
         # self.SetBackgroundColour(wx.Colour(30, 40, 62))
         self.SetBackgroundColour(wx.Colour(200, 210, 200))
-        
         #self.SetTransparent(gv.gTranspPct*255//100)
         self.SetIcon(wx.Icon(gv.ICO_PATH))
         # Build UI sizer
@@ -42,7 +41,7 @@ class UIFrame(wx.Frame):
         self.timer = wx.Timer(self)
         self.updateLock = False
         self.Bind(wx.EVT_TIMER, self.periodic)
-        self.timer.Start(PERIODIC)  # every 500 ms
+        self.timer.Start(gv.PERIODIC)
 
 #--UIFrame---------------------------------------------------------------------
     def _buidUISizer(self):
@@ -58,7 +57,6 @@ class UIFrame(wx.Frame):
         mSizer.AddSpacer(5)
         gv.iMapPanel = self.mapPanel = pnlMap.PanelMap(self)
         mSizer.Add(self.mapPanel, flag=flagsR, border=2)
-
         return mSizer
 
 #--UIFrame---------------------------------------------------------------------
