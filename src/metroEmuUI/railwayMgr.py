@@ -2,9 +2,9 @@
 #-----------------------------------------------------------------------------
 # Name:        railwayMgr.py
 #
-# Purpose:     This function is the railway function manager to connect the 
-#              agent element with their control panel.
-#
+# Purpose:     The management module to control all the components on the map 
+#              and update the components state. 
+# 
 # Author:      Yuancheng Liu
 #
 # Version:     v0.1
@@ -12,6 +12,7 @@
 # Copyright:   
 # License:     
 #-----------------------------------------------------------------------------
+
 import wx
 import metroEmuGobal as gv
 import railwayAgent as agent
@@ -24,6 +25,7 @@ class MapMgr(object):
         """ Init all the element on the map. All the parameters are public to 
             other module.
         """
+        self.tracks = {}
         self.trains = {}
         self.sensors = {}
         self.signals = {}
@@ -48,6 +50,7 @@ class MapMgr(object):
                        (900, 800),(900, 400), (1550, 400), (1550, 450), (950, 450), 
                        (950, 850), (550, 850), (550, 650),(50, 650)]
             }
+        self.tracks['weline'] = self.trackA
         trackATrainCfg = [  {'id': 'we01', 'head': (50, 200), 'nextPtIdx': 1, 'len': 5}, 
                             {'id': 'we02', 'head': (1500, 400),'nextPtIdx': 7, 'len': 5},
                             {'id': 'we03', 'head': (460, 600), 'nextPtIdx': 3, 'len': 5},
@@ -64,6 +67,7 @@ class MapMgr(object):
             'points': [(300, 50), (1200, 50), (1200, 300), (800, 300), (800, 600), (700, 600), 
                        (700, 100), (400, 100), (400, 450), (300, 450)]
         }
+        self.tracks['nsline'] = self.trackB
         trackBTrainCfg = [  {'id': 'ns01', 'head': (400, 50), 'nextPtIdx': 1, 'len': 4},
                             {'id': 'ns02', 'head': (1100, 300), 'nextPtIdx': 3, 'len': 4},
                             {'id': 'ns03', 'head': (600, 100), 'nextPtIdx': 7, 'len': 4}]
@@ -78,6 +82,7 @@ class MapMgr(object):
             'type': gv.RAILWAY_TYPE_CYCLE,
             'points': [(200, 200), (1400, 200), (1400, 700), (200, 700)]
         }
+        self.tracks['ccline'] = self.trackC
         trackCTrainCfg = [  {'id': 'cc01', 'head': (800, 200), 'nextPtIdx': 1, 'len': 6},
                             {'id': 'cc02', 'head': (300, 700), 'nextPtIdx': 3, 'len': 6},
                             {'id': 'cc03', 'head': (1300, 700), 'nextPtIdx': 3, 'len': 6}]
@@ -166,14 +171,6 @@ class MapMgr(object):
         self.signals['ccline'] = self.tCsignals
 
 #-----------------------------------------------------------------------------
-    def getSignals(self):
-        return self.signals
-
-#-----------------------------------------------------------------------------
-    def getSensors(self):
-        return self.sensors
-
-#-----------------------------------------------------------------------------
     def _getTrainsList(self, trainCfg, trackPts):
         trainList = []
         for trainInfo in trainCfg:
@@ -181,22 +178,27 @@ class MapMgr(object):
             headPos = trainInfo['head']
             tLength = trainInfo['len']
             trainObj = agent.AgentTrain(self, trainID, headPos, trackPts, trainLen=tLength)
-            trainObj.setNextPtIdx(trainInfo['nextPtIdx'])
+            #trainObj.setNextPtIdx(trainInfo['nextPtIdx'])
             trainList.append(trainObj)
         return trainList
 
 #-----------------------------------------------------------------------------
-    def getTrains(self):
+
+    def getTracks(self, trackID=None):
+        if trackID and trackID in self.tracks.keys(): return self.tracks[trackID]
+        return self.tracks
+
+    def getTrains(self, trackID=None):
+        if trackID and trackID in self.trains.keys(): return self.trains[trackID]
         return self.trains
 
-    def getTrackA(self):
-        return self.trackA
-        
-    def getTrackB(self):
-        return self.trackB
-    
-    def getTrackC(self):
-        return self.trackC
+    def getSignals(self, trackID=None):
+        if trackID and trackID in self.signals.keys(): return self.signals[trackID]
+        return self.signals
+
+    def getSensors(self, trackID=None):
+        if trackID and trackID in self.sensors.keys(): return self.sensors[trackID]
+        return self.sensors
     
 #-----------------------------------------------------------------------------
     def periodic(self , now):

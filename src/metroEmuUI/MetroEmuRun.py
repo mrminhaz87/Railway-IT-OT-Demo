@@ -42,6 +42,7 @@ class UIFrame(wx.Frame):
         self.updateLock = False
         self.Bind(wx.EVT_TIMER, self.periodic)
         self.timer.Start(gv.PERIODIC)
+        gv.gDebugPrint("Metro real world main frame inited.", logType=gv.LOG_INFO)
 
 #--UIFrame---------------------------------------------------------------------
     def _buidUISizer(self):

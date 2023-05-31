@@ -49,6 +49,14 @@ SINGAL_TYPE = "SG"
 
 PERIODIC = 300      # update the main in every 300ms
 
+# Init the log type parameters.
+DEBUG_FLG   = False
+LOG_INFO    = 0
+LOG_WARN    = 1
+LOG_ERR     = 2
+LOG_EXCEPT  = 3
+
+
 gTrainImgB = os.path.join(dirpath, IMG_FD, "train.png")
 gTrainImgH = os.path.join(dirpath, IMG_FD, "trainhead2.png")
 
@@ -57,6 +65,18 @@ gTrainImgH = os.path.join(dirpath, IMG_FD, "trainhead2.png")
 gTranspPct = 70     # Windows transparent percentage.
 gUpdateRate = 1     # main frame update rate 1 sec.
 gSensorCount = 0    # number of sensors.
+
+
+def gDebugPrint(msg, prt=True, logType=None):
+    if prt: print(msg)
+    if logType == LOG_WARN:
+        Log.warning(msg)
+    elif logType == LOG_ERR:
+        Log.error(msg)
+    elif logType == LOG_EXCEPT:
+        Log.exception(msg)
+    elif logType == LOG_INFO or DEBUG_FLG:
+        Log.info(msg)
 
 
 

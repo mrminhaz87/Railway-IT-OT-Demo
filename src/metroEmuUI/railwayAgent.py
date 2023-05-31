@@ -185,11 +185,26 @@ class AgentTrain(AgentTarget):
         self.traindir = 1   # follow the railway point with increase order.
         # self.pos = [pos[0]]*5
         # The train next distination index for each train body.
-        self.trainDistList = [0]*len(self.pos) # distination idx for each train body.
+        # self.trainDistList = [0]*len(self.pos) # destination idx for each train body.
+        self.trainDistList = self._getDestList(initPos)
         self.trainSpeed = trainSpeed    # train speed: pixel/periodic loop
         self.dockCount = 0      # time to stop in the station.
         self.emgStop = False    # emergency stop.
 
+#-----------------------------------------------------------------------------
+    def _getDestList(self, initPos):
+        """ Get the target points index automatically based on current train pos.
+            Returns:
+                _type_: _description_
+        """
+        (x0, y0) = initPos
+        for idx in range(len(self.railwayPts)-1):
+            x1, y1 = self.railwayPts[idx]
+            x2, y2 = self.railwayPts[idx+1]
+            if x1 == x0 == x2 or y1 == y0 == y2:
+                return [idx+1]*len(self.pos)
+        return [0]*len(self.pos)
+            
 #-----------------------------------------------------------------------------
     def _getDirc(self, srcPt, destPt):
         x = destPt[0] - srcPt[0]

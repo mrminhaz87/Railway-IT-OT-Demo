@@ -44,37 +44,14 @@ class PanelMap(wx.Panel):
         dc.SetBrush(wx.Brush(wx.Colour(30, 40, 62)))
         #dc.DrawBitmap(wx.Bitmap(gv.BGPNG_PATH), 1, 1) 
         dc.DrawRectangle(0, 0, w, h)
-        # draw the tracks
-        trackA = gv.iMapMgr.getTrackA()
-        dc.SetPen(wx.Pen(trackA['color'], width=4, style=wx.PENSTYLE_SOLID))
-        trackAPts = trackA['points']
-
-        for i in range(len(trackAPts)-1):
-            fromPt, toPt = trackAPts[i], trackAPts[i+1]
-            dc.DrawLine(fromPt[0], fromPt[1], toPt[0], toPt[1])
-        fromPt, toPt = trackAPts[0], trackAPts[-1]
-        if trackA['type'] == gv.RAILWAY_TYPE_CYCLE: dc.DrawLine(fromPt[0], fromPt[1], toPt[0], toPt[1])
-
-        trackB = gv.iMapMgr.getTrackB()
-        dc.SetPen(wx.Pen(trackB['color'], width=4, style=wx.PENSTYLE_SOLID))
-        trackBPts = trackB['points']
-
-        for i in range(len(trackBPts)-1):
-            fromPt, toPt = trackBPts[i], trackBPts[i+1]
-            dc.DrawLine(fromPt[0], fromPt[1], toPt[0], toPt[1])
-        fromPt, toPt = trackBPts[0], trackBPts[-1]
-        dc.DrawLine(fromPt[0], fromPt[1], toPt[0], toPt[1])
-
-        trackC = gv.iMapMgr.getTrackC()
-        dc.SetPen(wx.Pen(trackC['color'], width=4, style=wx.PENSTYLE_SOLID))
-        trackCPts = trackC['points']
-
-        for i in range(len(trackCPts)-1):
-            fromPt, toPt = trackCPts[i], trackCPts[i+1]
-            dc.DrawLine(fromPt[0], fromPt[1], toPt[0], toPt[1])
-        fromPt, toPt = trackCPts[0], trackCPts[-1]
-        dc.DrawLine(fromPt[0], fromPt[1], toPt[0], toPt[1])
-
+        for key, trackInfo in gv.iMapMgr.getTracks().items():
+            dc.SetPen(wx.Pen(trackInfo['color'], width=4, style=wx.PENSTYLE_SOLID))
+            trackPts = trackInfo['points']
+            for i in range(len(trackPts)-1):
+                fromPt, toPt = trackPts[i], trackPts[i+1]
+                dc.DrawLine(fromPt[0], fromPt[1], toPt[0], toPt[1])
+            fromPt, toPt = trackPts[0], trackPts[-1]
+            if trackInfo['type'] == gv.RAILWAY_TYPE_CYCLE: dc.DrawLine(fromPt[0], fromPt[1], toPt[0], toPt[1])
 
 #--PanelMap--------------------------------------------------------------------
     def _drawTrains_old(self, dc):
