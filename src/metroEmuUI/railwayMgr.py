@@ -13,6 +13,7 @@
 # License:     
 #-----------------------------------------------------------------------------
 
+import os
 import wx
 import metroEmuGobal as gv
 import railwayAgent as agent
@@ -30,11 +31,13 @@ class MapMgr(object):
         self.sensors = {}
         self.signals = {}
         self.stations = {}
+        self.envItems = []
 
         self._initTT()
         self._initSensors()
         self._initSignal()
         self._initStation()
+        self._initEnv()
 
 #-----------------------------------------------------------------------------
     def _initTT(self):
@@ -211,8 +214,6 @@ class MapMgr(object):
             self.tBStations.append(station)
         self.stations['nsline'] = self.tBStations
 
-
-
         trackCStationCfg = [ {'id':'Buona_Vsta', 'pos': (320, 700)}, 
                              {'id':'Farrer Road', 'pos': (200, 300)}, 
                              {'id':'Serangoon', 'pos': (930, 200)}, 
@@ -225,6 +226,20 @@ class MapMgr(object):
             station.bindTrains(self.trackCTrains)
             self.tCStations.append(station)
         self.stations['ccline'] = self.tCStations
+#-----------------------------------------------------------------------------
+    def _initEnv(self):
+
+        envCfg = [ {'id':'Tuas Industry Area', 'img':'factory_0.png', 'pos':(80, 80) ,  'size':(120, 120)},
+                   {'id':'Changgi Airport', 'img':'airport.jpg', 'pos':(1500, 240) ,  'size':(160, 100)},
+                   {'id':'JurongEast-Jem', 'img':'city_0.png', 'pos':(360, 520) ,  'size':(80, 80)},
+                   {'id':'CityHall-01', 'img':'city_2.png', 'pos':(750, 520) ,  'size':(90, 80)},
+                   {'id':'CityHall-02', 'img':'city_1.png', 'pos':(850, 500) ,  'size':(80, 60)}]
+        for info in envCfg:
+            imgPath = os.path.join(gv.IMG_FD, info['img'])
+            if os.path.exists(imgPath):
+                bitmap = wx.Bitmap(imgPath)
+                building = agent.agentEnv(self, info['id'], info['pos'], bitmap, info['size'] )
+                self.envItems.append(building)
 
 #-----------------------------------------------------------------------------
     def _getTrainsList(self, trainCfg, trackPts):
@@ -239,6 +254,9 @@ class MapMgr(object):
         return trainList
 
 #-----------------------------------------------------------------------------
+
+    def getEnvItems(self):
+        return self.envItems
 
     def getTracks(self, trackID=None):
         if trackID and trackID in self.tracks.keys(): return self.tracks[trackID]

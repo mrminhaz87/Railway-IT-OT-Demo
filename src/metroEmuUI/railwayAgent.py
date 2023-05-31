@@ -13,7 +13,7 @@
 # Copyright:   
 # License:     
 #-----------------------------------------------------------------------------
-
+import os
 import math
 import metroEmuGobal as gv
 
@@ -48,6 +48,21 @@ class AgentTarget(object):
         """
         dist = math.sqrt((self.pos[0] - posX)**2 + (self.pos[1] - posY)**2)
         return dist <= threshold
+
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+class agentEnv(AgentTarget):
+    def __init__(self, parent, tgtID, pos, wxBitMap, size ,tType=gv.ENV_TYPE):
+        super().__init__(parent, tgtID, pos, tType)
+        # build Icon: https://www.freepik.com/premium-vector/isometric-modern-supermarket-buildings-set_10094282.htm
+        self.bitmap = wxBitMap
+        self.size = size
+    
+    def getSize(self):
+        return self.size
+
+    def getWxBitmap(self):
+        return self.bitmap
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

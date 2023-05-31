@@ -38,6 +38,19 @@ class PanelMap(wx.Panel):
         self.SetDoubleBuffered(True)  # Avoid the panel flash during update.
 
 #-----------------------------------------------------------------------------
+    def _drawEnvItems(self, dc):
+        dc.SetPen(self.dcDefPen)
+        dc.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+        dc.SetTextForeground(wx.Colour('White'))
+        for item in gv.iMapMgr.getEnvItems():
+            id = item.getID()
+            pos = item.getPos()
+            bitmap = item.getWxBitmap()
+            size = item.getSize()
+            dc.DrawBitmap(bitmap, pos[0]-size[0]//2, pos[1]-size[1]//2)
+            dc.DrawText(str(id), pos[0]-size[0]//2, pos[1]-size[1]//2-15)
+
+#-----------------------------------------------------------------------------
     def _drawRailWay(self, dc):
         """ Draw the background and the railway."""
         w, h = self.panelSize
@@ -142,6 +155,7 @@ class PanelMap(wx.Panel):
                 dc.SetBrush(wx.Brush(color))
                 dc.DrawRectangle(x-5, y-5, 10, 10)
 
+#-----------------------------------------------------------------------------
     def _drawStation(self, dc):
         dc.SetPen(self.dcDefPen)
         dc.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
@@ -169,6 +183,7 @@ class PanelMap(wx.Panel):
         self._drawSensors(dc)
         self._drawSignals(dc)
         self._drawStation(dc)
+        self._drawEnvItems(dc)
 
     def updateDisplay(self, updateFlag=None):
         """ Set/Update the display: if called as updateDisplay() the function will 

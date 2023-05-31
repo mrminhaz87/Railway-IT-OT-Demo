@@ -37,9 +37,9 @@ import Log
 Log.initLogger(gTopDir, 'Logs', APP_NAME[0], APP_NAME[1], historyCnt=100, fPutLogsUnderDate=True)
 
 #------<IMAGES PATH>-------------------------------------------------------------
-IMG_FD = 'img'
-ICO_PATH = os.path.join(dirpath, IMG_FD, "geoIcon.ico")
-BGIMG_PATH = os.path.join(dirpath, IMG_FD, "SampleImg.png")
+IMG_FD = os.path.join(dirpath, 'img')
+ICO_PATH = os.path.join(IMG_FD, "geoIcon.ico")
+BGIMG_PATH = os.path.join(IMG_FD, "SampleImg.png")
 
 RAILWAY_TYPE_LINE = 'RW_L'
 RAILWAY_TYPE_CYCLE = 'RW_C'
@@ -47,6 +47,7 @@ TRAIN_TYPE = 'Train'
 SENSOR_TYPE = 'SS'
 SINGAL_TYPE = "SG"
 STATION_TYPE = 'ST'
+ENV_TYPE = 'ENV'
 
 PERIODIC = 300      # update the main in every 300ms
 
