@@ -46,6 +46,7 @@ RAILWAY_TYPE_CYCLE = 'RW_C'
 TRAIN_TYPE = 'Train'
 SENSOR_TYPE = 'SS'
 SINGAL_TYPE = "SG"
+STATION_TYPE = 'ST'
 
 PERIODIC = 300      # update the main in every 300ms
 
@@ -56,6 +57,12 @@ LOG_WARN    = 1
 LOG_ERR     = 2
 LOG_EXCEPT  = 3
 
+# Init the UI layout flags:
+LAY_U = 0 
+LAY_D = 1
+LAY_L = 2
+LAY_R = 3
+LAY_C = 4
 
 gTrainImgB = os.path.join(dirpath, IMG_FD, "train.png")
 gTrainImgH = os.path.join(dirpath, IMG_FD, "trainhead2.png")

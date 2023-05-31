@@ -81,20 +81,16 @@ class PanelMap(wx.Panel):
 
 #-----------------------------------------------------------------------------
     def _drawTrains(self, dc):
-        """ Draw the 2 trains on the map."""
+        """ Draw the trains on the map."""
         dc.SetPen(self.dcDefPen)
         clashPt = None
-        # Draw the train1 on the map.
-
-        #dc.SetPen(wx.Pen(wx.Colour(52, 169, 129)))
-        #trainColor = 'RED' if self.mapMgr.trainA.emgStop else '#CE8349'
-        #dc.SetBrush(wx.Brush(trainColor))
+        # Draw the trains on the map.
         trainDict = gv.iMapMgr.getTrains()
-        for key, val in trainDict.items(): 
+        for key, val in trainDict.items():
             for train in val:
-                trainColor = 'RED' if train.emgStop else 'GREEN'
+                trainColor = '#CE8349' if train.emgStop else 'GREEN'
                 dc.SetBrush(wx.Brush(trainColor))
-                for point in  train.getPos():
+                for point in train.getPos():
                     dc.DrawRectangle(point[0]-5, point[1]-5, 10, 10)
 
 #-----------------------------------------------------------------------------
@@ -133,18 +129,33 @@ class PanelMap(wx.Panel):
                 color = 'RED' if state else 'GREEN'
                 dc.SetPen(wx.Pen(color, width=2, style=wx.PENSTYLE_SOLID))
                 x, y = pos[0], pos[1]
-                if dir == 0:
+                if dir == gv.LAY_U:
                     y -= 15 
-                elif dir ==1:
+                elif dir == gv.LAY_D:
                     y += 15
-                elif dir == 2:
+                elif dir == gv.LAY_L:
                     x -= 15
-                elif dir == 3:
+                elif dir == gv.LAY_R:
                     x += 15
                 dc.DrawLine(pos[0], pos[1], x, y)
                 dc.DrawText("S"+str(id), x-10, y-25)
                 dc.SetBrush(wx.Brush(color))
                 dc.DrawRectangle(x-5, y-5, 10, 10)
+
+    def _drawStation(self, dc):
+        dc.SetPen(self.dcDefPen)
+        dc.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+        dc.SetBrush(wx.Brush('Blue'))
+        for key, stations in gv.iMapMgr.selfStations().items():
+            colorCode = gv.iMapMgr.getTracks(trackID=key)['color']
+            dc.SetBrush(wx.Brush(colorCode))
+            dc.SetTextForeground(colorCode)
+            for station in stations:
+                id = station.getID()
+                pos = station.getPos()
+                x, y = pos[0], pos[1]
+                dc.DrawCircle(x, y, 8)
+                dc.DrawText(str(id), x-10, y-25)
 
     #--PanelMap--------------------------------------------------------------------
     def onPaint(self, event):
@@ -157,6 +168,7 @@ class PanelMap(wx.Panel):
         self._drawTrains(dc)
         self._drawSensors(dc)
         self._drawSignals(dc)
+        self._drawStation(dc)
 
     def updateDisplay(self, updateFlag=None):
         """ Set/Update the display: if called as updateDisplay() the function will 

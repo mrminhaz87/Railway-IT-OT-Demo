@@ -105,6 +105,24 @@ class AgentSensors(AgentTarget):
                     break
         
 #-----------------------------------------------------------------------------
+class AgentStation(AgentTarget):
+    def __init__(self, parent, tgtID, pos, layout=gv.LAY_U):
+        super().__init__(parent, tgtID, pos, gv.STATION_TYPE)
+        self.dockCount = 10 # default the train will dock in the station.
+        self.trainList = []
+    
+    def bindTrains(self, TrainList):
+        self.trainList = TrainList
+
+    def updateTrainSDock(self):
+        if len(self.trainList) == 0: return
+        for train in self.trainList:
+            midPt = train.getTrainPos(idx=2)
+            if self.checkNear(midPt[0], midPt[1], 5):
+                if train.getDockCount() == 0: train.setDockCount(self.dockCount)
+                break
+
+#-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class AgentSignal(AgentTarget):
     def __init__(self, parent, tgtID, pos, dir=0, tType=gv.SINGAL_TYPE):
@@ -276,8 +294,12 @@ class AgentTrain(AgentTarget):
                 self.emgStop = singalObj.getState()
                 break
 
+    def getTrainLength(self):
+        return self.trainLen
+
 #--AgentTrain------------------------------------------------------------------
     def getTrainPos(self, idx=None):
+        if isinstance(idx, int) and idx < self.trainLen: return self.pos[idx]
         return self.pos
 
 #--AgentTrain------------------------------------------------------------------
@@ -305,7 +327,7 @@ class AgentTrain(AgentTarget):
     def updateTrainPos(self):
         """ Update the current train positions on the map."""
         if self.emgStop: return
-        if self.dockCount == 0:
+        if self.dockCount == 0 or self.dockCount ==1:
             # Train running on the railway:
             for i, trainPt in enumerate(self.pos):
                 # The next railway point idx train going to approch.
@@ -324,6 +346,7 @@ class AgentTrain(AgentTarget):
                     scale = float(self.trainSpeed)/float(dist)
                     trainPt[0] += int((nextPt[0]-trainPt[0])*scale)
                     trainPt[1] += int((nextPt[1]-trainPt[1])*scale)
+            if self.dockCount == 1: self.dockCount -= 1
 
         else:  # Train stop at the station.
             self.dockCount -= 1

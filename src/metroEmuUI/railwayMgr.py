@@ -29,10 +29,12 @@ class MapMgr(object):
         self.trains = {}
         self.sensors = {}
         self.signals = {}
+        self.stations = {}
 
         self._initTT()
         self._initSensors()
         self._initSignal()
+        self._initStation()
 
 #-----------------------------------------------------------------------------
     def _initTT(self):
@@ -119,56 +121,110 @@ class MapMgr(object):
     def _initSignal(self):
         # Set all the signal on track A
         trackASignalConfig = [
-            {'id': 'we-0', 'pos':(160, 600), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':(13,), 'offIdx':(12,) }, 
-            {'id': 'we-1', 'pos':(240, 650), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':(13,), 'offIdx':(12,) },
-            {'id': 'we-3', 'pos':(600, 660), 'dir': 3, 'tiggerS': self.tCsensors, 'onIdx':(11,), 'offIdx':(10,) },
-            {'id': 'we-4', 'pos':(550, 740), 'dir': 2, 'tiggerS': self.tCsensors, 'onIdx':(11,), 'offIdx':(10,) },
-            {'id': 'we-5', 'pos':(900, 740), 'dir': 2, 'tiggerS': self.tCsensors, 'onIdx':(9,), 'offIdx':(8,) },
-            {'id': 'we-6', 'pos':(950, 660), 'dir': 3, 'tiggerS': self.tCsensors, 'onIdx':(9,), 'offIdx':(8,) },
-            {'id': 'we-7', 'pos':(1360, 400), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':(7,), 'offIdx':(6,) },
-            {'id': 'we-8', 'pos':(1440, 450), 'dir': 0, 'tiggerS': self.tCsensors, 'onIdx':(7,), 'offIdx':(6,) },
+            {'id': 'we-0', 'pos':(160, 600), 'dir': gv.LAY_U, 'tiggerS': self.tCsensors, 'onIdx':(13,), 'offIdx':(12,) }, 
+            {'id': 'we-1', 'pos':(240, 650), 'dir': gv.LAY_U, 'tiggerS': self.tCsensors, 'onIdx':(13,), 'offIdx':(12,) },
+            {'id': 'we-3', 'pos':(600, 660), 'dir': gv.LAY_R, 'tiggerS': self.tCsensors, 'onIdx':(11,), 'offIdx':(10,) },
+            {'id': 'we-4', 'pos':(550, 740), 'dir': gv.LAY_L, 'tiggerS': self.tCsensors, 'onIdx':(11,), 'offIdx':(10,) },
+            {'id': 'we-5', 'pos':(900, 740), 'dir': gv.LAY_L, 'tiggerS': self.tCsensors, 'onIdx':(9,), 'offIdx':(8,) },
+            {'id': 'we-6', 'pos':(950, 660), 'dir': gv.LAY_R, 'tiggerS': self.tCsensors, 'onIdx':(9,), 'offIdx':(8,) },
+            {'id': 'we-7', 'pos':(1360, 400), 'dir': gv.LAY_U, 'tiggerS': self.tCsensors, 'onIdx':(7,), 'offIdx':(6,) },
+            {'id': 'we-8', 'pos':(1440, 450), 'dir': gv.LAY_U, 'tiggerS': self.tCsensors, 'onIdx':(7,), 'offIdx':(6,) },
         ]
         self.tAsignals = []
-        for Info in trackASignalConfig:
-            signal = agent.AgentSignal(self, Info['id'], Info['pos'], dir=Info['dir'])
-            signal.setTriggerOnSensors(Info['tiggerS'], Info['onIdx'])
-            signal.setTriggerOffSensors(Info['tiggerS'], Info['offIdx'])
+        for info in trackASignalConfig:
+            signal = agent.AgentSignal(self, info['id'], info['pos'], dir=info['dir'])
+            signal.setTriggerOnSensors(info['tiggerS'], info['onIdx'])
+            signal.setTriggerOffSensors(info['tiggerS'], info['offIdx'])
             self.tAsignals.append(signal)
         self.signals['weline'] = self.tAsignals
         
         # Set all the signal on trackB
         trackBSignalConfig = [
-            {'id': 'ns-0', 'pos':(300, 240), 'dir': 2, 'tiggerS': self.tCsensors, 'onIdx':(1,), 'offIdx':(0,) },
-            {'id': 'ns-2', 'pos':(400, 160), 'dir': 3, 'tiggerS': self.tCsensors, 'onIdx':(1,), 'offIdx':(0,) },
-            {'id': 'ns-3', 'pos':(700, 240), 'dir': 3, 'tiggerS': self.tCsensors, 'onIdx':(3,), 'offIdx':(2,) },
-            {'id': 'ns-4', 'pos':(1200, 160), 'dir': 3, 'tiggerS': self.tCsensors, 'onIdx':(5,), 'offIdx':(4,) },
+            {'id': 'ns-0', 'pos':(300, 240), 'dir': gv.LAY_L, 'tiggerS': self.tCsensors, 'onIdx':(1,), 'offIdx':(0,) },
+            {'id': 'ns-2', 'pos':(400, 160), 'dir': gv.LAY_R, 'tiggerS': self.tCsensors, 'onIdx':(1,), 'offIdx':(0,) },
+            {'id': 'ns-3', 'pos':(700, 240), 'dir': gv.LAY_R, 'tiggerS': self.tCsensors, 'onIdx':(3,), 'offIdx':(2,) },
+            {'id': 'ns-4', 'pos':(1200, 160), 'dir': gv.LAY_R, 'tiggerS': self.tCsensors, 'onIdx':(5,), 'offIdx':(4,) },
 
         ]
         self.tBsignals = []
-        for Info in trackBSignalConfig:
-            signal = agent.AgentSignal(self, Info['id'], Info['pos'], dir=Info['dir'])
-            signal.setTriggerOnSensors(Info['tiggerS'], Info['onIdx'])
-            signal.setTriggerOffSensors(Info['tiggerS'], Info['offIdx'])
+        for info in trackBSignalConfig:
+            signal = agent.AgentSignal(self, info['id'], info['pos'], dir=info['dir'])
+            signal.setTriggerOnSensors(info['tiggerS'], info['onIdx'])
+            signal.setTriggerOffSensors(info['tiggerS'], info['offIdx'])
             self.tBsignals.append(signal)
         self.signals['nsline'] = self.tBsignals
 
         # set all the signal on trackC
         trackCSignalConfig = [
-            {'id': 'cc-0', 'pos':(260, 200), 'dir': 0, 'tiggerS': self.tBsensors, 'onIdx':(1, 7), 'offIdx':(0, 2) },
-            {'id': 'cc-1', 'pos':(660, 200), 'dir': 0, 'tiggerS': self.tBsensors, 'onIdx':(5,), 'offIdx':(4,) },
-            {'id': 'cc-2', 'pos':(1160, 200), 'dir': 0, 'tiggerS': self.tBsensors, 'onIdx':(3,), 'offIdx':(2,) },
-            {'id': 'cc-3', 'pos':(1400, 360), 'dir': 3, 'tiggerS': self.tAsensors, 'onIdx':(8,10), 'offIdx':(7,9) },
-            {'id': 'cc-4', 'pos':(990, 700), 'dir': 0, 'tiggerS': self.tAsensors, 'onIdx':(6,12), 'offIdx':(5,11) },
-            {'id': 'cc-5', 'pos':(640, 700), 'dir': 0, 'tiggerS': self.tAsensors, 'onIdx':(4,14), 'offIdx':(3,13) },
-            {'id': 'cc-6', 'pos':(210, 700), 'dir': 0, 'tiggerS': self.tAsensors, 'onIdx':(2, 16), 'offIdx':(1,15) },
+            {'id': 'cc-0', 'pos':(260, 200), 'dir': gv.LAY_U, 'tiggerS': self.tBsensors, 'onIdx':(1, 7), 'offIdx':(0, 2) },
+            {'id': 'cc-1', 'pos':(660, 200), 'dir': gv.LAY_U, 'tiggerS': self.tBsensors, 'onIdx':(5,), 'offIdx':(4,) },
+            {'id': 'cc-2', 'pos':(1160, 200), 'dir': gv.LAY_U, 'tiggerS': self.tBsensors, 'onIdx':(3,), 'offIdx':(2,) },
+            {'id': 'cc-3', 'pos':(1400, 360), 'dir': gv.LAY_R, 'tiggerS': self.tAsensors, 'onIdx':(8,10), 'offIdx':(7,9) },
+            {'id': 'cc-4', 'pos':(990, 700), 'dir': gv.LAY_U, 'tiggerS': self.tAsensors, 'onIdx':(6,12), 'offIdx':(5,11) },
+            {'id': 'cc-5', 'pos':(640, 700), 'dir': gv.LAY_U, 'tiggerS': self.tAsensors, 'onIdx':(4,14), 'offIdx':(3,13) },
+            {'id': 'cc-6', 'pos':(210, 700), 'dir': gv.LAY_U, 'tiggerS': self.tAsensors, 'onIdx':(2, 16), 'offIdx':(1,15) },
         ]
         self.tCsignals = []
-        for Info in trackCSignalConfig:
-            signal = agent.AgentSignal(self, Info['id'], Info['pos'], dir=Info['dir'])
-            signal.setTriggerOnSensors(Info['tiggerS'], Info['onIdx'])
-            signal.setTriggerOffSensors(Info['tiggerS'], Info['offIdx'])
+        for info in trackCSignalConfig:
+            signal = agent.AgentSignal(self, info['id'], info['pos'], dir=info['dir'])
+            signal.setTriggerOnSensors(info['tiggerS'], info['onIdx'])
+            signal.setTriggerOffSensors(info['tiggerS'], info['offIdx'])
             self.tCsignals.append(signal)
         self.signals['ccline'] = self.tCsignals
+
+#-----------------------------------------------------------------------------
+    def _initStation(self):
+        """ Init all the stations
+
+        Returns:
+            _type_: _description_
+        """
+        # Init station on weline.
+        trackAStationCfg = [ {'id':'Tuas_Link', 'pos': (80, 200)}, 
+                             {'id':'Junrong_East', 'pos': (360, 600)}, 
+                             {'id':'Outram_Park', 'pos': (750, 800)}, 
+                             {'id':'City_Hall', 'pos': (900, 500)}, 
+                             {'id':'Paya_Leba', 'pos': (1250, 400)}, 
+                             {'id':'Changgi_Airport', 'pos': (1550, 450)}, 
+                             {'id':'Lavender', 'pos': (1100, 450)}, 
+                             {'id':'Raffles_Place', 'pos': (850, 850)}, 
+                             {'id':'Cliementi', 'pos': (430, 650)}, 
+                             {'id':'Boon_Lay', 'pos': (50, 450)}]
+        self.tAStations = []
+        for info in trackAStationCfg:
+            station = agent.AgentStation(self, info['id'], info['pos'])
+            station.bindTrains(self.trackATrains)
+            self.tAStations.append(station)
+        self.stations['weline'] = self.tAStations
+
+
+        trackBStationCfg = [ {'id':'Junrong_East', 'pos': (360, 450)}, 
+                             {'id':'Wood_Land', 'pos': (430, 50)},
+                             {'id':'Yishun', 'pos': (1040, 50)}, 
+                             {'id':'Orchard', 'pos': (980, 300)},
+                             {'id':'City_Hall', 'pos': (750, 600)},
+                             {'id':'BiShan', 'pos': (550, 100)}]
+        self.tBStations = []
+        for info in trackBStationCfg:
+            station = agent.AgentStation(self, info['id'], info['pos'])
+            station.bindTrains(self.trackBTrains)
+            self.tBStations.append(station)
+        self.stations['nsline'] = self.tBStations
+
+
+
+        trackCStationCfg = [ {'id':'Buona_Vsta', 'pos': (320, 700)}, 
+                             {'id':'Farrer Road', 'pos': (200, 300)}, 
+                             {'id':'Serangoon', 'pos': (930, 200)}, 
+                             {'id':'Nicoll Highway', 'pos': (1400, 600)}, 
+                             {'id':'Bayfront', 'pos': (1160, 700)},
+                             {'id':'HarbourFront', 'pos': (710, 700)}]
+        self.tCStations = []
+        for info in trackCStationCfg:
+            station = agent.AgentStation(self, info['id'], info['pos'])
+            station.bindTrains(self.trackCTrains)
+            self.tCStations.append(station)
+        self.stations['ccline'] = self.tCStations
 
 #-----------------------------------------------------------------------------
     def _getTrainsList(self, trainCfg, trackPts):
@@ -200,6 +256,10 @@ class MapMgr(object):
         if trackID and trackID in self.sensors.keys(): return self.sensors[trackID]
         return self.sensors
     
+    def selfStations(self, trackID=None):
+        if trackID and trackID in self.stations.keys(): return self.stations[trackID]
+        return self.stations
+
 #-----------------------------------------------------------------------------
     def periodic(self , now):
         """ Periodicly call back function."""
@@ -210,8 +270,8 @@ class MapMgr(object):
             for train in val:
                 # Check the signal 1st 
                 train.checkSignal(self.signals[key])
-                train.updateTrainPos()
                 train.checkClashFt(frontTrain)
+                train.updateTrainPos()
                 frontTrain = train                
                 # update the sensor state
             if key == 'weline':
@@ -220,7 +280,12 @@ class MapMgr(object):
                 self.tBsensors.updateActive(val)
             elif key == 'ccline':
                 self.tCsensors.updateActive(val)
-        
+        # update the station train's docking state
+        for key, val in self.stations.items():
+            for station in val:
+                station.updateTrainSDock()
+
+        # Update the signal state
         for key, val in self.signals.items():
             for signal in val:
                 signal.updateSingalState()
