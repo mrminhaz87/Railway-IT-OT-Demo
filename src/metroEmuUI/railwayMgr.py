@@ -150,7 +150,7 @@ class MapMgr(object):
 
         # set all the signal on track cline
         trackSignalConfig_cc = [
-            {'id': 'cc-0', 'pos':(260, 200), 'dir': gv.LAY_U, 'tiggerS': self.sensors['nsline'], 'onIdx':(1, 7), 'offIdx':(0, 2) },
+            {'id': 'cc-0', 'pos':(260, 200), 'dir': gv.LAY_U, 'tiggerS': self.sensors['nsline'], 'onIdx':(1, 7), 'offIdx':(0, 6) },
             {'id': 'cc-1', 'pos':(660, 200), 'dir': gv.LAY_U, 'tiggerS': self.sensors['nsline'], 'onIdx':(5,), 'offIdx':(4,) },
             {'id': 'cc-2', 'pos':(1160, 200), 'dir': gv.LAY_U, 'tiggerS': self.sensors['nsline'], 'onIdx':(3,), 'offIdx':(2,) },
             {'id': 'cc-3', 'pos':(1400, 360), 'dir': gv.LAY_R, 'tiggerS': self.sensors['weline'], 'onIdx':(8,10), 'offIdx':(7,9) },
@@ -273,6 +273,12 @@ class MapMgr(object):
         """ Periodicly call back function. This function need to be called before the 
             railwayPanelMap's periodic().
         """
+
+        # Update the signal state
+        for key, val in self.signals.items():
+            for signal in val:
+                signal.updateSingalState()
+
         # update the trains position.
         for key, val in self.trains.items():
             frontTrain = val[-1]
@@ -290,7 +296,4 @@ class MapMgr(object):
             for station in val:
                 station.updateTrainSDock()
 
-        # Update the signal state
-        for key, val in self.signals.items():
-            for signal in val:
-                signal.updateSingalState()
+

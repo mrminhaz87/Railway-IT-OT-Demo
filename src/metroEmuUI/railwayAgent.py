@@ -291,7 +291,7 @@ class AgentTrain(AgentTarget):
         return False
 
 #--AgentTrain------------------------------------------------------------------
-    def checkCollFt(self, frontTrain, threshold = 40):
+    def checkCollFt(self, frontTrain, threshold = 25):
         """ Check whether their is possible collision to the front train.
             Args:
                 frontTrain (_type_): _description_
@@ -311,7 +311,7 @@ class AgentTrain(AgentTarget):
         """
         for singalObj in signalList:
             x, y = singalObj.getPos()
-            if self.checkNear(x, y, 20) and not self.emgStop:
+            if self.checkNear(x, y, 20):
                 self.emgStop = singalObj.getState()
                 break
 
