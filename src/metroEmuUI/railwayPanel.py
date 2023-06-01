@@ -12,8 +12,9 @@
 # Copyright:   
 # License:     
 #-----------------------------------------------------------------------------
-import wx
+
 import os 
+import wx
 import metroEmuGobal as gv
 
 #-----------------------------------------------------------------------------
@@ -29,7 +30,7 @@ class PanelTainCtrl(wx.Panel):
         self.trainID = trainID
         self.SetSizer(self._buidUISizer())
 
-#--PanelCtrl-------------------------------------------------------------------
+#-----------------------------------------------------------------------------
     def _buidUISizer(self):
         """ build the control panel sizer. """
         flagsL = wx.LEFT
@@ -42,7 +43,7 @@ class PanelTainCtrl(wx.Panel):
         label.SetForegroundColour(wx.WHITE)
         vbox.Add(label, flag=flagsL, border=2)
 
-        vbox.Add(wx.StaticLine(self, wx.ID_ANY, size=(120, -1),
+        vbox.Add(wx.StaticLine(self, wx.ID_ANY, size=(136, -1),
                                  style=wx.LI_HORIZONTAL), flag=flagsL, border=2)
         vbox.AddSpacer(5)
         hbox0 =  wx.BoxSizer(wx.HORIZONTAL)
@@ -59,12 +60,12 @@ class PanelTainCtrl(wx.Panel):
         self.recbtn2.Bind(wx.EVT_BUTTON, self.stopTrain)
         hbox0.Add(self.recbtn2, flag=flagsL, border=2)
         hbox0.AddSpacer(5)
-
         vbox.Add(hbox0, flag=flagsL, border=2)
-
         return vbox
     
+    #-----------------------------------------------------------------------------
     def startTrain(self, event):
+        event.GetEventObject().GetID() 
         if gv.iMapMgr:
             gv.gDebugPrint('Start train: %s on track: %s' %(str(self.trainID), self.trackID))
             trains = gv.iMapMgr.getTrains(trackID=self.trackID)
@@ -72,6 +73,7 @@ class PanelTainCtrl(wx.Panel):
             trainAgent.setTrainSpeed(10)
             trainAgent.setEmgStop(False)
 
+    #-----------------------------------------------------------------------------
     def stopTrain(self, event):
         if gv.iMapMgr:
             gv.gDebugPrint('Stop train: %s on track: %s' %(str(self.trainID), self.trackID))

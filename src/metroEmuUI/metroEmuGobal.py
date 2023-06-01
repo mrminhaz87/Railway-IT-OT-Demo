@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------
-# Name:        Global.py
+# Name:        metroEmuGlobal.py
 #
 # Purpose:     This module is used as a local config file to set constants, 
 #              global parameters which will be used in the other modules.
@@ -18,6 +18,7 @@ For good coding practice, follow the following naming convention:
 """
 
 import os, sys
+from collections import OrderedDict
 
 print("Current working directory is : %s" % os.getcwd())
 DIR_PATH = dirpath = os.path.dirname(__file__)
@@ -39,15 +40,15 @@ Log.initLogger(gTopDir, 'Logs', APP_NAME[0], APP_NAME[1], historyCnt=100, fPutLo
 #------<IMAGES PATH>-------------------------------------------------------------
 IMG_FD = os.path.join(dirpath, 'img')
 ICO_PATH = os.path.join(IMG_FD, "geoIcon.ico")
-BGIMG_PATH = os.path.join(IMG_FD, "SampleImg.png")
 
-RAILWAY_TYPE_LINE = 'RW_L'
-RAILWAY_TYPE_CYCLE = 'RW_C'
-TRAIN_TYPE = 'Train'
-SENSOR_TYPE = 'SS'
-SINGAL_TYPE = "SG"
-STATION_TYPE = 'ST'
-ENV_TYPE = 'ENV'
+# Init the agent object type
+RAILWAY_TYPE_LINE   = 'RW_L'
+RAILWAY_TYPE_CYCLE  = 'RW_C'
+TRAIN_TYPE          = 'TR'
+SENSOR_TYPE         = 'SS'
+SINGAL_TYPE         = "SG"
+STATION_TYPE        = 'ST'
+ENV_TYPE            = 'ENV'
 
 PERIODIC = 300      # update the main in every 300ms
 
@@ -58,22 +59,27 @@ LOG_WARN    = 1
 LOG_ERR     = 2
 LOG_EXCEPT  = 3
 
-# Init the UI layout flags:
+# Init the UI layout flags
 LAY_U = 0 
 LAY_D = 1
 LAY_L = 2
 LAY_R = 3
 LAY_C = 4
 
-gTrainImgB = os.path.join(dirpath, IMG_FD, "train.png")
-gTrainImgH = os.path.join(dirpath, IMG_FD, "trainhead2.png")
+# gTrainImgB = os.path.join(dirpath, IMG_FD, "train.png")
+# gTrainImgH = os.path.join(dirpath, IMG_FD, "trainhead2.png")
 
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.
 gTranspPct = 70     # Windows transparent percentage.
-gUpdateRate = 1     # main frame update rate 1 sec.
+gUpdateRate = 0.8   # main frame update rate 0.5 sec.
 gSensorCount = 0    # number of sensors.
-gTrainsCount = [{'track':'weline', 'num': 4}, {'track':'nsline', 'num': 3}, {'track':'ccline', 'num': 3}]
+gTrackConfig = OrderedDict()
+
+
+[{'track':'weline', 'num': 4, 'color': None}, 
+                {'track':'nsline', 'num': 3, 'color': None}, 
+                {'track':'ccline', 'num': 3, 'color': None}]
 
 def gDebugPrint(msg, prt=True, logType=None):
     if prt: print(msg)
