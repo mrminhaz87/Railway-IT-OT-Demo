@@ -100,11 +100,15 @@ class PanelMap(wx.Panel):
         # Draw the trains on the map.
         trainDict = gv.iMapMgr.getTrains()
         for key, val in trainDict.items():
-            for train in val:
+            for i, train in enumerate(val):
                 trainColor = '#CE8349' if train.emgStop else 'GREEN'
                 dc.SetBrush(wx.Brush(trainColor))
                 for point in train.getPos():
                     dc.DrawRectangle(point[0]-5, point[1]-5, 10, 10)
+                # add the train ID:
+                dc.SetTextForeground(wx.Colour(trainColor))
+                pos = train.getTrainPos(idx=0)
+                dc.DrawText( key+'-'+str(i), pos[0]+5, pos[1]+5)
 
 #-----------------------------------------------------------------------------
     def _drawSensors(self, dc):
@@ -162,14 +166,19 @@ class PanelMap(wx.Panel):
         dc.SetBrush(wx.Brush('Blue'))
         for key, stations in gv.iMapMgr.selfStations().items():
             colorCode = gv.iMapMgr.getTracks(trackID=key)['color']
-            dc.SetBrush(wx.Brush(colorCode))
             dc.SetTextForeground(colorCode)
+            dc.SetBrush(wx.Brush(colorCode))
             for station in stations:
                 id = station.getID()
                 pos = station.getPos()
                 x, y = pos[0], pos[1]
-                dc.DrawCircle(x, y, 8)
                 dc.DrawText(str(id), x-10, y-25)
+                if station.getDockState():
+                    dc.SetBrush(wx.Brush('BLUE'))
+                    dc.DrawCircle(x, y, 8)
+                    dc.SetBrush(wx.Brush(colorCode))
+                else:
+                    dc.DrawCircle(x, y, 8)
 
     #--PanelMap--------------------------------------------------------------------
     def onPaint(self, event):

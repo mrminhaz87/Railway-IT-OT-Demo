@@ -73,7 +73,7 @@ gTrainImgH = os.path.join(dirpath, IMG_FD, "trainhead2.png")
 gTranspPct = 70     # Windows transparent percentage.
 gUpdateRate = 1     # main frame update rate 1 sec.
 gSensorCount = 0    # number of sensors.
-
+gTrainsCount = [{'track':'weline', 'num': 4}, {'track':'nsline', 'num': 3}, {'track':'ccline', 'num': 3}]
 
 def gDebugPrint(msg, prt=True, logType=None):
     if prt: print(msg)
@@ -85,9 +85,6 @@ def gDebugPrint(msg, prt=True, logType=None):
         Log.exception(msg)
     elif logType == LOG_INFO or DEBUG_FLG:
         Log.info(msg)
-
-
-
 
 #-------<GLOBAL PARAMTERS>-----------------------------------------------------
 iMainFrame = None   # MainFrame.

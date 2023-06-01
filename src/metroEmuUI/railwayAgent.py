@@ -125,17 +125,23 @@ class AgentStation(AgentTarget):
         super().__init__(parent, tgtID, pos, gv.STATION_TYPE)
         self.dockCount = 10 # default the train will dock in the station.
         self.trainList = []
+        self.dockState = False
     
     def bindTrains(self, TrainList):
         self.trainList = TrainList
+
+    def getDockState(self):
+        return self.dockState
 
     def updateTrainSDock(self):
         if len(self.trainList) == 0: return
         for train in self.trainList:
             midPt = train.getTrainPos(idx=2)
             if self.checkNear(midPt[0], midPt[1], 5):
+                self.dockState = True
                 if train.getDockCount() == 0: train.setDockCount(self.dockCount)
-                break
+                return
+        self.dockState = False
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

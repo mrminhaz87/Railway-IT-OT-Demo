@@ -12,10 +12,11 @@
 # Copyright:   
 # License:     
 #-----------------------------------------------------------------------------
-
+import os 
 import time
 import wx
 import metroEmuGobal as gv
+import railwayPanel as pnlFunction
 import railwayPanelMap as pnlMap
 import uiPanel as pl
 
@@ -47,18 +48,62 @@ class UIFrame(wx.Frame):
 #--UIFrame---------------------------------------------------------------------
     def _buidUISizer(self):
         """ Build the main UI Sizer. """
-        flagsR = wx.CENTER
+        flagsL = wx.LEFT
         mSizer = wx.BoxSizer(wx.HORIZONTAL)
         mSizer.AddSpacer(5)
-        gv.iCtrlPanel = pl.PanelCtrl(self)
-        mSizer.Add(gv.iCtrlPanel, flag=flagsR, border=2)
+        #gv.iCtrlPanel = pl.PanelCtrl(self)
+        vbox0 = self._buildTrainCtrlSizer()                
+        mSizer.Add(vbox0, flag=flagsL, border=2)
         mSizer.AddSpacer(5)
-        mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(-1, 560),
-                                 style=wx.LI_VERTICAL), flag=flagsR, border=2)
+
+        mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(-1, 980),
+                                 style=wx.LI_VERTICAL), flag=flagsL, border=2)
         mSizer.AddSpacer(5)
+
+        vbox1 = wx.BoxSizer(wx.VERTICAL)
+        vbox1.AddSpacer(5)
+        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        label = wx.StaticText(self, label= "RealWord Metro System Emulator")
+        label.SetFont(font)
+        vbox1.Add(label, flag=wx.CENTRE, border=2)
+        vbox1.AddSpacer(5)
         gv.iMapPanel = self.mapPanel = pnlMap.PanelMap(self)
-        mSizer.Add(self.mapPanel, flag=flagsR, border=2)
+        vbox1.Add(gv.iMapPanel, flag=wx.CENTRE, border=2)
+        mSizer.Add(vbox1, flag=flagsL, border=2)
         return mSizer
+
+#--UIFrame---------------------------------------------------------------------
+    def _buildTrainCtrlSizer(self):
+        flagsL = wx.LEFT
+        vbox0 = wx.BoxSizer(wx.VERTICAL)
+        vbox0.AddSpacer(5)
+        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        label = wx.StaticText(self, label= "Trains Control")
+        label.SetFont(font)
+        vbox0.Add(label, flag=flagsL, border=2)
+        vbox0.AddSpacer(5)
+        panelcfg = {
+            'weline': ('welabel.png', wx.Colour(52, 169, 129)),
+            'nsline': ('nslabel.png', wx.Colour(233, 0, 97)),
+            'ccline': ('cclabel.png', wx.Colour(255, 136, 0))
+        }
+        for panelCfg in gv.gTrainsCount:
+            [img, color] = panelcfg[panelCfg['track']]
+            img = os.path.join(gv.IMG_FD, img)
+            png = wx.Image(img, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+            sublabel = wx.StaticBitmap(self, -1, png, (10, 5), (png.GetWidth(), png.GetHeight()))
+            # vbox0.AddSpacer(10)
+            # font = wx.Font(11, wx.DECORATIVE, wx.BOLD, wx.NORMAL)
+            # sublabel = wx.StaticText(self, label= "Track: %s" %str(panelCfg['track']) )
+            # sublabel.SetFont(font)
+            # vbox0.AddSpacer(5)
+            vbox0.Add(sublabel, flag=flagsL, border=2)
+            for i in range(panelCfg['num']):
+                trainPanel = pnlFunction.PanelTainCtrl(self, panelCfg['track'], i, bgColor=color)
+                vbox0.Add(trainPanel, flag=flagsL, border=2)
+                vbox0.AddSpacer(5)
+
+        return vbox0
 
 #--UIFrame---------------------------------------------------------------------
     def periodic(self, event):
