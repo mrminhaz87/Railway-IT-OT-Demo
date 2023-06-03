@@ -162,18 +162,25 @@ class PanelMap(wx.Panel):
         for key, stations in gv.iMapMgr.selfStations().items():
             colorCode = gv.iMapMgr.getTracks(trackID=key)['color']
             dc.SetTextForeground(colorCode)
-            dc.SetBrush(wx.Brush(colorCode))
             for station in stations:
                 id = station.getID()
                 pos = station.getPos()
                 x, y = pos[0], pos[1]
-                dc.DrawText(str(id), x-10, y-25)
+                dc.SetPen(self.dcDefPen)
+                dc.SetBrush(wx.Brush(colorCode))
+                dc.DrawText(str(id), x-10, y-30)
                 if station.getDockState():
                     dc.SetBrush(wx.Brush('BLUE'))
                     dc.DrawCircle(x, y, 8)
-                    dc.SetBrush(wx.Brush(colorCode))
+                    dc.SetPen(wx.Pen('BLUE', width=1, style=wx.PENSTYLE_SOLID))
+                    dc.SetBrush(wx.Brush('BLUE', wx.TRANSPARENT))
+                    dc.DrawRectangle(x-35, y-7, 70, 14)
                 else:
                     dc.DrawCircle(x, y, 8)
+                    dc.SetPen(wx.Pen(colorCode, width=1, style=wx.PENSTYLE_LONG_DASH))
+                    dc.SetBrush(wx.Brush(colorCode, wx.TRANSPARENT))
+                    dc.DrawRectangle(x-35, y-7, 70, 14)
+
 
     #--PanelMap--------------------------------------------------------------------
     def onPaint(self, event):

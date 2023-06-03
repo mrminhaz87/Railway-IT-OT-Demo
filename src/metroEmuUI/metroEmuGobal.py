@@ -60,11 +60,13 @@ LOG_ERR     = 2
 LOG_EXCEPT  = 3
 
 # Init the UI layout flags
-LAY_U = 0 
-LAY_D = 1
-LAY_L = 2
-LAY_R = 3
-LAY_C = 4
+LAY_U = 0   # layout at up position  
+LAY_D = 1   # layout at down position 
+LAY_L = 2   # layout at left position
+LAY_R = 3   # layout at right position
+LAY_C = 4   # layout at center 
+LAY_H = 5   # horizontal layout
+LAY_V = 6   # vertical layout
 
 # gTrainImgB = os.path.join(dirpath, IMG_FD, "train.png")
 # gTrainImgH = os.path.join(dirpath, IMG_FD, "trainhead2.png")

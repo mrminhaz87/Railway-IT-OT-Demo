@@ -169,8 +169,8 @@ class MapMgr(object):
     def _initStation(self):
         """ Init all the train stations. """
         # Init all stations on weline.
-        trackStation_we = [{'id': 'Tuas_Link', 'pos': (80, 200)},
-                           {'id': 'Junrong_East', 'pos': (360, 600)},
+        trackStation_we = [{'id': 'Tuas_Link', 'pos': (80, 200), 'layout': gv.LAY_H},
+                           {'id': 'Junrong_East', 'pos': (360, 600), 'layout': gv.LAY_H},
                            {'id': 'Outram_Park', 'pos': (750, 800)},
                            {'id': 'City_Hall', 'pos': (900, 500)},
                            {'id': 'Paya_Leba', 'pos': (1250, 400)},
@@ -202,7 +202,7 @@ class MapMgr(object):
         trackStation_cc = [{'id': 'Buona_Vsta', 'pos': (320, 700)},
                            {'id': 'Farrer_Road', 'pos': (200, 300)},
                            {'id': 'Serangoon', 'pos': (930, 200)},
-                           {'id': 'Nicoll _ighway', 'pos': (1400, 600)},
+                           {'id': 'Nicoll _Highway', 'pos': (1400, 600)},
                            {'id': 'Bayfront', 'pos': (1160, 700)},
                            {'id': 'HarbourFront', 'pos': (710, 700)}]
         self.stations['ccline'] = []

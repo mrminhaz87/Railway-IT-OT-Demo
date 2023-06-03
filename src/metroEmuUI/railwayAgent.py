@@ -131,11 +131,12 @@ class AgentStation(AgentTarget):
         sense/check on pos on one line. Will add sense multiple point on different 
         tracks later.
     """
-    def __init__(self, parent, tgtID, pos, layout=gv.LAY_U):
+    def __init__(self, parent, tgtID, pos, layout=gv.LAY_H, labelPos=gv.LAY_U):
         super().__init__(parent, tgtID, pos, gv.STATION_TYPE)
         self.dockCount = 10 # default the train will dock in the station in 10 refresh cycle.
         self.trainList = []
         self.dockState = False
+        self.layout = layout
     
     def bindTrains(self, TrainList):
         self.trainList = TrainList
@@ -145,6 +146,9 @@ class AgentStation(AgentTarget):
 
     def getDockState(self):
         return self.dockState
+
+    def getLayout(self):
+        return self.layout
 
 #-----------------------------------------------------------------------------
     def updateTrainSDock(self):
