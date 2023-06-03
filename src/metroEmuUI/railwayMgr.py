@@ -171,18 +171,19 @@ class MapMgr(object):
         # Init all stations on weline.
         trackStation_we = [{'id': 'Tuas_Link', 'pos': (80, 200), 'layout': gv.LAY_H},
                            {'id': 'Junrong_East', 'pos': (360, 600), 'layout': gv.LAY_H},
-                           {'id': 'Outram_Park', 'pos': (750, 800)},
-                           {'id': 'City_Hall', 'pos': (900, 500)},
-                           {'id': 'Paya_Leba', 'pos': (1250, 400)},
-                           {'id': 'Changgi_Airport', 'pos': (1550, 450)},
-                           {'id': 'Lavender', 'pos': (1100, 450)},
-                           {'id': 'Raffles_Place', 'pos': (850, 850)},
-                           {'id': 'Cliementi', 'pos': (430, 650)},
-                           {'id': 'Boon_Lay', 'pos': (50, 450)}]
+                           {'id': 'Outram_Park', 'pos': (750, 800), 'layout': gv.LAY_H},
+                           {'id': 'City_Hall', 'pos': (900, 500), 'layout': gv.LAY_V, 'labelPos':(-70, -10)},
+                           {'id': 'Paya_Leba', 'pos': (1250, 400), 'layout': gv.LAY_H },
+                           {'id': 'Changgi_Airport', 'pos': (1550, 430), 'layout': gv.LAY_V, 'labelPos':(-70, -60)},
+                           {'id': 'Lavender', 'pos': (1100, 450), 'layout': gv.LAY_H},
+                           {'id': 'Raffles_Place', 'pos': (850, 850), 'layout': gv.LAY_H},
+                           {'id': 'Cliementi', 'pos': (430, 650), 'layout': gv.LAY_H},
+                           {'id': 'Boon_Lay', 'pos': (50, 450), 'layout': gv.LAY_V, 'labelPos':(20, -10)}]
         self.stations['weline'] = []
         for info in trackStation_we:
-            station = agent.AgentStation(self, info['id'], info['pos'])
+            station = agent.AgentStation(self, info['id'], info['pos'], layout=info['layout'])
             station.bindTrains(self.trains['weline'])
+            if 'labelPos' in info.keys(): station.setlabelPos(info['labelPos'])
             self.stations['weline'].append(station)
         
         # Init all stations on nsline
@@ -199,16 +200,17 @@ class MapMgr(object):
             self.stations['nsline'].append(station)
 
         # Init all stations on ccline
-        trackStation_cc = [{'id': 'Buona_Vsta', 'pos': (320, 700)},
-                           {'id': 'Farrer_Road', 'pos': (200, 300)},
-                           {'id': 'Serangoon', 'pos': (930, 200)},
-                           {'id': 'Nicoll _Highway', 'pos': (1400, 600)},
-                           {'id': 'Bayfront', 'pos': (1160, 700)},
-                           {'id': 'HarbourFront', 'pos': (710, 700)}]
+        trackStation_cc = [{'id': 'Buona_Vsta', 'pos': (320, 700), 'layout': gv.LAY_H},
+                           {'id': 'Farrer_Road', 'pos': (200, 300), 'layout': gv.LAY_V, 'labelPos':(20, -10) },
+                           {'id': 'Serangoon', 'pos': (930, 200), 'layout': gv.LAY_H},
+                           {'id': 'Nicoll _Highway', 'pos': (1400, 600), 'layout': gv.LAY_V, 'labelPos':(20, -10)},
+                           {'id': 'Bayfront', 'pos': (1160, 700),'layout': gv.LAY_H},
+                           {'id': 'HarbourFront', 'pos': (710, 700),'layout': gv.LAY_H}]
         self.stations['ccline'] = []
         for info in trackStation_cc:
-            station = agent.AgentStation(self, info['id'], info['pos'])
+            station = agent.AgentStation(self, info['id'], info['pos'], layout=info['layout'])
             station.bindTrains(self.trains['ccline'])
+            if 'labelPos' in info.keys(): station.setlabelPos(info['labelPos'])
             self.stations['ccline'].append(station)
 
 
@@ -219,7 +221,7 @@ class MapMgr(object):
                    {'id':'Changgi Airport', 'img':'airport.jpg', 'pos':(1500, 240) ,  'size':(160, 100)},
                    {'id':'JurongEast-Jem', 'img':'city_0.png', 'pos':(360, 520) ,  'size':(80, 80)},
                    {'id':'CityHall-01', 'img':'city_2.png', 'pos':(750, 520) ,  'size':(90, 80)},
-                   {'id':'CityHall-02', 'img':'city_1.png', 'pos':(850, 500) ,  'size':(80, 60)}]
+                   {'id':'CityHall-02', 'img':'city_1.png', 'pos':(850, 600) ,  'size':(80, 60)}]
         for info in envCfg:
             imgPath = os.path.join(gv.IMG_FD, info['img'])
             if os.path.exists(imgPath):

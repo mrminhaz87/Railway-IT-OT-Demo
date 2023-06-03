@@ -137,6 +137,7 @@ class AgentStation(AgentTarget):
         self.trainList = []
         self.dockState = False
         self.layout = layout
+        self.labelPos = (-25, -28) # default delta label location on the map
     
     def bindTrains(self, TrainList):
         self.trainList = TrainList
@@ -149,6 +150,14 @@ class AgentStation(AgentTarget):
 
     def getLayout(self):
         return self.layout
+
+    def getLabelPos(self):
+        return self.labelPos
+
+#-----------------------------------------------------------------------------
+# Define all the set() functions here:
+    def setlabelPos(self, pos):
+        self.labelPos = pos
 
 #-----------------------------------------------------------------------------
     def updateTrainSDock(self):

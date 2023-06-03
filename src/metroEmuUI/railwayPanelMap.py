@@ -168,19 +168,18 @@ class PanelMap(wx.Panel):
                 x, y = pos[0], pos[1]
                 dc.SetPen(self.dcDefPen)
                 dc.SetBrush(wx.Brush(colorCode))
-                dc.DrawText(str(id), x-10, y-30)
-                if station.getDockState():
-                    dc.SetBrush(wx.Brush('BLUE'))
-                    dc.DrawCircle(x, y, 8)
-                    dc.SetPen(wx.Pen('BLUE', width=1, style=wx.PENSTYLE_SOLID))
-                    dc.SetBrush(wx.Brush('BLUE', wx.TRANSPARENT))
+                (x1,y1) = station.getLabelPos()
+                dc.DrawText(str(id), x+x1, y+y1)
+                color = 'BLUE' if station.getDockState() else colorCode
+                line =wx.PENSTYLE_SOLID if station.getDockState() else wx.PENSTYLE_LONG_DASH
+                dc.SetBrush(wx.Brush(color))
+                dc.DrawCircle(x, y, 8)
+                dc.SetPen(wx.Pen(color, width=1, style=line))
+                dc.SetBrush(wx.Brush(color, wx.TRANSPARENT))
+                if station.getLayout() == gv.LAY_H:
                     dc.DrawRectangle(x-35, y-7, 70, 14)
-                else:
-                    dc.DrawCircle(x, y, 8)
-                    dc.SetPen(wx.Pen(colorCode, width=1, style=wx.PENSTYLE_LONG_DASH))
-                    dc.SetBrush(wx.Brush(colorCode, wx.TRANSPARENT))
-                    dc.DrawRectangle(x-35, y-7, 70, 14)
-
+                else: 
+                    dc.DrawRectangle(x-7, y-35, 14, 70)
 
     #--PanelMap--------------------------------------------------------------------
     def onPaint(self, event):
