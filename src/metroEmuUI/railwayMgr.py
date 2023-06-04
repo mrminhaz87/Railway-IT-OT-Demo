@@ -228,6 +228,20 @@ class MapMgr(object):
                 bitmap = wx.Bitmap(imgPath)
                 building = agent.agentEnv(self, info['id'], info['pos'], bitmap, info['size'] )
                 self.envItems.append(building)
+        
+        labelCfg = [
+                {'id': 'West-East Line [WE]', 'img': None, 'pos': (550, 560), 'size': (180, 30),
+                'color': gv.gTrackConfig['weline']['color'], 'link':((550, 560), (550, 600))},
+                {'id': 'North-Sourth [NS]', 'img': None, 'pos': (850, 100), 'size': (180, 30),
+                'color': gv.gTrackConfig['nsline']['color'], 'link':((850, 100), (850, 50))},
+                {'id': 'Circle Line [CC]', 'img': None, 'pos': (1260, 660), 'size': (180, 30),
+                'color': gv.gTrackConfig['ccline']['color'], 'link':((1260, 660), (1260, 700))}
+        ]
+        for info in labelCfg:
+            label = agent.agentEnv(self, info['id'], info['pos'], None, info['size'], tType=gv.LABEL_TYPE )
+            if 'link' in info.keys(): label.setLinkList(info['link'])
+            if 'color' in info.keys(): label.setColor(info['color'])
+            self.envItems.append(label)
 
 #-----------------------------------------------------------------------------
     def _getTrainsList(self, trainCfg, trackPts):

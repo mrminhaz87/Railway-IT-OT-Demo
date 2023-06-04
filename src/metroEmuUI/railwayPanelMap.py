@@ -38,15 +38,25 @@ class PanelMap(wx.Panel):
     def _drawEnvItems(self, dc):
         """ Draw the environment items."""
         dc.SetPen(self.dcDefPen)
-        dc.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
         dc.SetTextForeground(wx.Colour('White'))
         for item in gv.iMapMgr.getEnvItems():
             id = item.getID()
             pos = item.getPos()
             bitmap = item.getWxBitmap()
             size = item.getSize()
-            dc.DrawBitmap(bitmap, pos[0]-size[0]//2, pos[1]-size[1]//2)
-            dc.DrawText(str(id), pos[0]-size[0]//2, pos[1]-size[1]//2-15)
+            if item.getType() == gv.ENV_TYPE:
+                dc.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+                dc.DrawBitmap(bitmap, pos[0]-size[0]//2, pos[1]-size[1]//2)
+                dc.DrawText(str(id), pos[0]-size[0]//2, pos[1]-size[1]//2-15)
+            elif item.getType() == gv.LABEL_TYPE:
+                color, link = item.getColor(), item.getLink()
+                if link:
+                    dc.SetPen(wx.Pen(color, width=2, style=wx.PENSTYLE_SOLID))
+                    dc.DrawLines(link)
+                dc.SetFont(wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.BOLD))
+                dc.SetBrush(wx.Brush(color))
+                dc.DrawRectangle(pos[0]-size[0]//2, pos[1]-size[1]//2, size[0], size[1])
+                dc.DrawText(str(id), pos[0]-size[0]//2+6, pos[1]-size[1]//2+6)
 
 #-----------------------------------------------------------------------------
     def _drawRailWay(self, dc):

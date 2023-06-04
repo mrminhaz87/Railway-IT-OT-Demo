@@ -42,13 +42,14 @@ IMG_FD = os.path.join(dirpath, 'img')
 ICO_PATH = os.path.join(IMG_FD, "geoIcon.ico")
 
 # Init the agent object type
-RAILWAY_TYPE_LINE   = 'RW_L'
-RAILWAY_TYPE_CYCLE  = 'RW_C'
+RAILWAY_TYPE_LINE   = 'RL'
+RAILWAY_TYPE_CYCLE  = 'RC'
 TRAIN_TYPE          = 'TR'
+LABEL_TYPE          = 'LB'
 SENSOR_TYPE         = 'SS'
 SINGAL_TYPE         = "SG"
 STATION_TYPE        = 'ST'
-ENV_TYPE            = 'ENV'
+ENV_TYPE            = 'EV'
 
 PERIODIC = 300      # update the main in every 300ms
 
@@ -77,11 +78,6 @@ gTranspPct = 70     # Windows transparent percentage.
 gUpdateRate = 0.8   # main frame update rate 0.5 sec.
 gSensorCount = 0    # number of sensors.
 gTrackConfig = OrderedDict()
-
-
-[{'track':'weline', 'num': 4, 'color': None}, 
-                {'track':'nsline', 'num': 3, 'color': None}, 
-                {'track':'ccline', 'num': 3, 'color': None}]
 
 def gDebugPrint(msg, prt=True, logType=None):
     if prt: print(msg)

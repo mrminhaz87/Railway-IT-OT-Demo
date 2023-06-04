@@ -59,6 +59,8 @@ class agentEnv(AgentTarget):
         # build Icon: https://www.freepik.com/premium-vector/isometric-modern-supermarket-buildings-set_10094282.htm
         self.bitmap = wxBitMap
         self.size = size
+        self.color = None   
+        self.linkList = None
 
 #-----------------------------------------------------------------------------
 # Define all the get() functions here:
@@ -68,6 +70,20 @@ class agentEnv(AgentTarget):
 
     def getWxBitmap(self):
         return self.bitmap
+    
+    def getLink(self):
+        return self.linkList 
+    
+    def getColor(self):
+        return self.color
+
+#-----------------------------------------------------------------------------
+# Define all the set() functions here:
+    def setLinkList(self, linkList):
+        self.linkList = linkList
+
+    def setColor(self, color):
+        self.color = color
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
