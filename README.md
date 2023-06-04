@@ -17,6 +17,12 @@
 
 
 
+### System Design 
+
+The 3 parts will follow below work flow: 
+
+![](doc/systemWorkflow.png)
+
 ------
 
 > last edit by LiuYuancheng (liu_yuan_cheng@hotmail.com) by 30/05/2023 if you have any problem, please send me a message. 

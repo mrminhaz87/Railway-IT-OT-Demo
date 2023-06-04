@@ -217,11 +217,13 @@ class MapMgr(object):
 #-----------------------------------------------------------------------------
     def _initEnv(self):
         """ Init all the enviroment Items on the map such as IOT device or camera."""
-        envCfg = [ {'id':'Tuas Industry Area', 'img':'factory_0.png', 'pos':(80, 80) ,  'size':(120, 120)},
-                   {'id':'Changgi Airport', 'img':'airport.jpg', 'pos':(1500, 240) ,  'size':(160, 100)},
-                   {'id':'JurongEast-Jem', 'img':'city_0.png', 'pos':(360, 520) ,  'size':(80, 80)},
-                   {'id':'CityHall-01', 'img':'city_2.png', 'pos':(750, 520) ,  'size':(90, 80)},
-                   {'id':'CityHall-02', 'img':'city_1.png', 'pos':(850, 600) ,  'size':(80, 60)}]
+        envCfg = [ {'id':'Tuas Industry Area', 'img':'factory_0.png', 'pos':(80, 80), 'size':(120, 120)},
+                   {'id':'Changgi Airport', 'img':'airport.jpg', 'pos':(1500, 240), 'size':(160, 100)},
+                   {'id':'JurongEast-Jem', 'img':'city_0.png', 'pos':(360, 520), 'size':(80, 80)},
+                   {'id':'CityHall-01', 'img':'city_2.png', 'pos':(750, 520), 'size':(90, 80)},
+                   {'id':'CityHall-02', 'img':'city_1.png', 'pos':(850, 600), 'size':(80, 60)},
+                   {'id':'Legend', 'img':'legend.png', 'pos':(1450, 820), 'size':(200, 150)}
+                   ]
         for info in envCfg:
             imgPath = os.path.join(gv.IMG_FD, info['img'])
             if os.path.exists(imgPath):
@@ -230,12 +232,12 @@ class MapMgr(object):
                 self.envItems.append(building)
         
         labelCfg = [
-                {'id': 'West-East Line [WE]', 'img': None, 'pos': (550, 560), 'size': (180, 30),
-                'color': gv.gTrackConfig['weline']['color'], 'link':((550, 560), (550, 600))},
-                {'id': 'North-Sourth [NS]', 'img': None, 'pos': (850, 100), 'size': (180, 30),
+                {'id': 'West-East Line [WE]', 'img': None, 'pos': (550, 550), 'size': (180, 30),
+                'color': gv.gTrackConfig['weline']['color'], 'link':((550, 550), (550, 600))},
+                {'id': 'North-South [NS]', 'img': None, 'pos': (850, 100), 'size': (180, 30),
                 'color': gv.gTrackConfig['nsline']['color'], 'link':((850, 100), (850, 50))},
-                {'id': 'Circle Line [CC]', 'img': None, 'pos': (1260, 660), 'size': (180, 30),
-                'color': gv.gTrackConfig['ccline']['color'], 'link':((1260, 660), (1260, 700))}
+                {'id': 'Circle Line [CC]', 'img': None, 'pos': (1260, 650), 'size': (180, 30),
+                'color': gv.gTrackConfig['ccline']['color'], 'link':((1260, 650), (1260, 700))}
         ]
         for info in labelCfg:
             label = agent.agentEnv(self, info['id'], info['pos'], None, info['size'], tType=gv.LABEL_TYPE )
