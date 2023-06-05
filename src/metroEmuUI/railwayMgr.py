@@ -31,6 +31,7 @@ class MapMgr(object):
         self.sensors = {}
         self.signals = {}
         self.stations = {}
+        self.junctions = []
         self.envItems = [] # Currently we only have building item so use list instead of dict()
 
         self._initTandT()
@@ -38,6 +39,7 @@ class MapMgr(object):
         self._initSignal()
         self._initStation()
         self._initEnv()
+        self._initJunction()
 
         gv.gDebugPrint('Map display management controller inited', logType=gv.LOG_INFO)
 
@@ -59,7 +61,7 @@ class MapMgr(object):
         }
         trackTrainCfg_we = [{'id': 'we01', 'head': (50, 200), 'nextPtIdx': 1, 'len': 5}, 
                             {'id': 'we02', 'head': (1500, 400),'nextPtIdx': 7, 'len': 5},
-                            {'id': 'we03', 'head': (460, 600), 'nextPtIdx': 3, 'len': 5},
+                            {'id': 'we03', 'head': (480, 600), 'nextPtIdx': 3, 'len': 5},
                             {'id': 'we03', 'head': (800, 850), 'nextPtIdx': 11, 'len': 5}]
         self.trains[key] = self._getTrainsList(trackTrainCfg_we, self.tracks[key]['points'])
         # Init NS-Line and the trains on it.
@@ -85,7 +87,7 @@ class MapMgr(object):
             'points': [(200, 200), (1400, 200), (1400, 700), (200, 700)]
         }
         trackTrainCfg_cc = [  {'id': 'cc01', 'head': (800, 200), 'nextPtIdx': 1, 'len': 6},
-                            {'id': 'cc02', 'head': (300, 700), 'nextPtIdx': 3, 'len': 6},
+                            {'id': 'cc02', 'head': (700, 700), 'nextPtIdx': 3, 'len': 6},
                             {'id': 'cc03', 'head': (1300, 700), 'nextPtIdx': 3, 'len': 6}]
         self.trains['ccline'] = self._getTrainsList(trackTrainCfg_cc, self.tracks[key]['points'])
 
@@ -110,7 +112,7 @@ class MapMgr(object):
             (270, 200), (480, 200), (670, 200), (770, 200), 
             (1170, 200), (1270, 200), (1400, 370), (1400, 500), 
             (980, 700), (830, 700), (630, 700), (460, 700),
-            (200, 700), (200, 530)
+            (200, 700), (200, 530),
             ]
         self.sensors['ccline'] = agent.AgentSensors(self, 'cc', sensorPos_cc)
 
@@ -213,6 +215,22 @@ class MapMgr(object):
             if 'labelPos' in info.keys(): station.setlabelPos(info['labelPos'])
             self.stations['ccline'].append(station)
 
+#-----------------------------------------------------------------------------
+    def _initJunction(self):
+        metroJunctions = [
+            (300, 200), (400, 200), (700, 200), (1200, 200), (1400, 400), (1400, 450), 
+            (950, 700), (900, 700), (600, 700), (550, 700), (200, 650), (200, 600)
+        ]
+        trainList = []
+        for key, train in self.trains.items():
+            for val in train:
+                trainList.append(val)
+        print(trainList)
+            
+        for pos in metroJunctions:
+            junction = agent.AgentJunction(self, 'jc', pos)
+            junction.bindTrains(trainList)
+            self.junctions.append(junction)
 
 #-----------------------------------------------------------------------------
     def _initEnv(self):
@@ -293,9 +311,9 @@ class MapMgr(object):
         """
 
         # Update the signal state
-        for key, val in self.signals.items():
-            for signal in val:
-                signal.updateSingalState()
+        # for key, val in self.signals.items():
+        #     for signal in val:
+        #         signal.updateSingalState()
 
         # update the trains position.
         for key, val in self.trains.items():
@@ -309,6 +327,9 @@ class MapMgr(object):
             # update all the track's sensors state afte all the trains have moved.
             self.sensors[key].updateActive(val)
         
+        for junction in self.junctions:
+            junction.checkCollision()
+
         # update the station train's docking state
         for key, val in self.stations.items():
             for station in val:

@@ -65,7 +65,7 @@ class PanelTainCtrl(wx.Panel):
     
     #-----------------------------------------------------------------------------
     def startTrain(self, event):
-        event.GetEventObject().GetID() 
+        event.GetEventObject().GetId() 
         if gv.iMapMgr:
             gv.gDebugPrint('Start train: %s on track: %s' %(str(self.trainID), self.trackID))
             trains = gv.iMapMgr.getTrains(trackID=self.trackID)

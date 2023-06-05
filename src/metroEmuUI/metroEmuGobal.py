@@ -50,6 +50,7 @@ SENSOR_TYPE         = 'SS'
 SINGAL_TYPE         = "SG"
 STATION_TYPE        = 'ST'
 ENV_TYPE            = 'EV'
+JUNCTION_TYPE       = 'JC'
 
 PERIODIC = 300      # update the main in every 300ms
 
@@ -75,7 +76,7 @@ LAY_V = 6   # vertical layout
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.
 gTranspPct = 70     # Windows transparent percentage.
-gUpdateRate = 0.8   # main frame update rate 0.5 sec.
+gUpdateRate = 0.4   # main frame update rate 0.5 sec.
 gSensorCount = 0    # number of sensors.
 gTrackConfig = OrderedDict()
 
