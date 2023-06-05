@@ -416,3 +416,33 @@ class AgentTrain(AgentTarget):
 
         else:  # Train stop at the station.
             self.dockCount -= 1
+
+#-----------------------------------------------------------------------------
+class AgentJunction(AgentTarget):
+    def __init__(self, parent, tgtID, pos):
+        super().__init__(parent, tgtID, pos, gv.JUNCTION_TYPE)
+        self.trainList = []
+        self.crossingTrains = []
+
+    def bindTrains(self, trainList):
+        self.trainList = trainList
+
+    def checkCollision(self):
+        for train in self.trainList:
+            ftPt1, ftPt2 = train.getTrainPos(idx=0), train.getTrainPos(idx=-1)
+            if self.checkNear(ftPt1[0], ftPt1[1], 20):
+                if len(self.crossingTrains) == 0:
+                    self.crossingTrains.append(train)
+                else:
+                    train.setEmgStop(1)
+                    # Stop all trains in the junction
+                    for val in self.crossingTrains:
+                        val.setEmgStop(1)
+                    break
+        self.crossingTrains = []
+
+
+
+
+
+        
