@@ -418,7 +418,7 @@ class AgentTrain(AgentTarget):
             self.dockCount -= 1
 
 #-----------------------------------------------------------------------------
-class AgentJunction(AgentTarget):
+class AgentJunction_olc(AgentTarget):
     def __init__(self, parent, tgtID, pos):
         super().__init__(parent, tgtID, pos, gv.JUNCTION_TYPE)
         self.trainList = []
@@ -441,7 +441,42 @@ class AgentJunction(AgentTarget):
                     break
         self.crossingTrains = []
 
+#-----------------------------------------------------------------------------
+class AgentJunction(AgentTarget):
+    def __init__(self, parent, tgtID, pos, TrackID1, TrackID2):
+        super().__init__(parent, tgtID, pos, gv.JUNCTION_TYPE)
+        self.trackid1 = TrackID1
+        self.trackid2 = TrackID2
+        self.detectState = {
+            self.trackid1 : None,
+            self.trackid2 : None,
+        }
 
+    def _checkTrainEnter(self, trainArea, threshold=20):
+        """ Check whether a train has enter the junctin.
+        """
+        u,d,l,r = trainArea
+        x, y = self.getPos()
+        if (l-threshold <= x <= r+threshold)  and (u-threshold <= y <= d+threshold):
+            return True
+        return False
+
+    def updateState(self):
+        if self.parent:
+            # Check tains on trackID1:
+            for trackid in self.detectState.keys():
+                self.detectState[trackid] = None
+                for i, train in enumerate(self.parent.getTrains(trackID=trackid)):
+                    if self._checkTrainEnter(train.getTrainArea()):
+                        self.detectState[trackid] = i
+                        break
+
+    def getCollition(self):
+        if None in self.detectState.keys(): return False
+        return True
+
+    def getCollitionState(self):
+        return self.detectState
 
 
 

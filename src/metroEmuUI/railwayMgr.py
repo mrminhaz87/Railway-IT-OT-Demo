@@ -61,8 +61,10 @@ class MapMgr(object):
         }
         trackTrainCfg_we = [{'id': 'we01', 'head': (50, 200), 'nextPtIdx': 1, 'len': 5}, 
                             {'id': 'we02', 'head': (1500, 400),'nextPtIdx': 7, 'len': 5},
-                            {'id': 'we03', 'head': (480, 600), 'nextPtIdx': 3, 'len': 5},
+                            {'id': 'we03', 'head': (460, 600), 'nextPtIdx': 3, 'len': 5},
                             {'id': 'we03', 'head': (800, 850), 'nextPtIdx': 11, 'len': 5}]
+        if gv.gCollsionTestFlg: trackTrainCfg_we[2] = {'id': 'we03', 'head': (480, 600), 'nextPtIdx': 3, 'len': 5}
+
         self.trains[key] = self._getTrainsList(trackTrainCfg_we, self.tracks[key]['points'])
         # Init NS-Line and the trains on it.
         key = 'nsline'
@@ -87,8 +89,9 @@ class MapMgr(object):
             'points': [(200, 200), (1400, 200), (1400, 700), (200, 700)]
         }
         trackTrainCfg_cc = [  {'id': 'cc01', 'head': (800, 200), 'nextPtIdx': 1, 'len': 6},
-                            {'id': 'cc02', 'head': (700, 700), 'nextPtIdx': 3, 'len': 6},
+                            {'id': 'cc02', 'head': (300, 700), 'nextPtIdx': 3, 'len': 6},
                             {'id': 'cc03', 'head': (1300, 700), 'nextPtIdx': 3, 'len': 6}]
+        if gv.gCollsionTestFlg: trackTrainCfg_cc[1] = {'id': 'cc02', 'head': (700, 700), 'nextPtIdx': 3, 'len': 6}
         self.trains['ccline'] = self._getTrainsList(trackTrainCfg_cc, self.tracks[key]['points'])
 
 #-----------------------------------------------------------------------------
@@ -216,7 +219,7 @@ class MapMgr(object):
             self.stations['ccline'].append(station)
 
 #-----------------------------------------------------------------------------
-    def _initJunction(self):
+    def _initJunction_old(self):
         metroJunctions = [
             (300, 200), (400, 200), (700, 200), (1200, 200), (1400, 400), (1400, 450), 
             (950, 700), (900, 700), (600, 700), (550, 700), (200, 650), (200, 600)
@@ -231,6 +234,15 @@ class MapMgr(object):
             junction = agent.AgentJunction(self, 'jc', pos)
             junction.bindTrains(trainList)
             self.junctions.append(junction)
+
+#-----------------------------------------------------------------------------
+    def _initJunction(self):
+        metroJunctions = [ {'pos':(600, 700), 'tracks':('weline', 'ccline') }
+        ]
+
+        for info in metroJunctions:
+            junction = agent.AgentJunction(self, 'jc', info['pos'], info['tracks'][0],info['tracks'][1] )
+        self.junctions.append(junction)
 
 #-----------------------------------------------------------------------------
     def _initEnv(self):
@@ -300,6 +312,9 @@ class MapMgr(object):
         if trackID and trackID in self.sensors.keys(): return self.sensors[trackID]
         return self.sensors
     
+    def getJunction(self):
+        return self.junctions
+
     def selfStations(self, trackID=None):
         if trackID and trackID in self.stations.keys(): return self.stations[trackID]
         return self.stations
@@ -309,26 +324,40 @@ class MapMgr(object):
         """ Periodicly call back function. This function need to be called before the 
             railwayPanelMap's periodic().
         """
-
+        collsionTrainsDict = {
+            'weline' : [], 
+            'nsline' : [],
+            'ccline' : [],
+        }
+        if gv.gCollsionTestFlg:
+            for junction in self.junctions:
+                junction.updateState()
+                #gv.gDebugPrint(junction.getCollitionState(), logType=gv.LOG_INFO)
+                if junction.getCollition():
+                    colltionState = junction.getCollitionState()
+                    for key, val in colltionState.items():
+                        collsionTrainsDict[key].append(val)
+            
         # Update the signal state
-        # for key, val in self.signals.items():
-        #     for signal in val:
-        #         signal.updateSingalState()
+        if not gv.gCollsionTestFlg:
+            for key, val in self.signals.items():
+                for signal in val:
+                    signal.updateSingalState()
 
         # update the trains position.
         for key, val in self.trains.items():
             frontTrain = val[-1]
-            for train in val:
+            for i, train in enumerate(val):
                 # Check the signal 1st 
                 train.checkSignal(self.signals[key])
                 train.checkCollFt(frontTrain)
+                if i in collsionTrainsDict[key]:
+                    train.setEmgStop(1)
                 train.updateTrainPos()
                 frontTrain = train                
             # update all the track's sensors state afte all the trains have moved.
             self.sensors[key].updateActive(val)
         
-        for junction in self.junctions:
-            junction.checkCollision()
 
         # update the station train's docking state
         for key, val in self.stations.items():
