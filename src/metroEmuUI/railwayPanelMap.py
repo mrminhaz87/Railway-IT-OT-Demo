@@ -59,6 +59,21 @@ class PanelMap(wx.Panel):
                 dc.DrawText(str(id), pos[0]-size[0]//2+6, pos[1]-size[1]//2+6)
 
 #-----------------------------------------------------------------------------
+    def _drawJunction(self, dc):
+        """ Draw the junction 
+        """
+        dc.SetPen(self.dcDefPen)
+        for item in gv.iMapMgr.getJunction():
+            pos = item.getPos()
+            if item.getCollition():
+                dc.SetPen(wx.Pen('RED', width=1, style=wx.PENSTYLE_SOLID))
+                dc.SetBrush(wx.Brush('RED'))
+            else: 
+                dc.SetPen(wx.Pen('GREEN', width=1, style=wx.PENSTYLE_SOLID))
+                dc.SetBrush(wx.Brush('GREEN', wx.TRANSPARENT))
+            dc.DrawRectangle(pos[0]-10, pos[1]-10, 20, 20)
+
+#-----------------------------------------------------------------------------
     def _drawRailWay(self, dc):
         """ Draw the background and the railway."""
         w, h = self.panelSize
@@ -198,6 +213,7 @@ class PanelMap(wx.Panel):
         self.dcDefPen = dc.GetPen()
         # Draw all the components
         self._drawRailWay(dc)
+        self._drawJunction(dc)
         self._drawTrains(dc)
         self._drawSensors(dc)
         self._drawSignals(dc)

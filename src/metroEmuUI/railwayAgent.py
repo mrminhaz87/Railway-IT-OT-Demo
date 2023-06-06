@@ -87,6 +87,47 @@ class agentEnv(AgentTarget):
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
+class AgentJunction(AgentTarget):
+    def __init__(self, parent, tgtID, pos, TrackID1, TrackID2):
+        super().__init__(parent, tgtID, pos, gv.JUNCTION_TYPE)
+        self.trackid1 = TrackID1
+        self.trackid2 = TrackID2
+        self.detectState = {
+            self.trackid1 : None,
+            self.trackid2 : None,
+        }
+
+    def _checkTrainEnter(self, trainArea, threshold=15):
+        """ Check whether a train has enter the junctin."""
+        u,d,l,r = trainArea
+        x, y = self.getPos()
+        if (l-threshold <= x <= r+threshold) and (u-threshold <= y <= d+threshold):
+            return True
+        return False
+
+#-----------------------------------------------------------------------------
+# Define all the get() functions here:
+    def getCollition(self):
+        if None in self.detectState.values(): return False
+        return True
+
+    def getCollitionState(self):
+        return self.detectState
+
+#-----------------------------------------------------------------------------
+    def updateState(self):
+        """ Update the current station of a junction """
+        if self.parent:
+            # Check tains on trackID1:
+            for trackid in self.detectState.keys():
+                self.detectState[trackid] = None
+                for i, train in enumerate(self.parent.getTrains(trackID=trackid)):
+                    if self._checkTrainEnter(train.getTrainArea()):
+                        self.detectState[trackid] = i
+                        break
+
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 class AgentSensors(AgentTarget):
     """ The sensors set to show the sensors detection state."""
     def __init__(self, parent, idx, pos):
@@ -416,67 +457,6 @@ class AgentTrain(AgentTarget):
 
         else:  # Train stop at the station.
             self.dockCount -= 1
-
-#-----------------------------------------------------------------------------
-class AgentJunction_olc(AgentTarget):
-    def __init__(self, parent, tgtID, pos):
-        super().__init__(parent, tgtID, pos, gv.JUNCTION_TYPE)
-        self.trainList = []
-        self.crossingTrains = []
-
-    def bindTrains(self, trainList):
-        self.trainList = trainList
-
-    def checkCollision(self):
-        for train in self.trainList:
-            ftPt1, ftPt2 = train.getTrainPos(idx=0), train.getTrainPos(idx=-1)
-            if self.checkNear(ftPt1[0], ftPt1[1], 20):
-                if len(self.crossingTrains) == 0:
-                    self.crossingTrains.append(train)
-                else:
-                    train.setEmgStop(1)
-                    # Stop all trains in the junction
-                    for val in self.crossingTrains:
-                        val.setEmgStop(1)
-                    break
-        self.crossingTrains = []
-
-#-----------------------------------------------------------------------------
-class AgentJunction(AgentTarget):
-    def __init__(self, parent, tgtID, pos, TrackID1, TrackID2):
-        super().__init__(parent, tgtID, pos, gv.JUNCTION_TYPE)
-        self.trackid1 = TrackID1
-        self.trackid2 = TrackID2
-        self.detectState = {
-            self.trackid1 : None,
-            self.trackid2 : None,
-        }
-
-    def _checkTrainEnter(self, trainArea, threshold=20):
-        """ Check whether a train has enter the junctin.
-        """
-        u,d,l,r = trainArea
-        x, y = self.getPos()
-        if (l-threshold <= x <= r+threshold)  and (u-threshold <= y <= d+threshold):
-            return True
-        return False
-
-    def updateState(self):
-        if self.parent:
-            # Check tains on trackID1:
-            for trackid in self.detectState.keys():
-                self.detectState[trackid] = None
-                for i, train in enumerate(self.parent.getTrains(trackID=trackid)):
-                    if self._checkTrainEnter(train.getTrainArea()):
-                        self.detectState[trackid] = i
-                        break
-
-    def getCollition(self):
-        if None in self.detectState.keys(): return False
-        return True
-
-    def getCollitionState(self):
-        return self.detectState
 
 
 

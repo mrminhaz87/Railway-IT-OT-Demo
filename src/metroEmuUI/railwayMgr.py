@@ -237,12 +237,19 @@ class MapMgr(object):
 
 #-----------------------------------------------------------------------------
     def _initJunction(self):
-        metroJunctions = [ {'pos':(600, 700), 'tracks':('weline', 'ccline') }
+        juncType1 = ('nsline', 'ccline')
+        juncType2 = ('weline', 'ccline')
+        metroJunctions = [ 
+            {'pos':(300, 200), 'tracks':juncType1}, {'pos':(400, 200), 'tracks':juncType1},
+            {'pos':(700, 200), 'tracks':juncType1}, {'pos':(1200, 200), 'tracks':juncType1},
+            {'pos':(1400, 400), 'tracks':juncType2}, {'pos': (1400, 450), 'tracks':juncType2},
+            {'pos':(950, 700), 'tracks':juncType2}, {'pos':(950, 700), 'tracks':juncType2},
+            {'pos':(600, 700), 'tracks':juncType2}, {'pos':(550, 700), 'tracks':juncType2},
+            {'pos':(200, 650), 'tracks':juncType2}, {'pos':(200, 600), 'tracks':juncType2}
         ]
-
-        for info in metroJunctions:
-            junction = agent.AgentJunction(self, 'jc', info['pos'], info['tracks'][0],info['tracks'][1] )
-        self.junctions.append(junction)
+        for i, info in enumerate(metroJunctions):
+            junction = agent.AgentJunction(self, 'jc-%s' % str(i), info['pos'], info['tracks'][0], info['tracks'][1])
+            self.junctions.append(junction)
 
 #-----------------------------------------------------------------------------
     def _initEnv(self):
@@ -291,6 +298,22 @@ class MapMgr(object):
         return trainList
 
 #-----------------------------------------------------------------------------
+    def _updateJunctionState(self):
+        collsionTrainsDict = {
+            'weline' : [], 
+            'nsline' : [],
+            'ccline' : [],
+        }
+        for junction in self.junctions:
+            junction.updateState()
+            #gv.gDebugPrint(junction.getCollitionState(), logType=gv.LOG_INFO)
+            if junction.getCollition():
+                colltionState = junction.getCollitionState()
+                for key, val in colltionState.items():
+                    collsionTrainsDict[key].append(val)
+        return collsionTrainsDict
+
+#-----------------------------------------------------------------------------
 # Define all the get() functions here:
 
     def getEnvItems(self):
@@ -318,26 +341,14 @@ class MapMgr(object):
     def selfStations(self, trackID=None):
         if trackID and trackID in self.stations.keys(): return self.stations[trackID]
         return self.stations
-
+    
 #-----------------------------------------------------------------------------
     def periodic(self , now):
         """ Periodicly call back function. This function need to be called before the 
             railwayPanelMap's periodic().
         """
-        collsionTrainsDict = {
-            'weline' : [], 
-            'nsline' : [],
-            'ccline' : [],
-        }
-        if gv.gCollsionTestFlg:
-            for junction in self.junctions:
-                junction.updateState()
-                #gv.gDebugPrint(junction.getCollitionState(), logType=gv.LOG_INFO)
-                if junction.getCollition():
-                    colltionState = junction.getCollitionState()
-                    for key, val in colltionState.items():
-                        collsionTrainsDict[key].append(val)
-            
+
+        collsionTrainsDict = self._updateJunctionState() if gv.gCollsionTestFlg else None
         # Update the signal state
         if not gv.gCollsionTestFlg:
             for key, val in self.signals.items():
@@ -351,14 +362,14 @@ class MapMgr(object):
                 # Check the signal 1st 
                 train.checkSignal(self.signals[key])
                 train.checkCollFt(frontTrain)
-                if i in collsionTrainsDict[key]:
+                # stop the train if it got collision at any junction.
+                if collsionTrainsDict and i in collsionTrainsDict[key]:
                     train.setEmgStop(1)
                 train.updateTrainPos()
                 frontTrain = train                
             # update all the track's sensors state afte all the trains have moved.
             self.sensors[key].updateActive(val)
         
-
         # update the station train's docking state
         for key, val in self.stations.items():
             for station in val:

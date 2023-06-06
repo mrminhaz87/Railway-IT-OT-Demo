@@ -79,7 +79,7 @@ gTranspPct = 70     # Windows transparent percentage.
 gUpdateRate = 0.4   # main frame update rate 0.5 sec.
 gSensorCount = 0    # number of sensors.
 gTrackConfig = OrderedDict()
-gCollsionTestFlg = True
+gCollsionTestFlg = True # flag used to enable test the train collision at the junction.
 
 def gDebugPrint(msg, prt=True, logType=None):
     if prt: print(msg)
