@@ -116,8 +116,9 @@ class UIFrame(wx.Frame):
         if (not self.updateLock) and now - self.lastPeriodicTime >= gv.gUpdateRate:
             print("main frame update at %s" % str(now))
             self.lastPeriodicTime = now
-            # update the 
+            # update the manager.
             gv.iMapMgr.periodic(now)
+            # apply the state on the map panel.
             self.mapPanel.periodic(now)
 
 #-----------------------------------------------------------------------------

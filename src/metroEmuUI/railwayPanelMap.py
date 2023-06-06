@@ -89,8 +89,6 @@ class PanelMap(wx.Panel):
                 dc.SetBrush(wx.Brush('GREEN', wx.TRANSPARENT))
                 dc.DrawRectangle(pos[0]-10, pos[1]-10, 20, 20)
 
-            
-
 #-----------------------------------------------------------------------------
     def _drawRailWay(self, dc):
         """ Draw the background and the railway."""

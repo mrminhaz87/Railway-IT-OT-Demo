@@ -115,7 +115,7 @@ class MapMgr(object):
             (270, 200), (480, 200), (670, 200), (770, 200), 
             (1170, 200), (1270, 200), (1400, 370), (1400, 500), 
             (980, 700), (830, 700), (630, 700), (460, 700),
-            (200, 700), (200, 530),
+            (200, 700), (200, 530)
             ]
         self.sensors['ccline'] = agent.AgentSensors(self, 'cc', sensorPos_cc)
 
@@ -243,7 +243,7 @@ class MapMgr(object):
             {'pos':(300, 200), 'tracks':juncType1}, {'pos':(400, 200), 'tracks':juncType1},
             {'pos':(700, 200), 'tracks':juncType1}, {'pos':(1200, 200), 'tracks':juncType1},
             {'pos':(1400, 400), 'tracks':juncType2}, {'pos': (1400, 450), 'tracks':juncType2},
-            {'pos':(950, 700), 'tracks':juncType2}, {'pos':(950, 700), 'tracks':juncType2},
+            {'pos':(950, 700), 'tracks':juncType2}, {'pos':(900, 700), 'tracks':juncType2},
             {'pos':(600, 700), 'tracks':juncType2}, {'pos':(550, 700), 'tracks':juncType2},
             {'pos':(200, 650), 'tracks':juncType2}, {'pos':(200, 600), 'tracks':juncType2}
         ]

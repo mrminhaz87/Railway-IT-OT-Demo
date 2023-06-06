@@ -303,14 +303,25 @@ class AgentTrain(AgentTarget):
         self.railwayPts = railwayPts
         self.railwayType = railwayType
         self.trainLen = trainLen
-        # Init the train head and tail points at the horizontal position.
-        self.pos = [[initPos[0] + 10*i, initPos[1]] for i in range(self.trainLen)]
+        self.initPos = initPos
         self.dirs = [0]*5
         self.traindir = 1   # follow the railway point with increase order.
         self.trainDestList = self._getDestList(initPos)
+        # Init the train head and tail points at the horizontal position.
+        #self.pos = [[initPos[0] + 10*i, initPos[1]] for i in range(self.trainLen)]
+        self.pos = self._buildTrainPos()
         self.trainSpeed = trainSpeed    # train speed: pixel/periodic loop
         self.dockCount = 0              # refersh cycle number of a train to stop in the station.
         self.emgStop = False            # emergency stop.
+
+#-----------------------------------------------------------------------------
+    def _buildTrainPos(self):
+        x, y = self.initPos
+        x1, y1 = self.railwayPts[self.trainDestList[0]]
+        i = j = 0
+        if x == x1: j = 1 if y > y1 else -1
+        if y == y1: i = 1 if x > x1  else -1
+        return [[x+10*i*k, y+10*j*k] for k in range(self.trainLen)]
 
 #-----------------------------------------------------------------------------
     def _getDestList(self, initPos):
@@ -321,8 +332,8 @@ class AgentTrain(AgentTarget):
         for idx in range(len(self.railwayPts)-1):
             x1, y1 = self.railwayPts[idx]
             x2, y2 = self.railwayPts[idx+1]
-            if x1 == x0 == x2 or y1 == y0 == y2: return [idx+1]*len(self.pos)
-        return [0]*len(self.pos)
+            if x1 == x0 == x2 or y1 == y0 == y2: return [idx+1]*self.trainLen
+        return [0]*self.trainLen
             
 #-----------------------------------------------------------------------------
     def _getDirc(self, srcPt, destPt):
@@ -426,6 +437,15 @@ class AgentTrain(AgentTarget):
 
     def setTrainSpeed(self, speed):
         self.trainSpeed = speed
+
+#--AgentTrain------------------------------------------------------------------
+    def resetTrain(self):
+        """ reset the train to the init position."""
+        self.trainDestList = self._getDestList(self.initPos)
+        self.pos = self._buildTrainPos()
+        self.emgStop = 0
+        self.trainSpeed = 10
+        self.dockCount = 0
 
 #--AgentTrain------------------------------------------------------------------
     def updateTrainPos(self):
