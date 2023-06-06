@@ -95,6 +95,7 @@ def gDebugPrint(msg, prt=True, logType=None):
 #-------<GLOBAL PARAMTERS>-----------------------------------------------------
 iMainFrame = None   # MainFrame.
 iImagePanel = None  # Image panel.
-iCtrlPanel = None   # control panel
+iCtrlPanel = None   # control panel.
 iMapPanel = None
-iMapMgr = None      # map manager
+iMapMgr = None      # map manager.
+iDBMgr = None
