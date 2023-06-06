@@ -12,6 +12,8 @@
 # Copyright:   
 # License:     
 #-----------------------------------------------------------------------------
+
+import os
 import wx
 import math
 
@@ -28,11 +30,21 @@ class PanelMap(wx.Panel):
         self.bgColor = wx.Colour(30, 40, 62)
         self.SetBackgroundColour(self.bgColor)
         self.panelSize = panelSize
+        self.bitMaps = self._loadBitMaps()
         self.toggle = False
         # Paint the map
         self.Bind(wx.EVT_PAINT, self.onPaint)
         # self.Bind(wx.EVT_LEFT_DOWN, self.onLeftClick)
         self.SetDoubleBuffered(True)  # Set the panel double buffer to void the panel flash during update.
+
+#-----------------------------------------------------------------------------
+    def _loadBitMaps(self):
+        """ load the internal usage bitmaps."""
+        imgDict = {}
+        img = os.path.join(gv.IMG_FD, 'Alert.png')
+        png = wx.Image(img, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        imgDict['alert'] = png
+        return imgDict
 
 #-----------------------------------------------------------------------------
     def _drawEnvItems(self, dc):
@@ -66,12 +78,18 @@ class PanelMap(wx.Panel):
         for item in gv.iMapMgr.getJunction():
             pos = item.getPos()
             if item.getCollition():
-                dc.SetPen(wx.Pen('RED', width=1, style=wx.PENSTYLE_SOLID))
-                dc.SetBrush(wx.Brush('RED'))
+                if self.toggle:
+                    dc.DrawBitmap(self.bitMaps['alert'], pos[0]-15, pos[1]-15)
+                else:
+                    dc.SetPen(wx.Pen('RED', width=1, style=wx.PENSTYLE_SOLID))
+                    dc.SetBrush(wx.Brush('RED'))
+                    dc.DrawRectangle(pos[0]-10, pos[1]-10, 20, 20)
             else: 
                 dc.SetPen(wx.Pen('GREEN', width=1, style=wx.PENSTYLE_SOLID))
                 dc.SetBrush(wx.Brush('GREEN', wx.TRANSPARENT))
-            dc.DrawRectangle(pos[0]-10, pos[1]-10, 20, 20)
+                dc.DrawRectangle(pos[0]-10, pos[1]-10, 20, 20)
+
+            
 
 #-----------------------------------------------------------------------------
     def _drawRailWay(self, dc):
