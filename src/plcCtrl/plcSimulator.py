@@ -57,7 +57,7 @@ class plcAgent(object):
             'nsline': [0, 0, 0, 0],
             'ccline': [0, 0, 0, 0, 0, 0, 0]
         }
-        
+        # Init the ladder logic.
         self.ladderDict = {}
         self._initLadderLogic()
         
@@ -138,7 +138,7 @@ class plcAgent(object):
             if self.rwConnector:
                 resp = self.rwConnector.sendMsg(rqst, resp=response)
                 if resp:
-                    print('===> resp:%s' %str(resp))
+                    #gv.gDebugPrint('===> resp:%s' %str(resp), logType=gv.LOG_INFO)
                     k, t, data = parseIncomeMsg(resp)
                     if k != 'REP': gv.gDebugPrint('The msg reply key %s is invalid' % k, logType=gv.LOG_WARN)
                     if t != rqstType: gv.gDebugPrint('The reply type doesnt match.%s' %str((rqstType, t)), logType=gv.LOG_WARN)

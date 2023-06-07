@@ -18,7 +18,6 @@ For good coding practice, follow the following naming convention:
 """
 
 import os, sys
-from collections import OrderedDict
 
 print("Current working directory is : %s" % os.getcwd())
 DIR_PATH = dirpath = os.path.dirname(__file__)
@@ -47,7 +46,7 @@ LOG_EXCEPT  = 3
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.
 gRealWordIP = ('127.0.0.1', 3001)
-gInterval = 0.4
+gInterval = 0.6
 
 def gDebugPrint(msg, prt=True, logType=None):
     if prt: print(msg)
