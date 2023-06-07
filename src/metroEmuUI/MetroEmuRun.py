@@ -21,6 +21,9 @@ import railwayMgr as dataMgr
 import railwayPanel as pnlFunction
 import railwayPanelMap as pnlMap
 
+import dataMgr as dm
+
+
 FRAME_SIZE = (1800, 1000)
 
 #-----------------------------------------------------------------------------
@@ -42,10 +45,17 @@ class UIFrame(wx.Frame):
         self.SetSizer(self._buidUISizer())
         # Set the periodic call back
         self.updateLock = False
+
+        # Define the data manager parallel thread.
+        gv.iDataMgr = dm.DataManager(self)
+        gv.iDataMgr.start()
+
         self.lastPeriodicTime = time.time()
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.periodic)
         self.timer.Start(gv.PERIODIC)
+
+        self.Bind(wx.EVT_CLOSE, self.onClose)
         gv.gDebugPrint("Metro real world main frame inited.", logType=gv.LOG_INFO)
 
 #--UIFrame---------------------------------------------------------------------
@@ -120,6 +130,11 @@ class UIFrame(wx.Frame):
             gv.iMapMgr.periodic(now)
             # apply the state on the map panel.
             self.mapPanel.periodic(now)
+
+    def onClose(self, evt):
+        gv.iDataMgr.stop()
+        self.timer.Stop()
+        self.Destroy()
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
