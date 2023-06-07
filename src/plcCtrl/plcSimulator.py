@@ -46,6 +46,21 @@ class plcAgent(object):
         self.parent = parent
         self.id = plcID
         self.realworld = realworldIP
+        
+        self.inputState = {
+            'weline': [],
+            'nsline': [],
+            'ccline': [] }
+        
+        self.coilState = {
+            'weline': [0, 0, 0, 0, 0, 0, 0, 0 ],
+            'nsline': [0, 0, 0, 0],
+            'ccline': [0, 0, 0, 0, 0, 0, 0]
+        }
+        
+        self.ladderDict = {}
+        self._initLadderLogic()
+        
         self.realwordInfo= {
             'ip': realworldIP[0],
             'port': realworldIP[1]
@@ -55,15 +70,41 @@ class plcAgent(object):
             gv.gDebugPrint('Login the realworld successfully', logType=gv.LOG_INFO)
         else:
             gv.gDebugPrint('Cannot connect to the realworld emulator', logType=gv.LOG_INFO)
+        
         self.terminate = False
 
+#-----------------------------------------------------------------------------
     def _initLadderLogic(self):
-        """ This is a temp test function, the ladder diagram logic will be replaced by real ladder 
-            config file.
+        """ This is a temp test function to implement the ladder logic of PLC, the ladder diagram 
+            logic will be replaced by real ladder config file.
         """
-        
+        self.ladderDict['weline'] = [
+            {'id': 'we-0', 'tiggerS': 'ccline', 'onIdx':(13,), 'offIdx':(12,) }, 
+            {'id': 'we-1', 'tiggerS': 'ccline', 'onIdx':(13,), 'offIdx':(12,) },
+            {'id': 'we-2', 'tiggerS': 'ccline', 'onIdx':(11,), 'offIdx':(10,) },
+            {'id': 'we-3', 'tiggerS': 'ccline', 'onIdx':(11,), 'offIdx':(10,) },
+            {'id': 'we-4', 'tiggerS': 'ccline', 'onIdx':(9,), 'offIdx':(8,) },
+            {'id': 'we-5', 'tiggerS': 'ccline', 'onIdx':(9,), 'offIdx':(8,) },
+            {'id': 'we-6', 'tiggerS': 'ccline', 'onIdx':(7,), 'offIdx':(6,) },
+            {'id': 'we-7', 'tiggerS': 'ccline', 'onIdx':(7,), 'offIdx':(6,) }
+        ]
 
+        self.ladderDict['nsline'] = [
+            {'id': 'ns-0', 'tiggerS': 'ccline', 'onIdx':(1,), 'offIdx':(0,) },
+            {'id': 'ns-1', 'tiggerS': 'ccline', 'onIdx':(1,), 'offIdx':(0,) },
+            {'id': 'ns-2', 'tiggerS': 'ccline', 'onIdx':(3,), 'offIdx':(2,) },
+            {'id': 'ns-3', 'tiggerS': 'ccline', 'onIdx':(5,), 'offIdx':(4,) }
+        ]
 
+        self.ladderDict['ccline'] = [
+            {'id': 'cc-0', 'tiggerS': 'nsline', 'onIdx':(1, 7), 'offIdx':(0, 6) },
+            {'id': 'cc-1', 'tiggerS': 'nsline', 'onIdx':(5,), 'offIdx':(4,) },
+            {'id': 'cc-2', 'tiggerS': 'nsline', 'onIdx':(3,), 'offIdx':(2,) },
+            {'id': 'cc-3', 'tiggerS': 'weline', 'onIdx':(8,10), 'offIdx':(7,9) },
+            {'id': 'cc-4', 'tiggerS': 'weline', 'onIdx':(6,12), 'offIdx':(5,11) },
+            {'id': 'cc-5', 'tiggerS': 'weline', 'onIdx':(4,14), 'offIdx':(3,13) },
+            {'id': 'cc-6', 'tiggerS': 'weline', 'onIdx':(2, 16), 'offIdx':(1,15) }
+        ]
 
 #-----------------------------------------------------------------------------
     def _loginRealWord(self):
@@ -95,8 +136,9 @@ class plcAgent(object):
         if rqstKey and rqstType and rqstDict:
             rqst = ';'.join((rqstKey, rqstType, json.dumps(rqstDict)))
             if self.rwConnector:
-                resp = self.rwConnector.sendMsg(rqst, resp=True)
+                resp = self.rwConnector.sendMsg(rqst, resp=response)
                 if resp:
+                    print('===> resp:%s' %str(resp))
                     k, t, data = parseIncomeMsg(resp)
                     if k != 'REP': gv.gDebugPrint('The msg reply key %s is invalid' % k, logType=gv.LOG_WARN)
                     if t != rqstType: gv.gDebugPrint('The reply type doesnt match.%s' %str((rqstType, t)), logType=gv.LOG_WARN)
@@ -121,13 +163,50 @@ class plcAgent(object):
                     'ccline': None}
         result = self._queryToRW(rqstKey, rqstType, rqstDict)
         return result
-
-
-
+    
+    def changeSignalCoil(self):
+        rqstKey = 'POST'
+        rqstType = 'signals'
+        rqstDict = self.coilState
+        result = self._queryToRW(rqstKey, rqstType, rqstDict)
+        return result
+    
 #-----------------------------------------------------------------------------
     def periodic(self, now):
         result = self.getSensorsInfo()
-        print(result[2])
+        time.sleep(0.1)
+        for key in result[2].keys():
+            self.inputState[key] = result[2][key]
+        self.updateCoilOutput()
+        rst = self.changeSignalCoil()
+        print(rst)
+
+#-----------------------------------------------------------------------------
+    def updateCoilOutput(self):
+        """ update the coil output based in the input and ladder logic
+        """
+        for key in self.ladderDict.keys():
+            for i, ladder in enumerate(self.ladderDict[key]):
+                sensorTp = ladder['tiggerS']
+                triggerOnSensorIdx = ladder['onIdx']
+                triggerOffSensorIdx = ladder['offIdx']
+                # check signal 'On' state:
+                if self.coilState[key][i]:
+                    for idx in triggerOnSensorIdx:
+                        try:
+                            if self.inputState[sensorTp][idx]:
+                                self.coilState[key][i] = 0
+                                break
+                        except:
+                            gv.gDebugPrint(str(sensorTp)+str(idx), logType=gv.LOG_ERR)
+                else:
+                    for idx in triggerOffSensorIdx:
+                        try:
+                            if self.inputState[sensorTp][idx]:
+                                self.coilState[key][i] = 1
+                                break
+                        except:
+                            gv.gDebugPrint(str(sensorTp)+str(idx), logType=gv.LOG_ERR)
 
 #-----------------------------------------------------------------------------
     def run(self):

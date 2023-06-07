@@ -99,19 +99,20 @@ class DataManager(threading.Thread):
                 respStr = self.fetchSensorInfo(reqJsonStr)
                 resp =';'.join(('REP', 'sensors', respStr))
         elif reqKey=='POST':
-            if reqType == 'singals':
+            if reqType == 'signals':
                 respStr = self.setSignals(reqJsonStr)
                 resp =';'.join(('REP', 'signals', respStr))
             pass
             # TODO: Handle all the control request here.
         if isinstance(resp, str): resp = resp.encode('utf-8')
+        #gv.gDebugPrint('reply: %s' %str(resp), logType=gv.LOG_INFO )
         return resp
     
     #-----------------------------------------------------------------------------
     def fetchSensorInfo(self, reqJsonStr):
         reqDict = json.loads(reqJsonStr)
         self.updateSensorsData()
-        respStr= 'Failed'
+        respStr= json.dumps({'result': 'failed'})
         try:
             for key in reqDict.keys():
                 if key in self.sensorsDict.keys():
@@ -124,12 +125,12 @@ class DataManager(threading.Thread):
     #-----------------------------------------------------------------------------
     def setSignals(self, reqJsonStr):
         reqDict = json.loads(reqJsonStr)
-        respStr = 'Failed'
+        respStr = json.dumps({'result': 'success'})
         try:
             if gv.iMapMgr:
                 for key, val in reqDict.items():
                     gv.iMapMgr.setSingals(key, val)
-                respStr = 'Success'
+                respStr = json.dumps({'result': 'success'})
             respStr = json.dumps(reqDict)
         except Exception as err:
             gv.gDebugPrint("setSignals() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
