@@ -53,6 +53,8 @@ ENV_TYPE            = 'EV'
 JUNCTION_TYPE       = 'JC'
 
 PERIODIC = 300      # update the main in every 300ms
+UDP_PORT = 3001
+
 
 # Init the log type parameters.
 DEBUG_FLG   = False
@@ -98,4 +100,5 @@ iImagePanel = None  # Image panel.
 iCtrlPanel = None   # control panel.
 iMapPanel = None
 iMapMgr = None      # map manager.
+iDataMgr = None     # data manager to handling data fetch and set requirment.
 iDBMgr = None
