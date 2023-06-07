@@ -97,12 +97,11 @@ class DataManager(threading.Thread):
                 resp = ';'.join(('REP', 'login', json.dumps({'state':'ready'})))
             elif reqType == 'sensors':
                 respStr = self.fetchSensorInfo(reqJsonStr)
-                resp =';'.join(('REP', 'jobState', respStr))
-
+                resp =';'.join(('REP', 'sensors', respStr))
         elif reqKey=='POST':
-            if reqType == 'changeTsk':
-                respStr = self.changeTask(reqJsonStr)
-                resp =';'.join(('REP', 'changeTsk', respStr))
+            if reqType == 'singals':
+                respStr = self.setSignals(reqJsonStr)
+                resp =';'.join(('REP', 'signals', respStr))
             pass
             # TODO: Handle all the control request here.
         if isinstance(resp, str): resp = resp.encode('utf-8')
@@ -112,10 +111,28 @@ class DataManager(threading.Thread):
     def fetchSensorInfo(self, reqJsonStr):
         reqDict = json.loads(reqJsonStr)
         self.updateSensorsData()
-        for key in reqDict.keys():
-            if key in self.sensorsDict.keys():
-                reqDict[key] = self.sensorsDict[key]
-        respStr = json.dumps(reqDict)
+        respStr= 'Failed'
+        try:
+            for key in reqDict.keys():
+                if key in self.sensorsDict.keys():
+                    reqDict[key] = self.sensorsDict[key]
+            respStr = json.dumps(reqDict)
+        except Exception as err:
+            gv.gDebugPrint("fetchSensorInfo() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
+        return respStr
+
+    #-----------------------------------------------------------------------------
+    def setSignals(self, reqJsonStr):
+        reqDict = json.loads(reqJsonStr)
+        respStr = 'Failed'
+        try:
+            if gv.iMapMgr:
+                for key, val in reqDict.items():
+                    gv.iMapMgr.setSingals(key, val)
+                respStr = 'Success'
+            respStr = json.dumps(reqDict)
+        except Exception as err:
+            gv.gDebugPrint("setSignals() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
         return respStr
 
     #-----------------------------------------------------------------------------

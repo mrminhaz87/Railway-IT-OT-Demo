@@ -338,10 +338,20 @@ class MapMgr(object):
     def getJunction(self):
         return self.junctions
 
+
+#-----------------------------------------------------------------------------
+# Define all the set() functions here:
+
     def selfStations(self, trackID=None):
         if trackID and trackID in self.stations.keys(): return self.stations[trackID]
         return self.stations
     
+    def setSingals(self, trackID, signalStatList):
+        if trackID in self.signals.keys():
+            for i, singal in enumerate(self.signals[trackID]):
+                if i < len(signalStatList):
+                    singal.setState(signalStatList[i])
+                
 #-----------------------------------------------------------------------------
     def periodic(self , now):
         """ Periodicly call back function. This function need to be called before the 
