@@ -98,24 +98,13 @@ class AgentJunction(AgentTarget):
         }
         self.signalList = None
 
-    def _checkTrainEnter(self, trainArea, threshold=0):
+    def _checkTrainEnter(self, trainArea, threshold=15):
         """ Check whether a train has enter the junctin."""
         u,d,l,r = trainArea
         x, y = self.getPos()
         if (l-threshold <= x <= r+threshold) and (u-threshold <= y <= d+threshold):
             return True
         return False
-
-    def handleDeadLock(self):
-        noDeadLock = False
-        if self.signalList:
-            for i, signal in enumerate(self.signalList):
-                if not signal.getState():
-                    noDeadLock = True
-                break
-            if noDeadLock == False:
-                self.signalList[1].startManualOverrideOnDeadlock()
-        
 
 #-----------------------------------------------------------------------------
 # Define all the get() functions here:
@@ -265,13 +254,6 @@ class AgentSignal(AgentTarget):
         self.triggerOnIdx = None
         self.triggerOffSenAgent = None
         self.triggerOffIdx = None
-
-    def startManualOverrideOnDeadlock(self):
-        for idx in self.triggerOffIdx:
-            self.triggerOffSenAgent.setSensorState(idx, 1)
-        for idx in self.triggerOnIdx:
-            self.triggerOnSenAgent.setSensorState(idx, 0)
-        self.signalOn = False
         
 #-----------------------------------------------------------------------------
 # Define all the get() functions here:
