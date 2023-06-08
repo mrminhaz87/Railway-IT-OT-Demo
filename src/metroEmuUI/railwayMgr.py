@@ -77,10 +77,9 @@ class MapMgr(object):
             'points': [(300, 50), (1200, 50), (1200, 300), (800, 300), (800, 600), (700, 600), 
                        (700, 100), (400, 100), (400, 450), (300, 450)]
         }
-        trackTrainCfg_ns = [{'id': 'ns01', 'head': (400, 50), 'nextPtIdx': 1, 'len': 4},
+        trackTrainCfg_ns = [{'id': 'ns01', 'head': (1160, 50), 'nextPtIdx': 1, 'len': 4},
                             {'id': 'ns02', 'head': (1100, 300), 'nextPtIdx': 3, 'len': 4},
                             {'id': 'ns03', 'head': (600, 100), 'nextPtIdx': 7, 'len': 4}]
-        if gv.gCollsionTestFlg or gv.gDeadlockTestFlg: trackTrainCfg_ns[0] = {'id': 'ns01', 'head': (1160, 50), 'nextPtIdx': 1, 'len': 4}
         self.trains[key] = self._getTrainsList(trackTrainCfg_ns, self.tracks[key]['points'])
         # Init CC-Line and the trains on it.
         key = 'ccline'
@@ -90,10 +89,9 @@ class MapMgr(object):
             'type': gv.RAILWAY_TYPE_CYCLE,
             'points': [(200, 200), (1400, 200), (1400, 700), (200, 700)]
         }
-        trackTrainCfg_cc = [  {'id': 'cc01', 'head': (800, 200), 'nextPtIdx': 1, 'len': 6},
+        trackTrainCfg_cc = [  {'id': 'cc01', 'head': (1000, 200), 'nextPtIdx': 1, 'len': 6},
                             {'id': 'cc02', 'head': (300, 700), 'nextPtIdx': 3, 'len': 6},
                             {'id': 'cc03', 'head': (1300, 700), 'nextPtIdx': 3, 'len': 6}]
-        if gv.gCollsionTestFlg or gv.gDeadlockTestFlg: trackTrainCfg_cc[0] = {'id': 'cc01', 'head': (1000, 200), 'nextPtIdx': 1, 'len': 6}
         self.trains['ccline'] = self._getTrainsList(trackTrainCfg_cc, self.tracks[key]['points'])
 
 #-----------------------------------------------------------------------------
