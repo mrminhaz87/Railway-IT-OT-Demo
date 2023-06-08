@@ -66,6 +66,7 @@ class MapMgr(object):
                             {'id': 'we02', 'head': (1500, 400),'nextPtIdx': 7, 'len': 5},
                             {'id': 'we03', 'head': (460, 600), 'nextPtIdx': 3, 'len': 5},
                             {'id': 'we04', 'head': (800, 850), 'nextPtIdx': 11, 'len': 5}]
+        if gv.gCollsionTestFlg: trackTrainCfg_we[2] = {'id': 'we03', 'head': (480, 600), 'nextPtIdx': 3, 'len': 5}
         self.trains[key] = self._getTrainsList(trackTrainCfg_we, self.tracks[key]['points'])
         # Init NS-Line and the trains on it.
         key = 'nsline'
@@ -92,6 +93,7 @@ class MapMgr(object):
         trackTrainCfg_cc = [  {'id': 'cc01', 'head': (1000, 200), 'nextPtIdx': 1, 'len': 6},
                             {'id': 'cc02', 'head': (300, 700), 'nextPtIdx': 3, 'len': 6},
                             {'id': 'cc03', 'head': (1300, 700), 'nextPtIdx': 3, 'len': 6}]
+        if gv.gCollsionTestFlg: trackTrainCfg_cc[1] = {'id': 'cc02', 'head': (700, 700), 'nextPtIdx': 3, 'len': 6}
         self.trains['ccline'] = self._getTrainsList(trackTrainCfg_cc, self.tracks[key]['points'])
 
 #-----------------------------------------------------------------------------
@@ -359,7 +361,6 @@ class MapMgr(object):
 
 #-----------------------------------------------------------------------------
     def updateSignalState(self, key):
-        if gv.gCollsionTestFlg: return
         piority = {
             'weline': ('ccline',),
             'nsline': ('ccline',),
@@ -389,8 +390,10 @@ class MapMgr(object):
                 frontTrain = train                
             # update all the track's sensors state afte all the trains have moved.
             self.sensors[key].updateActive(val)
-            # updaste all the signal
-            self.updateSignalState(key)
+            # updaste all the signal, if test mode (not connect to PLC) call the 
+            # buildin signal control logic, else the data manager will read the signal 
+            # infromation from PLC then do the auto update.
+            if gv.gTestMD: self.updateSignalState(key)
 
         # update the station train's docking state
         for key, val in self.stations.items():

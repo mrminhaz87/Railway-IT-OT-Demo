@@ -39,7 +39,7 @@ Log.initLogger(gTopDir, 'Logs', APP_NAME[0], APP_NAME[1], historyCnt=100, fPutLo
 
 #------<IMAGES PATH>-------------------------------------------------------------
 IMG_FD = os.path.join(dirpath, 'img')
-ICO_PATH = os.path.join(IMG_FD, "geoIcon.ico")
+ICO_PATH = os.path.join(IMG_FD, "metro.ico")
 
 # Init the agent object type
 RAILWAY_TYPE_LINE   = 'RL'
@@ -82,7 +82,7 @@ gTranspPct = 70     # Windows transparent percentage.
 gUpdateRate = 0.8   # main frame update rate 0.5 sec.
 gSensorCount = 0    # number of sensors.
 gTrackConfig = OrderedDict()
-gCollsionTestFlg = False # flag used to enable test the train collision at the junction.
+gCollsionTestFlg = True # flag used to enable test the train collision at the junction.
 
 def gDebugPrint(msg, prt=True, logType=None):
     if prt: print(msg)

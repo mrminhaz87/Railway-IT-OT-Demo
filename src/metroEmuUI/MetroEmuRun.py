@@ -64,6 +64,7 @@ class UIFrame(wx.Frame):
         gv.gTrackConfig['nsline'] = {'id':'nsline', 'num': 3, 'color': wx.Colour(233, 0, 97), 'icon': 'nslabel.png'}
         gv.gTrackConfig['ccline'] = {'id':'ccline', 'num': 3, 'color': wx.Colour(255, 136, 0), 'icon': 'cclabel.png'}
         # Init all the global instance
+        if gv.gCollsionTestFlg: gv.gTestMD = False # disable the test mode flag to fetch the signal from PLC
         gv.iMapMgr = dataMgr.MapMgr(self)
 
 #--UIFrame---------------------------------------------------------------------
