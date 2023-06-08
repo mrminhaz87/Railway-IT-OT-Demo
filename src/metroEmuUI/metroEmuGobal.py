@@ -83,7 +83,7 @@ gUpdateRate = 0.8   # main frame update rate 0.5 sec.
 gSensorCount = 0    # number of sensors.
 gTrackConfig = OrderedDict()
 gCollsionTestFlg = True # flag used to enable test the train collision at the junction.
-gDeadlockTestFlg = True # flag used to enable the test  for the train deadlock handler at the junction.
+gDeadlockTestFlg = False # flag used to enable the test  for the train deadlock handler at the junction.
 
 def gDebugPrint(msg, prt=True, logType=None):
     if prt: print(msg)

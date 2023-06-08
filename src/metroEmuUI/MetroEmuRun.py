@@ -23,7 +23,6 @@ import railwayPanelMap as pnlMap
 
 import dataMgr as dm
 
-
 FRAME_SIZE = (1800, 1000)
 
 #-----------------------------------------------------------------------------

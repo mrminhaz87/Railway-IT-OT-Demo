@@ -15,6 +15,10 @@
 
 import os
 import wx
+
+from collections import OrderedDict
+
+
 import metroEmuGobal as gv
 import railwayAgent as agent
 
@@ -26,11 +30,11 @@ class MapMgr(object):
         """ Init all the elements on the map. All the parameters are public to 
             other module.
         """
-        self.tracks = {}
-        self.trains = {}
-        self.sensors = {}
-        self.signals = {}
-        self.stations = {}
+        self.tracks = OrderedDict()
+        self.trains = OrderedDict()
+        self.sensors = OrderedDict()
+        self.signals = OrderedDict()
+        self.stations = OrderedDict()
         self.junctions = []
         self.envItems = [] # Currently we only have building item so use list instead of dict()
 
@@ -306,8 +310,8 @@ class MapMgr(object):
         }
         for junction in self.junctions:
             junction.updateState()
-            if gv.gDeadlockTestFlg:
-                junction.handleDeadLock()
+            #if gv.gDeadlockTestFlg:
+            #    junction.handleDeadLock()
             #gv.gDebugPrint(junction.getCollitionState(), logType=gv.LOG_INFO)
             if junction.getCollition():
                 colltionState = junction.getCollitionState()
@@ -353,7 +357,19 @@ class MapMgr(object):
             for i, singal in enumerate(self.signals[trackID]):
                 if i < len(signalStatList):
                     singal.setState(signalStatList[i])
-                
+
+#-----------------------------------------------------------------------------
+    def updateSignalState(self, key):
+        if gv.gCollsionTestFlg: return
+        piority = {
+            'weline': ('ccline',),
+            'nsline': ('ccline',),
+            'ccline': ('weline', 'nsline')
+        }
+        for lineKey in piority[key]:
+            for signal in self.signals[lineKey]:
+                signal.updateSingalState()
+
 #-----------------------------------------------------------------------------
     def periodic(self , now):
         """ Periodicly call back function. This function need to be called before the 
@@ -361,10 +377,10 @@ class MapMgr(object):
         """
 
         # Update the signal state
-        if not gv.gCollsionTestFlg:
-            for key, val in self.signals.items():
-                for signal in val:
-                    signal.updateSingalState()
+        #if not gv.gCollsionTestFlg:
+        #    for key, val in self.signals.items():
+        #        for signal in val:
+        #            signal.updateSingalState()
 
         collsionTrainsDict = self._updateJunctionState()
         
@@ -386,7 +402,9 @@ class MapMgr(object):
                 frontTrain = train                
             # update all the track's sensors state afte all the trains have moved.
             self.sensors[key].updateActive(val)
-        
+            # updaste all the signal
+            self.updateSignalState(key)
+
         # update the station train's docking state
         for key, val in self.stations.items():
             for station in val:
