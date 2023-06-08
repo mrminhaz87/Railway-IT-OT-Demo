@@ -15,6 +15,7 @@
 #-----------------------------------------------------------------------------
 
 import math
+import random
 import metroEmuGobal as gv
 
 #-----------------------------------------------------------------------------
@@ -216,7 +217,8 @@ class AgentStation(AgentTarget):
     """
     def __init__(self, parent, tgtID, pos, layout=gv.LAY_H, labelPos=gv.LAY_U):
         super().__init__(parent, tgtID, pos, gv.STATION_TYPE)
-        self.dockCount = 10  # default the train will dock in the station in 10 refresh cycle.
+        self.dockCount = random.randrange(1, 20) # defines the dock time by refresh cycle (capped at 20)
+        self.emptyCount = gv.gMinTrainDist # defines how long the station has been empty for by refresh cycle 
         self.trainList = []
         self.dockState = False
         self.layout = layout
@@ -227,6 +229,9 @@ class AgentStation(AgentTarget):
 
     def getDockState(self):
         return self.dockState
+
+    def getEmptyCount(self):
+        return self.emptyCount    
 
     def getLayout(self):
         return self.layout
@@ -250,6 +255,9 @@ class AgentStation(AgentTarget):
     def setTrainDockCount(self, dockCount):
         self.dockCount = dockCount
 
+    def setEmptyCount(self, count):
+        self.emptyCount = count
+
 #-----------------------------------------------------------------------------
     def updateTrainsDock(self):
         if len(self.trainList) == 0: return
@@ -257,7 +265,17 @@ class AgentStation(AgentTarget):
             midPt = train.getTrainPos(idx=2)
             if self.checkNear(midPt[0], midPt[1], 5):
                 self.dockState = True
-                if train.getDockCount() == 0: train.setDockCount(self.dockCount)
+                self.dockCount = random.randrange(1, 20)
+                # print("Station: " + str(self.getID()) + " - " + str(self.emptyCount))
+                if train.getDockCount() == 0: 
+                    distFromFtTrain = self.emptyCount
+                    if distFromFtTrain >= gv.gMinTrainDist:
+                        train.setDockCount(self.dockCount)
+                    else:
+                        minDockCount = gv.gMinTrainDist - distFromFtTrain
+                        train.setDockCount(max(minDockCount, self.dockCount))
+                    # Reset empty count when station is occupied
+                    self.emptyCount = 0
                 return
         self.dockState = False
 
@@ -427,7 +445,8 @@ class AgentTrain(AgentTarget):
         if self.checkNear(ftTail[0], ftTail[1], threshold):
             if self.trainSpeed > 0 and self.dockCount==0:
                 self.setEmgStop(True)
-        if not self.emgStop: self.setEmgStop(False)
+        else:
+            self.setEmgStop(False)
 
 #--AgentTrain------------------------------------------------------------------
     def checkSignal(self, signalList):

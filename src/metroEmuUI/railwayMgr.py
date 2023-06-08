@@ -94,6 +94,10 @@ class MapMgr(object):
                             {'id': 'cc02', 'head': (300, 700), 'nextPtIdx': 3, 'len': 6},
                             {'id': 'cc03', 'head': (1300, 700), 'nextPtIdx': 3, 'len': 6}]
         if gv.gCollsionTestFlg: trackTrainCfg_cc[1] = {'id': 'cc02', 'head': (700, 700), 'nextPtIdx': 3, 'len': 6}
+        if gv.gTrainDistTestFlag:
+            trackTrainCfg_cc[0]['head'] = (510, 700)
+            trackTrainCfg_cc[1]['head'] = (430, 700)
+            trackTrainCfg_cc[2]['head'] = (300, 700)
         self.trains['ccline'] = self._getTrainsList(trackTrainCfg_cc, self.tracks[key]['points'])
 
 #-----------------------------------------------------------------------------
@@ -379,10 +383,10 @@ class MapMgr(object):
         # update the trains position.
         for key, val in self.trains.items():
             for i, train in enumerate(val):
+                frontTrain = val[(i+1)%len(val)]
+                train.checkCollFt(frontTrain)                
                 # Check the signal 1st 
                 train.checkSignal(self.signals[key])        
-                frontTrain = val[(i+1)%len(val)]
-                train.checkCollFt(frontTrain)
                 # stop the train if it got collision at any junction.
                 if collsionTrainsDict and i in collsionTrainsDict[key]:
                     train.setEmgStop(1)
@@ -399,6 +403,7 @@ class MapMgr(object):
         for key, val in self.stations.items():
             for station in val:
                 station.updateTrainsDock()
-
+                if not station.getDockState():
+                    station.setEmptyCount(station.getEmptyCount() + 1)
 
 
