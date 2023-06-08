@@ -84,7 +84,7 @@ gSensorCount = 0    # number of sensors.
 gMinTrainDist = 80  # min distance between each trains by refresh rate
 gTrackConfig = OrderedDict()
 gCollsionTestFlg = False # flag used to enable test the train collision at the junction.
-gTrainDistTestFlag = True # flag used to see if the minimum distance between trains are observed
+gTrainDistTestFlag = False # flag used to see if the minimum distance between trains are observed
 
 def gDebugPrint(msg, prt=True, logType=None):
     if prt: print(msg)

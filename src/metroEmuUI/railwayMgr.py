@@ -383,10 +383,10 @@ class MapMgr(object):
         # update the trains position.
         for key, val in self.trains.items():
             for i, train in enumerate(val):
+                frontTrain = val[(i+1)%len(val)]
+                train.checkCollFt(frontTrain)                
                 # Check the signal 1st 
                 train.checkSignal(self.signals[key])        
-                frontTrain = val[(i+1)%len(val)]
-                train.checkCollFt(frontTrain)
                 # stop the train if it got collision at any junction.
                 if collsionTrainsDict and i in collsionTrainsDict[key]:
                     train.setEmgStop(1)
