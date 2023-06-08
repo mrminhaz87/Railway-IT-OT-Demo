@@ -63,10 +63,10 @@ class MapMgr(object):
                        (950, 850), (550, 850), (550, 650), (50, 650)]
         }
         trackTrainCfg_we = [{'id': 'we01', 'head': (50, 200), 'nextPtIdx': 1, 'len': 5}, 
-                            {'id': 'we02', 'head': (1500, 400),'nextPtIdx': 7, 'len': 5},
-                            {'id': 'we03', 'head': (460, 600), 'nextPtIdx': 3, 'len': 5},
+                            {'id': 'we02', 'head': (460, 600),'nextPtIdx': 7, 'len': 5},
+                            {'id': 'we03', 'head': (1500, 400), 'nextPtIdx': 3, 'len': 5},
                             {'id': 'we04', 'head': (800, 850), 'nextPtIdx': 11, 'len': 5}]
-        if gv.gCollsionTestFlg: trackTrainCfg_we[2] = {'id': 'we03', 'head': (480, 600), 'nextPtIdx': 3, 'len': 5}
+        if gv.gCollsionTestFlg: trackTrainCfg_we[1] = {'id': 'we02', 'head': (480, 600), 'nextPtIdx': 3, 'len': 5}
         self.trains[key] = self._getTrainsList(trackTrainCfg_we, self.tracks[key]['points'])
         # Init NS-Line and the trains on it.
         key = 'nsline'
@@ -91,9 +91,9 @@ class MapMgr(object):
             'points': [(200, 200), (1400, 200), (1400, 700), (200, 700)]
         }
         trackTrainCfg_cc = [  {'id': 'cc01', 'head': (1000, 200), 'nextPtIdx': 1, 'len': 6},
-                            {'id': 'cc02', 'head': (300, 700), 'nextPtIdx': 3, 'len': 6},
-                            {'id': 'cc03', 'head': (1300, 700), 'nextPtIdx': 3, 'len': 6}]
-        if gv.gCollsionTestFlg: trackTrainCfg_cc[1] = {'id': 'cc02', 'head': (700, 700), 'nextPtIdx': 3, 'len': 6}
+                            {'id': 'cc02', 'head': (1300, 700), 'nextPtIdx': 3, 'len': 6},
+                            {'id': 'cc03', 'head': (300, 700), 'nextPtIdx': 3, 'len': 6}]
+        if gv.gCollsionTestFlg: trackTrainCfg_cc[2] = {'id': 'cc03', 'head': (700, 700), 'nextPtIdx': 3, 'len': 6}
         if gv.gTrainDistTestFlag:
             trackTrainCfg_cc[0]['head'] = (510, 700)
             trackTrainCfg_cc[1]['head'] = (430, 700)
@@ -384,14 +384,14 @@ class MapMgr(object):
         for key, val in self.trains.items():
             for i, train in enumerate(val):
                 frontTrain = val[(i+1)%len(val)]
-                train.checkCollFt(frontTrain)                
-                # Check the signal 1st 
-                train.checkSignal(self.signals[key])        
+                # Check the collision to the front train 1st. 
+                result = train.checkCollFt(frontTrain)                
+                # if collision with the front train, ignore the signal.
+                if not result: train.checkSignal(self.signals[key])        
                 # stop the train if it got collision at any junction.
                 if collsionTrainsDict and i in collsionTrainsDict[key]:
-                    train.setEmgStop(1)
-                train.updateTrainPos()
-                frontTrain = train                
+                    train.setEmgStop(True)
+                train.updateTrainPos()               
             # update all the track's sensors state afte all the trains have moved.
             self.sensors[key].updateActive(val)
             # updaste all the signal, if test mode (not connect to PLC) call the 

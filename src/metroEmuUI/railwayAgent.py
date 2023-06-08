@@ -441,12 +441,15 @@ class AgentTrain(AgentTarget):
                 frontTrain (_type_): _description_
                 threshold (int, optional): collision detection distance. Defaults to 40.
         """
-        ftTail = frontTrain.getTrainPos()[-1] # front train tail position.
+        ftTail = frontTrain.getTrainPos(idx=-1) # front train tail position.
         if self.checkNear(ftTail[0], ftTail[1], threshold):
             if self.trainSpeed > 0 and self.dockCount==0:
-                self.setEmgStop(True)
-        else:
-            self.setEmgStop(False)
+                # self.setEmgStop(True)
+                self.trainSpeed = 0
+                return True # detected will be collision to the front train
+        elif self.trainSpeed == 0 and self.dockCount <= 1:
+            self.trainSpeed = 10
+        return False
 
 #--AgentTrain------------------------------------------------------------------
     def checkSignal(self, signalList):
@@ -456,7 +459,7 @@ class AgentTrain(AgentTarget):
         for singalObj in signalList:
             x, y = singalObj.getPos()
             if self.checkNear(x, y, 20):
-                self.emgStop = singalObj.getState()
+                self.trainSpeed = 0 if singalObj.getState() else 10
                 break
 
 #-----------------------------------------------------------------------------
@@ -482,13 +485,21 @@ class AgentTrain(AgentTarget):
         if isinstance(idx, int) and idx < self.trainLen: return self.pos[idx]
         return self.pos
 
+    def getTrainSpeed(self):
+        return self.trainSpeed
+
+    def getEmgStop(self):
+        return self.emgStop
+
 #-----------------------------------------------------------------------------
 # Define all the set() functions here:
     def setDockCount(self, count):
         self.dockCount = count
+        self.trainSpeed =0
 
     def setEmgStop(self, emgStop):
         self.emgStop = emgStop
+        self.trainSpeed = 0 if self.emgStop else 10
 
     def setNextPtIdx(self, nextPtIdx):
         if nextPtIdx < len(self.railwayPts): 
@@ -506,7 +517,7 @@ class AgentTrain(AgentTarget):
         """ reset the train to the init position."""
         self.trainDestList = self._getDestList(self.initPos)
         self.pos = self._buildTrainPos()
-        self.emgStop = 0
+        self.emgStop = False
         self.trainSpeed = 10
         self.dockCount = 0
 
@@ -524,7 +535,7 @@ class AgentTrain(AgentTarget):
                 nextPtIdx = self.trainDestList[i]
                 nextPt = self.railwayPts[nextPtIdx]
                 dist = math.sqrt((trainPt[0] - nextPt[0])**2 + (trainPt[1] - nextPt[1])**2)
-                if dist < self.trainSpeed:
+                if dist <= self.trainSpeed:
                     # Go to the next check point if the distance is less than 1 speed unit.
                     trainPt[0], trainPt[1] = nextPt[0], nextPt[1]
                     # Update the next train distination if the train already get its next dist.
@@ -536,10 +547,12 @@ class AgentTrain(AgentTarget):
                     scale = float(self.trainSpeed)/float(dist)
                     trainPt[0] += int((nextPt[0]-trainPt[0])*scale)
                     trainPt[1] += int((nextPt[1]-trainPt[1])*scale)
-            if self.dockCount == 1: self.dockCount -= 1
-
+            if self.dockCount == 1: 
+                self.dockCount -= 1
+                if self.trainSpeed == 0: self.trainSpeed = 10
         else:  # Train stop at the station.
             self.dockCount -= 1
+
 
 
 

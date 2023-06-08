@@ -76,7 +76,6 @@ class PanelTainCtrl(wx.Panel):
             gv.gDebugPrint('Start train: %s on track: %s' %(str(self.trainID), self.trackID))
             trains = gv.iMapMgr.getTrains(trackID=self.trackID)
             trainAgent = trains[self.trainID]
-            trainAgent.setTrainSpeed(10)
             trainAgent.setEmgStop(False)
 
     #-----------------------------------------------------------------------------
@@ -85,7 +84,6 @@ class PanelTainCtrl(wx.Panel):
             gv.gDebugPrint('Stop train: %s on track: %s' %(str(self.trainID), self.trackID))
             trains = gv.iMapMgr.getTrains(trackID=self.trackID)
             trainAgent = trains[self.trainID]
-            trainAgent.setTrainSpeed(0)
             trainAgent.setEmgStop(True)
 
     #-----------------------------------------------------------------------------

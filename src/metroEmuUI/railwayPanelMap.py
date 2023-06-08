@@ -138,7 +138,9 @@ class PanelMap(wx.Panel):
         trainDict = gv.iMapMgr.getTrains()
         for key, val in trainDict.items():
             for i, train in enumerate(val):
-                trainColor = '#CE8349' if train.emgStop else 'GREEN'
+                trainColor = '#CE8349' if train.getTrainSpeed() == 0 else 'GREEN'
+                if train.getEmgStop():
+                    trainColor = 'RED'
                 dc.SetBrush(wx.Brush(trainColor))
                 for point in train.getPos():
                     dc.DrawRectangle(point[0]-5, point[1]-5, 10, 10)
