@@ -2,7 +2,7 @@
 # Name:        railwayAgent.py
 #
 # Purpose:     This module is the agents module to init different items in the 
-#              railway system. All the items on the Map are agent object, each 
+#              railway system map. All the items on the Map are agent objects, each 
 #              agent's update() function is a self-driven function to update the 
 #              item's state.
 # 
@@ -52,8 +52,7 @@ class AgentTarget(object):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class agentEnv(AgentTarget):
-    """ The environment Item shown on the map such as building, IOT, camera.
-    """
+    """ The environment Item shown on the map such as building, IOT, camera."""
     def __init__(self, parent, tgtID, pos, wxBitMap, size ,tType=gv.ENV_TYPE):
         super().__init__(parent, tgtID, pos, tType)
         # build Icon: https://www.freepik.com/premium-vector/isometric-modern-supermarket-buildings-set_10094282.htm
@@ -64,6 +63,11 @@ class agentEnv(AgentTarget):
 
 #-----------------------------------------------------------------------------
 # Define all the get() functions here:
+    def getColor(self):
+        return self.color
+    
+    def getLink(self):
+        return self.linkList 
 
     def getSize(self):
         return self.size
@@ -71,23 +75,23 @@ class agentEnv(AgentTarget):
     def getWxBitmap(self):
         return self.bitmap
     
-    def getLink(self):
-        return self.linkList 
-    
-    def getColor(self):
-        return self.color
-
 #-----------------------------------------------------------------------------
 # Define all the set() functions here:
-    def setLinkList(self, linkList):
-        self.linkList = linkList
 
     def setColor(self, color):
         self.color = color
 
+    def setLinkList(self, linkList):
+        self.linkList = linkList
+
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class AgentJunction(AgentTarget):
+    """ The temporary test junction agent to check the train collision. Currently 
+        the junction only support two tracks. YC: will implement multiple trasks (> 3)
+        junctions. 
+        The input parameter parent needs to be a <MapMgr> obj.
+    """
     def __init__(self, parent, tgtID, pos, TrackID1, TrackID2):
         super().__init__(parent, tgtID, pos, gv.JUNCTION_TYPE)
         self.trackid1 = TrackID1
@@ -98,24 +102,13 @@ class AgentJunction(AgentTarget):
         }
         self.signalList = None
 
-    def _checkTrainEnter(self, trainArea, threshold=0):
-        """ Check whether a train has enter the junctin."""
+    def _checkTrainEnter(self, trainArea, threshold=15):
+        """ Check whether a train has enter the junction."""
         u,d,l,r = trainArea
         x, y = self.getPos()
         if (l-threshold <= x <= r+threshold) and (u-threshold <= y <= d+threshold):
             return True
         return False
-
-    def handleDeadLock(self):
-        noDeadLock = False
-        if self.signalList:
-            for i, signal in enumerate(self.signalList):
-                if not signal.getState():
-                    noDeadLock = True
-                break
-            if noDeadLock == False:
-                self.signalList[1].startManualOverrideOnDeadlock()
-        
 
 #-----------------------------------------------------------------------------
 # Define all the get() functions here:
@@ -133,10 +126,25 @@ class AgentJunction(AgentTarget):
         self.signalList = signalList
 
 #-----------------------------------------------------------------------------
+    def handleDeadLock(self):
+        """ Check whether there are 2 trains triggered the junction's signal at the 
+            same time.
+            YC: current this function is not used as we set the train priority. But 
+            we may use this function in the future. 
+        """
+        noDeadLock = False
+        if self.signalList:
+            for i, signal in enumerate(self.signalList):
+                if not signal.getState():
+                    noDeadLock = True
+                break
+            if noDeadLock == False:
+                self.signalList[1].startManualOverrideOnDeadlock()
+
+#-----------------------------------------------------------------------------
     def updateState(self):
         """ Update the current station of a junction """
         if self.parent:
-            # Check tains on trackID1:
             for trackid in self.detectState.keys():
                 self.detectState[trackid] = None
                 for i, train in enumerate(self.parent.getTrains(trackID=trackid)):
@@ -208,15 +216,12 @@ class AgentStation(AgentTarget):
     """
     def __init__(self, parent, tgtID, pos, layout=gv.LAY_H, labelPos=gv.LAY_U):
         super().__init__(parent, tgtID, pos, gv.STATION_TYPE)
-        self.dockCount = 10 # default the train will dock in the station in 10 refresh cycle.
+        self.dockCount = 10  # default the train will dock in the station in 10 refresh cycle.
         self.trainList = []
         self.dockState = False
         self.layout = layout
         self.labelPos = (-25, -28) # default delta label location on the map
     
-    def bindTrains(self, TrainList):
-        self.trainList = TrainList
-
 #-----------------------------------------------------------------------------
 # Define all the get() functions here:
 
@@ -231,11 +236,22 @@ class AgentStation(AgentTarget):
 
 #-----------------------------------------------------------------------------
 # Define all the set() functions here:
+
+    def setCheckTrains(self, TrainList):
+        """ Set the trains may dock in the station.
+            Args:
+                TrainList (list(<AgentTrain>)):  list of AgentTrain obj.
+        """
+        self.trainList = TrainList
+
     def setlabelPos(self, pos):
         self.labelPos = pos
 
+    def setTrainDockCount(self, dockCount):
+        self.dockCount = dockCount
+
 #-----------------------------------------------------------------------------
-    def updateTrainSDock(self):
+    def updateTrainsDock(self):
         if len(self.trainList) == 0: return
         for train in self.trainList:
             midPt = train.getTrainPos(idx=2)
@@ -259,19 +275,12 @@ class AgentSignal(AgentTarget):
             tType (_type_, optional): _description_. Defaults to gv.SINGAL_TYPE.
         """
         super().__init__(parent, tgtID, pos, tType)
-        self.signalOn = False # signal on (True): train stop, signal off(False): train pass  
-        self.dir = dir # signal indicator's direction on map. 0-up, 1-down, 2-left, 3-right
-        self.triggerOnSenAgent = None
-        self.triggerOnIdx = None
+        self.signalOn = False   # signal on (True): train stop, signal off(False): train pass  
+        self.dir = dir          # signal indicator's direction on map. 0-up, 1-down, 2-left, 3-right
+        self.triggerOnSenAgent = None 
+        self.triggerOnIdxList = None
         self.triggerOffSenAgent = None
-        self.triggerOffIdx = None
-
-    def startManualOverrideOnDeadlock(self):
-        for idx in self.triggerOffIdx:
-            self.triggerOffSenAgent.setSensorState(idx, 1)
-        for idx in self.triggerOnIdx:
-            self.triggerOnSenAgent.setSensorState(idx, 0)
-        self.signalOn = False
+        self.triggerOffIdxList = None
         
 #-----------------------------------------------------------------------------
 # Define all the get() functions here:
@@ -283,25 +292,36 @@ class AgentSignal(AgentTarget):
 
     def setTriggerOnSensors(self, sensorAgent, idxList):
         self.triggerOnSenAgent = sensorAgent
-        self.triggerOnIdx = idxList
+        self.triggerOnIdxList = idxList
 
     def setTriggerOffSensors(self, sensorAgent, idxList):
         self.triggerOffSenAgent = sensorAgent
-        self.triggerOffIdx = idxList
+        self.triggerOffIdxList = idxList
 
     def setState(self, state):
         self.signalOn = state
 
 #-----------------------------------------------------------------------------
+    def startManualOverrideOnDeadlock(self):
+        """ YC: currently we will now use this function, but may be used in the
+            future.
+        """
+        for idx in self.triggerOffIdxList:
+            self.triggerOffSenAgent.setSensorState(idx, 1)
+        for idx in self.triggerOnIdxList:
+            self.triggerOnSenAgent.setSensorState(idx, 0)
+        self.signalOn = False
+    
+#-----------------------------------------------------------------------------
     def updateSingalState(self):
         if self.signalOn:
-            for idx in self.triggerOnIdx:
+            for idx in self.triggerOffIdxList:
                 if self.triggerOffSenAgent.getSensorState(idx): 
                     self.signalOn = False
                     break
         else:
-            for idx in self.triggerOffIdx:
-                if self.triggerOffSenAgent.getSensorState(idx):
+            for idx in self.triggerOnIdxList:
+                if self.triggerOnSenAgent.getSensorState(idx):
                     self.signalOn =True
                     break
 
@@ -350,8 +370,8 @@ class AgentTrain(AgentTarget):
 
 #-----------------------------------------------------------------------------
     def _getDestList(self, initPos):
-        """ Get the idx list of the target points on the track based on current 
-            train pos.
+        """ Get the idx list of the target points (train destination) on the track 
+            based on current train pos.
         """
         (x0, y0) = initPos
         for idx in range(len(self.railwayPts)-1):
@@ -406,9 +426,8 @@ class AgentTrain(AgentTarget):
         ftTail = frontTrain.getTrainPos()[-1] # front train tail position.
         if self.checkNear(ftTail[0], ftTail[1], threshold):
             if self.trainSpeed > 0 and self.dockCount==0:
-                ftDockCount = frontTrain.getDockCount()
-                # temp add make the behing train wait 
-                self.setDockCount(ftDockCount+10)
+                self.setEmgStop(True)
+        if not self.emgStop: self.setEmgStop(False)
 
 #--AgentTrain------------------------------------------------------------------
     def checkSignal(self, signalList):

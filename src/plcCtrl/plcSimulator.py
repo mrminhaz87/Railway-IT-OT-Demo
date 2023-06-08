@@ -18,6 +18,8 @@ import os
 import time
 import json
 from datetime import datetime
+from collections import OrderedDict
+
 
 import plcSimGlobal as gv
 import Log
@@ -58,7 +60,12 @@ class plcAgent(object):
             'ccline': [0, 0, 0, 0, 0, 0, 0]
         }
         # Init the ladder logic.
-        self.ladderDict = {}
+        self.ladderDict = OrderedDict()
+        self.LadderPiority = {
+            'weline': ('ccline',),
+            'nsline': ('ccline',),
+            'ccline': ('weline', 'nsline')
+        }
         self._initLadderLogic()
         
         self.realwordInfo= {
@@ -79,31 +86,31 @@ class plcAgent(object):
             logic will be replaced by real ladder config file.
         """
         self.ladderDict['weline'] = [
-            {'id': 'we-0', 'tiggerS': 'ccline', 'onIdx':(13,), 'offIdx':(12,) }, 
-            {'id': 'we-1', 'tiggerS': 'ccline', 'onIdx':(13,), 'offIdx':(12,) },
-            {'id': 'we-2', 'tiggerS': 'ccline', 'onIdx':(11,), 'offIdx':(10,) },
-            {'id': 'we-3', 'tiggerS': 'ccline', 'onIdx':(11,), 'offIdx':(10,) },
-            {'id': 'we-4', 'tiggerS': 'ccline', 'onIdx':(9,), 'offIdx':(8,) },
-            {'id': 'we-5', 'tiggerS': 'ccline', 'onIdx':(9,), 'offIdx':(8,) },
-            {'id': 'we-6', 'tiggerS': 'ccline', 'onIdx':(7,), 'offIdx':(6,) },
-            {'id': 'we-7', 'tiggerS': 'ccline', 'onIdx':(7,), 'offIdx':(6,) }
+            {'id': 'we-0', 'tiggerS': 'ccline', 'onIdx':(12,), 'offIdx':(13,) }, 
+            {'id': 'we-1', 'tiggerS': 'ccline', 'onIdx':(12,), 'offIdx':(13,) },
+            {'id': 'we-2', 'tiggerS': 'ccline', 'onIdx':(10,), 'offIdx':(11,) },
+            {'id': 'we-3', 'tiggerS': 'ccline', 'onIdx':(10,), 'offIdx':(11,) },
+            {'id': 'we-4', 'tiggerS': 'ccline', 'onIdx':(8,), 'offIdx':(9,) },
+            {'id': 'we-5', 'tiggerS': 'ccline', 'onIdx':(8,), 'offIdx':(9,) },
+            {'id': 'we-6', 'tiggerS': 'ccline', 'onIdx':(6,), 'offIdx':(7,) },
+            {'id': 'we-7', 'tiggerS': 'ccline', 'onIdx':(6,), 'offIdx':(7,) }
         ]
 
         self.ladderDict['nsline'] = [
-            {'id': 'ns-0', 'tiggerS': 'ccline', 'onIdx':(1,), 'offIdx':(0,) },
-            {'id': 'ns-1', 'tiggerS': 'ccline', 'onIdx':(1,), 'offIdx':(0,) },
-            {'id': 'ns-2', 'tiggerS': 'ccline', 'onIdx':(3,), 'offIdx':(2,) },
-            {'id': 'ns-3', 'tiggerS': 'ccline', 'onIdx':(5,), 'offIdx':(4,) }
+            {'id': 'ns-0', 'tiggerS': 'ccline', 'onIdx':(0,), 'offIdx':(1,) },
+            {'id': 'ns-1', 'tiggerS': 'ccline', 'onIdx':(0,), 'offIdx':(1,) },
+            {'id': 'ns-2', 'tiggerS': 'ccline', 'onIdx':(2,), 'offIdx':(3,) },
+            {'id': 'ns-3', 'tiggerS': 'ccline', 'onIdx':(4,), 'offIdx':(5,) }
         ]
 
         self.ladderDict['ccline'] = [
-            {'id': 'cc-0', 'tiggerS': 'nsline', 'onIdx':(1, 7), 'offIdx':(0, 6) },
-            {'id': 'cc-1', 'tiggerS': 'nsline', 'onIdx':(5,), 'offIdx':(4,) },
-            {'id': 'cc-2', 'tiggerS': 'nsline', 'onIdx':(3,), 'offIdx':(2,) },
-            {'id': 'cc-3', 'tiggerS': 'weline', 'onIdx':(8,10), 'offIdx':(7,9) },
-            {'id': 'cc-4', 'tiggerS': 'weline', 'onIdx':(6,12), 'offIdx':(5,11) },
-            {'id': 'cc-5', 'tiggerS': 'weline', 'onIdx':(4,14), 'offIdx':(3,13) },
-            {'id': 'cc-6', 'tiggerS': 'weline', 'onIdx':(2, 16), 'offIdx':(1,15) }
+            {'id': 'cc-0', 'tiggerS': 'nsline', 'onIdx':(0, 6), 'offIdx':(1, 7) },
+            {'id': 'cc-1', 'tiggerS': 'nsline', 'onIdx':(4,), 'offIdx':(5,) },
+            {'id': 'cc-2', 'tiggerS': 'nsline', 'onIdx':(2,), 'offIdx':(3,) },
+            {'id': 'cc-3', 'tiggerS': 'weline', 'onIdx':(7,9), 'offIdx':(8,10) },
+            {'id': 'cc-4', 'tiggerS': 'weline', 'onIdx':(5,11), 'offIdx':(6,12) },
+            {'id': 'cc-5', 'tiggerS': 'weline', 'onIdx':(3,13), 'offIdx':(4,14) },
+            {'id': 'cc-6', 'tiggerS': 'weline', 'onIdx':(1, 15), 'offIdx':(2,16) }
         ]
 
 #-----------------------------------------------------------------------------
@@ -192,7 +199,7 @@ class plcAgent(object):
                 triggerOffSensorIdx = ladder['offIdx']
                 # check signal 'On' state:
                 if self.coilState[key][i]:
-                    for idx in triggerOnSensorIdx:
+                    for idx in triggerOffSensorIdx:
                         try:
                             if self.inputState[sensorTp][idx]:
                                 self.coilState[key][i] = 0
@@ -200,7 +207,7 @@ class plcAgent(object):
                         except:
                             gv.gDebugPrint(str(sensorTp)+str(idx), logType=gv.LOG_ERR)
                 else:
-                    for idx in triggerOffSensorIdx:
+                    for idx in triggerOnSensorIdx:
                         try:
                             if self.inputState[sensorTp][idx]:
                                 self.coilState[key][i] = 1

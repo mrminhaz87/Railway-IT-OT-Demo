@@ -18,7 +18,6 @@ import wx
 
 from collections import OrderedDict
 
-
 import metroEmuGobal as gv
 import railwayAgent as agent
 
@@ -77,10 +76,10 @@ class MapMgr(object):
             'points': [(300, 50), (1200, 50), (1200, 300), (800, 300), (800, 600), (700, 600), 
                        (700, 100), (400, 100), (400, 450), (300, 450)]
         }
-        trackTrainCfg_ns = [{'id': 'ns01', 'head': (400, 50), 'nextPtIdx': 1, 'len': 4},
+        trackTrainCfg_ns = [{'id': 'ns01', 'head': (1160, 50), 'nextPtIdx': 1, 'len': 4},
                             {'id': 'ns02', 'head': (1100, 300), 'nextPtIdx': 3, 'len': 4},
                             {'id': 'ns03', 'head': (600, 100), 'nextPtIdx': 7, 'len': 4}]
-        if gv.gCollsionTestFlg or gv.gDeadlockTestFlg: trackTrainCfg_ns[0] = {'id': 'ns01', 'head': (1160, 50), 'nextPtIdx': 1, 'len': 4}
+
         self.trains[key] = self._getTrainsList(trackTrainCfg_ns, self.tracks[key]['points'])
         # Init CC-Line and the trains on it.
         key = 'ccline'
@@ -90,10 +89,9 @@ class MapMgr(object):
             'type': gv.RAILWAY_TYPE_CYCLE,
             'points': [(200, 200), (1400, 200), (1400, 700), (200, 700)]
         }
-        trackTrainCfg_cc = [  {'id': 'cc01', 'head': (800, 200), 'nextPtIdx': 1, 'len': 6},
+        trackTrainCfg_cc = [  {'id': 'cc01', 'head': (1000, 200), 'nextPtIdx': 1, 'len': 6},
                             {'id': 'cc02', 'head': (300, 700), 'nextPtIdx': 3, 'len': 6},
                             {'id': 'cc03', 'head': (1300, 700), 'nextPtIdx': 3, 'len': 6}]
-        if gv.gCollsionTestFlg or gv.gDeadlockTestFlg: trackTrainCfg_cc[0] = {'id': 'cc01', 'head': (1000, 200), 'nextPtIdx': 1, 'len': 6}
         self.trains['ccline'] = self._getTrainsList(trackTrainCfg_cc, self.tracks[key]['points'])
 
 #-----------------------------------------------------------------------------
@@ -125,14 +123,14 @@ class MapMgr(object):
     def _initSignal(self):
         # Set all the signal on track weline
         trackSignalConfig_we = [
-            {'id': 'we-0', 'pos':(160, 600), 'dir': gv.LAY_U, 'tiggerS': self.sensors['ccline'], 'onIdx':(13,), 'offIdx':(12,) }, 
-            {'id': 'we-1', 'pos':(240, 650), 'dir': gv.LAY_U, 'tiggerS': self.sensors['ccline'], 'onIdx':(13,), 'offIdx':(12,) },
-            {'id': 'we-2', 'pos':(600, 660), 'dir': gv.LAY_R, 'tiggerS': self.sensors['ccline'], 'onIdx':(11,), 'offIdx':(10,) },
-            {'id': 'we-3', 'pos':(550, 740), 'dir': gv.LAY_L, 'tiggerS': self.sensors['ccline'], 'onIdx':(11,), 'offIdx':(10,) },
-            {'id': 'we-4', 'pos':(900, 740), 'dir': gv.LAY_L, 'tiggerS': self.sensors['ccline'], 'onIdx':(9,), 'offIdx':(8,) },
-            {'id': 'we-5', 'pos':(950, 660), 'dir': gv.LAY_R, 'tiggerS': self.sensors['ccline'], 'onIdx':(9,), 'offIdx':(8,) },
-            {'id': 'we-6', 'pos':(1360, 400), 'dir': gv.LAY_U, 'tiggerS': self.sensors['ccline'], 'onIdx':(7,), 'offIdx':(6,) },
-            {'id': 'we-7', 'pos':(1440, 450), 'dir': gv.LAY_U, 'tiggerS': self.sensors['ccline'], 'onIdx':(7,), 'offIdx':(6,) },
+            {'id': 'we-0', 'pos':(160, 600), 'dir': gv.LAY_U, 'tiggerS': self.sensors['ccline'], 'onIdx':(12,), 'offIdx':(13,) }, 
+            {'id': 'we-1', 'pos':(240, 650), 'dir': gv.LAY_U, 'tiggerS': self.sensors['ccline'], 'onIdx':(12,), 'offIdx':(13,) },
+            {'id': 'we-2', 'pos':(600, 660), 'dir': gv.LAY_R, 'tiggerS': self.sensors['ccline'], 'onIdx':(10,), 'offIdx':(11,) },
+            {'id': 'we-3', 'pos':(550, 740), 'dir': gv.LAY_L, 'tiggerS': self.sensors['ccline'], 'onIdx':(10,), 'offIdx':(11,) },
+            {'id': 'we-4', 'pos':(900, 740), 'dir': gv.LAY_L, 'tiggerS': self.sensors['ccline'], 'onIdx':(8,), 'offIdx':(9,) },
+            {'id': 'we-5', 'pos':(950, 660), 'dir': gv.LAY_R, 'tiggerS': self.sensors['ccline'], 'onIdx':(8,), 'offIdx':(9,) },
+            {'id': 'we-6', 'pos':(1360, 400), 'dir': gv.LAY_U, 'tiggerS': self.sensors['ccline'], 'onIdx':(6,), 'offIdx':(7,) },
+            {'id': 'we-7', 'pos':(1440, 450), 'dir': gv.LAY_U, 'tiggerS': self.sensors['ccline'], 'onIdx':(6,), 'offIdx':(7,) },
         ]
         self.signals['weline'] = []
         for info in trackSignalConfig_we:
@@ -143,10 +141,10 @@ class MapMgr(object):
         
         # Set all the signal on track nsline
         trackSignalConfig_ns = [
-            {'id': 'ns-0', 'pos':(300, 240), 'dir': gv.LAY_L, 'tiggerS': self.sensors['ccline'], 'onIdx':(1,), 'offIdx':(0,) },
-            {'id': 'ns-1', 'pos':(400, 160), 'dir': gv.LAY_R, 'tiggerS': self.sensors['ccline'], 'onIdx':(1,), 'offIdx':(0,) },
-            {'id': 'ns-2', 'pos':(700, 240), 'dir': gv.LAY_R, 'tiggerS': self.sensors['ccline'], 'onIdx':(3,), 'offIdx':(2,) },
-            {'id': 'ns-3', 'pos':(1200, 160), 'dir': gv.LAY_R, 'tiggerS': self.sensors['ccline'], 'onIdx':(5,), 'offIdx':(4,) },
+            {'id': 'ns-0', 'pos':(300, 240), 'dir': gv.LAY_L, 'tiggerS': self.sensors['ccline'], 'onIdx':(0,), 'offIdx':(1,) },
+            {'id': 'ns-1', 'pos':(400, 160), 'dir': gv.LAY_R, 'tiggerS': self.sensors['ccline'], 'onIdx':(0,), 'offIdx':(1,) },
+            {'id': 'ns-2', 'pos':(700, 240), 'dir': gv.LAY_R, 'tiggerS': self.sensors['ccline'], 'onIdx':(2,), 'offIdx':(3,) },
+            {'id': 'ns-3', 'pos':(1200, 160), 'dir': gv.LAY_R, 'tiggerS': self.sensors['ccline'], 'onIdx':(4,), 'offIdx':(5,) },
         ]
         self.signals['nsline'] = []
         for info in trackSignalConfig_ns:
@@ -157,13 +155,13 @@ class MapMgr(object):
 
         # set all the signal on track cline
         trackSignalConfig_cc = [
-            {'id': 'cc-0', 'pos':(260, 200), 'dir': gv.LAY_U, 'tiggerS': self.sensors['nsline'], 'onIdx':(1, 7), 'offIdx':(0, 6) },
-            {'id': 'cc-1', 'pos':(660, 200), 'dir': gv.LAY_U, 'tiggerS': self.sensors['nsline'], 'onIdx':(5,), 'offIdx':(4,) },
-            {'id': 'cc-2', 'pos':(1160, 200), 'dir': gv.LAY_U, 'tiggerS': self.sensors['nsline'], 'onIdx':(3,), 'offIdx':(2,) },
-            {'id': 'cc-3', 'pos':(1400, 360), 'dir': gv.LAY_R, 'tiggerS': self.sensors['weline'], 'onIdx':(8,10), 'offIdx':(7,9) },
-            {'id': 'cc-4', 'pos':(990, 700), 'dir': gv.LAY_U, 'tiggerS': self.sensors['weline'], 'onIdx':(6,12), 'offIdx':(5,11) },
-            {'id': 'cc-5', 'pos':(640, 700), 'dir': gv.LAY_U, 'tiggerS': self.sensors['weline'], 'onIdx':(4,14), 'offIdx':(3,13) },
-            {'id': 'cc-6', 'pos':(210, 700), 'dir': gv.LAY_U, 'tiggerS': self.sensors['weline'], 'onIdx':(2, 16), 'offIdx':(1,15) },
+            {'id': 'cc-0', 'pos':(260, 200), 'dir': gv.LAY_U, 'tiggerS': self.sensors['nsline'], 'onIdx':(0, 6), 'offIdx':(1, 7) },
+            {'id': 'cc-1', 'pos':(660, 200), 'dir': gv.LAY_U, 'tiggerS': self.sensors['nsline'], 'onIdx':(4,), 'offIdx':(5,) },
+            {'id': 'cc-2', 'pos':(1160, 200), 'dir': gv.LAY_U, 'tiggerS': self.sensors['nsline'], 'onIdx':(2,), 'offIdx':(3,) },
+            {'id': 'cc-3', 'pos':(1400, 360), 'dir': gv.LAY_R, 'tiggerS': self.sensors['weline'], 'onIdx':(7,9), 'offIdx':(8,10) },
+            {'id': 'cc-4', 'pos':(990, 700), 'dir': gv.LAY_U, 'tiggerS': self.sensors['weline'], 'onIdx':(5,11), 'offIdx':(6,12) },
+            {'id': 'cc-5', 'pos':(640, 700), 'dir': gv.LAY_U, 'tiggerS': self.sensors['weline'], 'onIdx':(3,13), 'offIdx':(4,14) },
+            {'id': 'cc-6', 'pos':(210, 700), 'dir': gv.LAY_U, 'tiggerS': self.sensors['weline'], 'onIdx':(1, 15), 'offIdx':(2,16) },
         ]
         self.signals['ccline'] = []
         for info in trackSignalConfig_cc:
@@ -189,7 +187,7 @@ class MapMgr(object):
         self.stations['weline'] = []
         for info in trackStation_we:
             station = agent.AgentStation(self, info['id'], info['pos'], layout=info['layout'])
-            station.bindTrains(self.trains['weline'])
+            station.setCheckTrains(self.trains['weline'])
             if 'labelPos' in info.keys(): station.setlabelPos(info['labelPos'])
             self.stations['weline'].append(station)
         
@@ -203,7 +201,7 @@ class MapMgr(object):
         self.stations['nsline'] = []
         for info in trackStation_ns:
             station = agent.AgentStation(self, info['id'], info['pos'])
-            station.bindTrains(self.trains['nsline'])
+            station.setCheckTrains(self.trains['nsline'])
             self.stations['nsline'].append(station)
 
         # Init all stations on ccline
@@ -216,7 +214,7 @@ class MapMgr(object):
         self.stations['ccline'] = []
         for info in trackStation_cc:
             station = agent.AgentStation(self, info['id'], info['pos'], layout=info['layout'])
-            station.bindTrains(self.trains['ccline'])
+            station.setCheckTrains(self.trains['ccline'])
             if 'labelPos' in info.keys(): station.setlabelPos(info['labelPos'])
             self.stations['ccline'].append(station)
 
@@ -242,17 +240,18 @@ class MapMgr(object):
         for i, info in enumerate(metroJunctions):
             track1Id = info['tracks'][0]
             track2Id = info['tracks'][1]
-            signalList = []
+            #signalList = []
             junction = agent.AgentJunction(self, 'jc-%s' % str(i), info['pos'], track1Id, track2Id)
-
+            # YC TODO : temporary disabled the junction deadlock check function as we will 
+            # add the train priority check part.
             # Set the signals related to each other in each junction  
-            for j, signal in enumerate(self.signals[track1Id]):
-                if j in info['Idx1']:
-                    signalList.append(signal)
-            for j, signal in enumerate(self.signals[track2Id]):
-                if j in info['Idx2']:
-                    signalList.append(signal)
-            junction.setSignalList(signalList)         
+            # for j, signal in enumerate(self.signals[track1Id]):
+            #     if j in info['Idx1']:
+            #         signalList.append(signal)
+            # for j, signal in enumerate(self.signals[track2Id]):
+            #     if j in info['Idx2']:
+            #         signalList.append(signal)
+            # junction.setSignalList(signalList)         
             self.junctions.append(junction)
 
 #-----------------------------------------------------------------------------
@@ -375,25 +374,13 @@ class MapMgr(object):
         """ Periodicly call back function. This function need to be called before the 
             railwayPanelMap's periodic().
         """
-
-        # Update the signal state
-        #if not gv.gCollsionTestFlg:
-        #    for key, val in self.signals.items():
-        #        for signal in val:
-        #            signal.updateSingalState()
-
         collsionTrainsDict = self._updateJunctionState()
-        
-        # for junction in self.junctions:
-        #     boolean = junction.checkDeadLock()
-        #     print(boolean)       
-
         # update the trains position.
         for key, val in self.trains.items():
-            frontTrain = val[-1]
             for i, train in enumerate(val):
                 # Check the signal 1st 
-                train.checkSignal(self.signals[key])
+                train.checkSignal(self.signals[key])        
+                frontTrain = val[(i+1)%len(val)]
                 train.checkCollFt(frontTrain)
                 # stop the train if it got collision at any junction.
                 if collsionTrainsDict and i in collsionTrainsDict[key]:
@@ -408,7 +395,7 @@ class MapMgr(object):
         # update the station train's docking state
         for key, val in self.stations.items():
             for station in val:
-                station.updateTrainSDock()
+                station.updateTrainsDock()
 
 
 
