@@ -79,10 +79,12 @@ LAY_V = 6   # vertical layout
 gTestMD = True      # test mode flag, True: the simulator will operate with control logic itself. 
 # False: The simultor will connect to the PLC, PLC will implement the control logic.
 gTranspPct = 70     # Windows transparent percentage.
-gUpdateRate = 0.8   # main frame update rate 0.5 sec.
+gUpdateRate = 0.1   # main frame update rate 0.5 sec.
 gSensorCount = 0    # number of sensors.
+gMinTrainDist = 80  # min distance between each trains by refresh rate
 gTrackConfig = OrderedDict()
-gCollsionTestFlg = True # flag used to enable test the train collision at the junction.
+gCollsionTestFlg = False # flag used to enable test the train collision at the junction.
+gTrainDistTestFlag = True # flag used to see if the minimum distance between trains are observed
 
 def gDebugPrint(msg, prt=True, logType=None):
     if prt: print(msg)
