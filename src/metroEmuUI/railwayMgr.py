@@ -349,7 +349,6 @@ class MapMgr(object):
     def getJunction(self):
         return self.junctions
 
-
 #-----------------------------------------------------------------------------
 # Define all the set() functions here:
 

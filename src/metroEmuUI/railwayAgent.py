@@ -443,12 +443,11 @@ class AgentTrain(AgentTarget):
         """
         ftTail = frontTrain.getTrainPos(idx=-1) # front train tail position.
         if self.checkNear(ftTail[0], ftTail[1], threshold):
-            if self.trainSpeed > 0 and self.dockCount==0:
-                # self.setEmgStop(True)
+            if self.trainSpeed >= 0 and self.dockCount==0:
                 self.trainSpeed = 0
-                return True # detected will be collision to the front train
+            return True # detected will be collision to the front train
         elif self.trainSpeed == 0 and self.dockCount <= 1:
-            self.trainSpeed = 10
+            self.setTrainSpeed(10)
         return False
 
 #--AgentTrain------------------------------------------------------------------
@@ -459,7 +458,8 @@ class AgentTrain(AgentTarget):
         for singalObj in signalList:
             x, y = singalObj.getPos()
             if self.checkNear(x, y, 20):
-                self.trainSpeed = 0 if singalObj.getState() else 10
+                speed = 0 if singalObj.getState() else 10
+                self.setTrainSpeed(speed)
                 break
 
 #-----------------------------------------------------------------------------
@@ -510,6 +510,7 @@ class AgentTrain(AgentTarget):
         self.railwayPts = railwayPts
 
     def setTrainSpeed(self, speed):
+        if self.emgStop: return
         self.trainSpeed = speed
 
 #--AgentTrain------------------------------------------------------------------

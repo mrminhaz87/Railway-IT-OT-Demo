@@ -28,6 +28,8 @@ APP_NAME = ('MetroEmu', 'UI')
 TOPDIR = 'src'
 LIBDIR = 'lib'
 
+#-----------------------------------------------------------------------------
+# Init the logger:
 idx = dirpath.find(TOPDIR)
 gTopDir = dirpath[:idx + len(TOPDIR)] if idx != -1 else dirpath   # found it - truncate right after TOPDIR
 # Config the lib folder 
@@ -36,6 +38,19 @@ if os.path.exists(gLibDir):
     sys.path.insert(0, gLibDir)
 import Log
 Log.initLogger(gTopDir, 'Logs', APP_NAME[0], APP_NAME[1], historyCnt=100, fPutLogsUnderDate=True)
+
+#-----------------------------------------------------------------------------
+# Init the configure file loader.
+import ConfigLoader
+CONFIG_FILE_NAME = 'metroConfig.txt'
+gGonfigPath = os.path.join(dirpath, CONFIG_FILE_NAME)
+iConfigLoader = ConfigLoader.ConfigLoader(gGonfigPath, mode='r')
+if iConfigLoader is None:
+    print("Error: The config file %s is not exist.Program exit!" %str(gGonfigPath))
+    exit()
+
+CONFIG_DICT = iConfigLoader.getJson()
+
 
 #------<IMAGES PATH>-------------------------------------------------------------
 IMG_FD = os.path.join(dirpath, 'img')
@@ -76,15 +91,16 @@ LAY_V = 6   # vertical layout
 
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.
-gTestMD = True      # test mode flag, True: the simulator will operate with control logic itself. 
+gTestMD = CONFIG_DICT['TEST_MD']      # test mode flag, True: the simulator will operate with control logic itself. 
 # False: The simultor will connect to the PLC, PLC will implement the control logic.
 gTranspPct = 70     # Windows transparent percentage.
-gUpdateRate = 0.5   # main frame update rate 0.5 sec.
+# main frame update rate 0.5 sec.
+gUpdateRate = float(CONFIG_DICT['TEST_MD']) if float(CONFIG_DICT['TEST_MD'])>0 else 0.5
 gSensorCount = 0    # number of sensors.
 gMinTrainDist = 80  # min distance between each trains by refresh rate
 gTrackConfig = OrderedDict()
-gCollsionTestFlg = True # flag used to enable test the train collision at the junction.
-gTrainDistTestFlag = False # flag used to see if the minimum distance between trains are observed
+gCollsionTestFlg = CONFIG_DICT['TEST_JC_COLLISION'] # flag used to enable test the train collision at the junction.
+gTrainDistTestFlag = CONFIG_DICT['TEST_TR_DISTANCE'] # flag used to see if the minimum distance between trains are observed
 
 def gDebugPrint(msg, prt=True, logType=None):
     if prt: print(msg)
@@ -98,10 +114,8 @@ def gDebugPrint(msg, prt=True, logType=None):
         Log.info(msg)
 
 #-------<GLOBAL PARAMTERS>-----------------------------------------------------
-iMainFrame = None   # MainFrame.
-iImagePanel = None  # Image panel.
-iCtrlPanel = None   # control panel.
-iMapPanel = None
+iMainFrame = None   # UI MainFrame.
+iCtrlPanel = None   # UI function control panel.
+iMapPanel = None    # UI map display panel
 iMapMgr = None      # map manager.
 iDataMgr = None     # data manager to handling data fetch and set requirment.
-iDBMgr = None

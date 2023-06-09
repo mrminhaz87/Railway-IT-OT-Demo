@@ -1,0 +1,24 @@
+# This is the config file template for the module <MetroEmuRun.py>, to use it,
+# set your own parameters and change the file name to metroConfig.txt.
+# Setup the paramter with below format (every line follow <key>:<val> format, the
+# key can not be changed):
+
+# Config section 00: Basic general parameter config.
+
+# Test mode:
+# True: use the real word internal logic to simulator the control logic. 
+# False: connect to PLC let plc control the signals 
+TEST_MD:True
+
+# Init the dataManager port for PCL to fetch and set data. 
+UDP_PORT:3001
+
+# Init the UI update interval:
+UI_INTERVAL:0.4
+
+# Init the test scenario enable/disable flag"
+# Test junction collision.
+TEST_JC_COLLISION:False
+
+# Test train safe distance 
+TEST_TR_DISTANCE:True

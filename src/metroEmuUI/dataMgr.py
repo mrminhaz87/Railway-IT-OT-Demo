@@ -58,12 +58,7 @@ class DataManager(threading.Thread):
             'ccline': None
         } # the sensors data dictionary
 
-        self.signalDict = {
-            'weline': None,
-            'nsline': None, 
-            'ccline': None
-        }
-
+    #-----------------------------------------------------------------------------
     def updateSensorsData(self):
         if gv.iMapMgr:
             for key in self.sensorsDict.keys():
@@ -90,7 +85,7 @@ class DataManager(threading.Thread):
         # request message format: 
         # data fetch: GET:<key>:<val1>:<val2>...
         # data set: POST:<key>:<val1>:<val2>...
-        resp = b'REP:deny:{}'
+        resp = b'REP;deny;{}'
         (reqKey, reqType, reqJsonStr) = parseIncomeMsg(msg)
         if reqKey=='GET':
             if reqType == 'login':
@@ -125,7 +120,7 @@ class DataManager(threading.Thread):
     #-----------------------------------------------------------------------------
     def setSignals(self, reqJsonStr):
         reqDict = json.loads(reqJsonStr)
-        respStr = json.dumps({'result': 'success'})
+        respStr = json.dumps({'result': 'failed'})
         try:
             if gv.iMapMgr:
                 for key, val in reqDict.items():

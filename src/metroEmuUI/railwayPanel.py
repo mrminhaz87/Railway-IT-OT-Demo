@@ -64,7 +64,6 @@ class PanelTainCtrl(wx.Panel):
         self.recbtn3.Bind(wx.EVT_BUTTON, self.resetTrain)
         hbox0.Add(self.recbtn3, flag=flagsL, border=2)
 
-
         hbox0.AddSpacer(5)
         vbox.Add(hbox0, flag=flagsL, border=2)
         return vbox
@@ -89,9 +88,9 @@ class PanelTainCtrl(wx.Panel):
     #-----------------------------------------------------------------------------
     def resetTrain(self, event):
         if gv.iMapMgr:
-            gv.gDebugPrint('Reset train: %s on track: %s' %(str(self.trainID), self.trackID))
+            gv.gDebugPrint('Reset train: idx-%s on track: %s' %(str(self.trainID), self.trackID))
             trains = gv.iMapMgr.getTrains(trackID=self.trackID)
-            dlg = wx.MessageDialog(self, "Press Yes to confirm reset train: %s on track: %s'?" % (
+            dlg = wx.MessageDialog(self, "Press [ Yes ] to confirm reset train: %s on track: %s'?" % (
                 str(self.trainID), self.trackID), 'Alert', wx.YES_NO | wx.ICON_QUESTION)
             result = dlg.ShowModal()
             if result == wx.ID_YES:
