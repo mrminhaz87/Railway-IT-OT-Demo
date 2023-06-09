@@ -73,7 +73,11 @@ class plcAgent(object):
             'port': realworldIP[1]
         }
         self.rwConnector = udpCom.udpClient((self.realwordInfo['ip'], self.realwordInfo['port']))
-        if self._loginRealWord():
+
+        self.recoonectCount = 30
+        self.realwordOnline = self._loginRealWord()
+        
+        if self.realwordOnline:
             gv.gDebugPrint('Login the realworld successfully', logType=gv.LOG_INFO)
         else:
             gv.gDebugPrint('Cannot connect to the realworld emulator', logType=gv.LOG_INFO)
@@ -219,7 +223,14 @@ class plcAgent(object):
     def run(self):
         while not self.terminate:
             now = time.time()
-            self.periodic(now)
+            if self.realwordOnline:
+                self.periodic(now)
+            else:
+                self.recoonectCount -=1
+                if self.recoonectCount == 0:
+                    gv.gDebugPrint('Try to reconnect to the realword.', logType=gv.LOG_INFO)
+                    self.realwordOnline = self._loginRealWord()
+                    if not self.realwordOnline: self.recoonectCount = 30
             time.sleep(gv.gInterval)
 
 #-----------------------------------------------------------------------------
