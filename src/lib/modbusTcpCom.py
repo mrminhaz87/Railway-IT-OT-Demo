@@ -15,6 +15,8 @@
 # License:     
 #-----------------------------------------------------------------------------
 
+import time
+
 from pyModbusTCP.client import ModbusClient
 from pyModbusTCP.server import ModbusServer, DataHandler
 from pyModbusTCP.constants import EXP_ILLEGAL_FUNCTION
@@ -38,7 +40,7 @@ class plcDataHandler(DataHandler):
         self.serverInfo = serverInfo
 
 #-----------------------------------------------------------------------------
-# Init all the read() functions.
+# Init all the iterator read() functions.(Internal callback by <modbusTcpServer>)
 
     def read_coils(self, address, addrOffset, srv_info):
         """ Read the output coils state
@@ -81,7 +83,7 @@ class plcDataHandler(DataHandler):
         return super().read_i_regs(address, addrOffset, srv_info)
 
 #-----------------------------------------------------------------------------
-# Init all the write() functions.
+# Init all the iterator write() functions.(Internal callback by <modbusTcpServer>)
     def write_coils(self, address, bits_l, srv_info):
         """ Write the PLC out coils.
             Args:
@@ -106,23 +108,23 @@ class plcDataHandler(DataHandler):
         return super().write_h_regs(address, words_l, srv_info)
 
 #-----------------------------------------------------------------------------
+# define all the public function.
+    
     def setAllowReadIpaddresses(self, ipList):
         self.allowRipList = ipList
 
-#-----------------------------------------------------------------------------
     def setAllowWriteIpaddresses(self, ipList):
         self.allowWipList = ipList
 
-#-----------------------------------------------------------------------------
     def updateOutPutCoils(self, address, bitList):
         if self.serverInfo:
-            return self.write_coils(address, bitList, self.serverInfo)
+            return super().write_coils(address, bitList, self.serverInfo)
         print("updateOutPutCoils() Error: Parent modBus server not config, call initServerInfo() first.")
         return False
 
     def updateHoldingRegs(self, address, bitList):
         if self.serverInfo:
-            return self.read_h_regs(address, bitList, self.serverInfo)
+            return super().write_h_regs(address, bitList, self.serverInfo)
         print("updateHoldingRegs() Error: Parent modBus server not config, call initServerInfo() first.")
         return False
 
@@ -135,6 +137,11 @@ class modbusTcpClient(object):
         self.tgtPort = tgtPort
         self.client = ModbusClient(host=self.tgtIp, port=self.tgtPort, auto_open=True)
         self.client.timeout = defaultTO # set time out.
+        # Try to connect to the 
+        for _ in range(5):
+            print('Try to login to the PLC unit.')
+            if self.client.open(): break
+            time.sleep(0.2)
         if self.client.is_open:
             print('Success connect to the target PLC: %s' %str(self.tgtIp))
         else:
@@ -169,7 +176,7 @@ class modbusTcpClient(object):
 
     def close(self):
         self.client.close()
-        
+
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class modbusTcpServer(object):
@@ -185,11 +192,14 @@ class modbusTcpServer(object):
     def isRunning(self):
         return self.server.is_run
     
+    def getServerInfo(self):
+        return self.server.ServerInfo
+
     def startServer(self):
         print("Start to run the Modbus TCP server: (%s, %s)" %(self.hostIp, str(self.hostPort)))
-        if self.isRunning: 
-            print("The server is running, stop and restart it.")
-            self.server.stop()
+        #if self.isRunning: 
+        #    print("The server is running, stop and restart it.")
+        #    self.server.stop()
         self.server.start()
 
     def stopServer(self):
