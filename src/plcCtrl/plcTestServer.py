@@ -23,6 +23,7 @@ from pyModbusTCP.constants import EXP_ILLEGAL_FUNCTION
 ALLOW_R_L = ['127.0.0.1', '192.168.0.10']
 ALLOW_W_L = ['127.0.0.1']
 
+serverInfo = None
 
 # a custom data handler with IPs filter
 class MyDataHandler(DataHandler):
@@ -42,6 +43,7 @@ class MyDataHandler(DataHandler):
         if srv_info.client.address in ALLOW_R_L:
             print(address)
             print(count)
+            super().write_h_regs(address, [1,1,1,1,1,1,1], serverInfo)
             print(srv_info)
             data = super().read_h_regs(address, count, srv_info)
             print(data)
@@ -73,4 +75,5 @@ if __name__ == '__main__':
     hostPort = 502
     # init modbus server and start it
     server = ModbusServer(host=hostIP, port=hostPort, data_hdl=MyDataHandler())
+    serverInfo = server.ServerInfo
     server.start()

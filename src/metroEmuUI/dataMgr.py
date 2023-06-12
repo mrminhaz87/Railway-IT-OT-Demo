@@ -51,7 +51,7 @@ class DataManager(threading.Thread):
         self.terminate = False
         self.server = udpCom.udpServer(None, gv.UDP_PORT)
         self.lastUpdate = datetime.now()
-
+        self.daemon = True
         self.sensorsDict = {
             'weline': None,
             'nsline': None, 
