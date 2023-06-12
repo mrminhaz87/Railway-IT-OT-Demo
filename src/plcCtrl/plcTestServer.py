@@ -5,36 +5,72 @@ An example of Modbus/TCP server with a change logger.
 
 Run this as root to listen on TCP privileged ports (<= 1024).
 """
+#!/usr/bin/env python3
+
+"""
+An example of Modbus/TCP server which allow modbus read and/or write only from
+specific IPs.
+
+Run this as root to listen on TCP privileged ports (<= 1024).
+"""
 
 import argparse
-import logging
-from pyModbusTCP.server import ModbusServer, DataBank
+from pyModbusTCP.server import ModbusServer, DataHandler
+from pyModbusTCP.constants import EXP_ILLEGAL_FUNCTION
 
 
-class MyDataBank(DataBank):
-    """A custom ModbusServerDataBank for override on_xxx_change methods."""
+# some const
+ALLOW_R_L = ['127.0.0.1', '192.168.0.10']
+ALLOW_W_L = ['127.0.0.1']
 
-    def on_coils_change(self, address, from_value, to_value, srv_info):
-        """Call by server when change occur on coils space."""
-        msg = 'change in coil space [{0!r:^5} > {1!r:^5}] at @ 0x{2:04X} from ip: {3:<15}'
-        msg = msg.format(from_value, to_value, address, srv_info.client.address)
-        logging.info(msg)
 
-    def on_holding_registers_change(self, address, from_value, to_value, srv_info):
-        """Call by server when change occur on holding registers space."""
-        msg = 'change in hreg space [{0!r:^5} > {1!r:^5}] at @ 0x{2:04X} from ip: {3:<15}'
-        msg = msg.format(from_value, to_value, address, srv_info.client.address)
-        logging.info(msg)
+# a custom data handler with IPs filter
+class MyDataHandler(DataHandler):
+    def read_coils(self, address, count, srv_info):
+        if srv_info.client.address in ALLOW_R_L:
+            return super().read_coils(address, count, srv_info)
+        else:
+            return DataHandler.Return(exp_code=EXP_ILLEGAL_FUNCTION)
+
+    def read_d_inputs(self, address, count, srv_info):
+        if srv_info.client.address in ALLOW_R_L:
+            return super().read_d_inputs(address, count, srv_info)
+        else:
+            return DataHandler.Return(exp_code=EXP_ILLEGAL_FUNCTION)
+
+    def read_h_regs(self, address, count, srv_info):
+        if srv_info.client.address in ALLOW_R_L:
+            print(address)
+            print(count)
+            print(srv_info)
+            data = super().read_h_regs(address, count, srv_info)
+            print(data)
+            return data
+        else:
+            return DataHandler.Return(exp_code=EXP_ILLEGAL_FUNCTION)
+
+    def read_i_regs(self, address, count, srv_info):
+        if srv_info.client.address in ALLOW_R_L:
+            return super().read_i_regs(address, count, srv_info)
+        else:
+            return DataHandler.Return(exp_code=EXP_ILLEGAL_FUNCTION)
+
+    def write_coils(self, address, bits_l, srv_info):
+        if srv_info.client.address in ALLOW_W_L:
+            return super().write_coils(address, bits_l, srv_info)
+        else:
+            return DataHandler.Return(exp_code=EXP_ILLEGAL_FUNCTION)
+
+    def write_h_regs(self, address, words_l, srv_info):
+        if srv_info.client.address in ALLOW_W_L:
+            return super().write_h_regs(address, words_l, srv_info)
+        else:
+            return DataHandler.Return(exp_code=EXP_ILLEGAL_FUNCTION)
 
 
 if __name__ == '__main__':
-    # parse args
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-H', '--host', type=str, default='localhost', help='Host (default: localhost)')
-    parser.add_argument('-p', '--port', type=int, default=502, help='TCP port (default: 502)')
-    args = parser.parse_args()
-    # logging setup
-    logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
+    hostIP = 'localhost'
+    hostPort = 502
     # init modbus server and start it
-    server = ModbusServer(host=args.host, port=args.port, data_bank=MyDataBank())
+    server = ModbusServer(host=hostIP, port=hostPort, data_hdl=MyDataHandler())
     server.start()
