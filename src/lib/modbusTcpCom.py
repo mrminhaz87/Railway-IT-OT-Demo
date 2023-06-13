@@ -180,13 +180,13 @@ class modbusTcpClient(object):
     def getCoilsBits(self, addressIdx, offset):
         if self.client.is_open:
             data = self.client.read_coils(addressIdx, offset)
-            return list(data)
+            if data: return list(data)
         return None
     
     def getHoldingRegs(self, addressIdx, offset):
         if self.client.is_open:
             data = self.client.read_holding_registers(addressIdx, offset)
-            return list(data)
+            if data: return list(data)
         return None
 
     def setCoilsBit(self, addressIdx, bitVal):

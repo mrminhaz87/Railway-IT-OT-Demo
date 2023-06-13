@@ -17,13 +17,14 @@
 import os
 import time
 import json
+import threading
 from datetime import datetime
 from collections import OrderedDict
-
 
 import plcSimGlobal as gv
 import Log
 import udpCom
+import modbusTcpCom
 
 # Define all the module local untility functions here:
 #-----------------------------------------------------------------------------
@@ -39,6 +40,31 @@ def parseIncomeMsg(msg):
         Log.error('parseIncomeMsg(): The income message format is incorrect.')
         Log.exception(err)
     return (reqKey.strip(), reqType.strip(), reqJsonStr)
+
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+class modBusService(threading.Thread):
+
+    def __init__(self, parent, threadID, name):
+        threading.Thread.__init__(self)
+        hostIp = 'localhost'
+        hostPort = 502
+        self.dataMgr = modbusTcpCom.plcDataHandler(allowRipList=gv.ALLOW_R_L, allowWipList=gv.ALLOW_W_L)
+        self.server = modbusTcpCom.modbusTcpServer(hostIp=hostIp, hostPort=hostPort, dataHandler=self.dataMgr)
+        serverInfo = self.server.getServerInfo()
+        self.dataMgr.initServerInfo(serverInfo)
+        gv.iMBhandler = self.dataMgr
+        self.daemon = True
+
+    def run(self):
+        """ Start the udp server's main message handling loop."""
+        print("ModbusTCP service thread run() start.")
+        self.server.startServer()
+        print("Server thread run() end.")
+        self.threadName = None # set the thread name to None when finished.
+
+    def stop(self):
+        self.server.stopServer()
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -82,6 +108,10 @@ class plcAgent(object):
         else:
             gv.gDebugPrint('Cannot connect to the realworld emulator', logType=gv.LOG_INFO)
         
+        # create the local modbus TCP server
+        gv.iMBservice = modBusService(self, 1, 'ModbusService')
+        gv.iMBservice.start()
+
         self.terminate = False
 
 #-----------------------------------------------------------------------------
@@ -189,8 +219,10 @@ class plcAgent(object):
         for key in result[2].keys():
             self.inputState[key] = result[2][key]
         self.updateCoilOutput()
+        # update the modbus data
+        self.updateModBusInfo()
         rst = self.changeSignalCoil()
-        print(rst)
+        #print(rst)
 
 #-----------------------------------------------------------------------------
     def updateCoilOutput(self):
@@ -218,6 +250,21 @@ class plcAgent(object):
                                 break
                         except:
                             gv.gDebugPrint(str(sensorTp)+str(idx), logType=gv.LOG_ERR)
+
+#-----------------------------------------------------------------------------
+    def updateModBusInfo(self):
+        checkSeq = ('weline', 'nsline', 'ccline')
+        holdingRegs = []
+        coils = []
+        for key in checkSeq:
+            holdingRegs += self.inputState[key]
+            coils += self.coilState[key]
+        gv.gDebugPrint("updateModBusInfo(): update holding registers: %s" %str(holdingRegs), logType=gv.LOG_INFO)
+        gv.iMBhandler.updateHoldingRegs(0, holdingRegs)
+
+        gv.gDebugPrint("updateModBusInfo(): update coils: %s" %str(coils), logType=gv.LOG_INFO)
+        gv.iMBhandler.updateOutPutCoils(0, coils)
+
 
 #-----------------------------------------------------------------------------
     def run(self):

@@ -43,6 +43,10 @@ LOG_WARN    = 1
 LOG_ERR     = 2
 LOG_EXCEPT  = 3
 
+ALLOW_R_L = ['127.0.0.1', '192.168.0.10']
+ALLOW_W_L = ['127.0.0.1']
+
+
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.
 gRealWordIP = ('127.0.0.1', 3001)
@@ -58,3 +62,8 @@ def gDebugPrint(msg, prt=True, logType=None):
         Log.exception(msg)
     elif logType == LOG_INFO or DEBUG_FLG:
         Log.info(msg)
+
+
+#-------<GLOBAL PARAMTERS>-----------------------------------------------------
+iMBhandler = None   # modbus TCP data handler.
+iMBservice = None   # modbus TCP service   
