@@ -39,16 +39,25 @@ class UIFrame(wx.Frame):
         self.SetBackgroundColour(wx.Colour(200, 210, 200))
         #self.SetTransparent(gv.gTranspPct*255//100)
         self.SetIcon(wx.Icon(gv.ICO_PATH))
+        self._initGlobals()
         # Build UI sizer
         self.SetSizer(self._buidUISizer())
         # Set the periodic call back
         hostIp = '127.0.0.1'
-        gv.idataMgr = dataMgr.DataManager(hostIp)
+        if not gv.TEST_MD:
+            gv.idataMgr = dataMgr.DataManager(hostIp)
         self.lastPeriodicTime = time.time()
         self.timer = wx.Timer(self)
         self.updateLock = False
         self.Bind(wx.EVT_TIMER, self.periodic)
         self.timer.Start(PERIODIC)  # every 500 ms
+
+    def _initGlobals(self):
+        # Init the global parameters used only by this module
+        gv.gTrackConfig['weline'] = {'id':'weline', 'num': 4, 'color': wx.Colour(52, 169, 129), 'icon': 'welabel.png'}
+        gv.gTrackConfig['nsline'] = {'id':'nsline', 'num': 3, 'color': wx.Colour(233, 0, 97), 'icon': 'nslabel.png'}
+        gv.gTrackConfig['ccline'] = {'id':'ccline', 'num': 3, 'color': wx.Colour(255, 136, 0), 'icon': 'cclabel.png'}
+        # Init all the global instance
 
 #--UIFrame---------------------------------------------------------------------
     def _buidUISizer(self):
@@ -96,14 +105,15 @@ class UIFrame(wx.Frame):
         if (not self.updateLock) and now - self.lastPeriodicTime >= gv.gUpdateRate:
             print("main frame update at %s" % str(now))
             self.lastPeriodicTime = now
-            if gv.idataMgr: gv.idataMgr.periodic(now)
-            self.plcPnl1.updataPLCdata()
-            self.plcPnl2.updataPLCdata()
-            self.plcPnl3.updataPLCdata()
+            if not gv.TEST_MD:
+                if gv.idataMgr: gv.idataMgr.periodic(now)
+                self.plcPnl1.updataPLCdata()
+                self.plcPnl2.updataPLCdata()
+                self.plcPnl3.updataPLCdata()
 
-            self.plcPnl1.updateDisplay()
-            self.plcPnl2.updateDisplay()
-            self.plcPnl3.updateDisplay()
+                self.plcPnl1.updateDisplay()
+                self.plcPnl2.updateDisplay()
+                self.plcPnl3.updateDisplay()
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

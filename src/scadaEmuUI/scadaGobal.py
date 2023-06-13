@@ -44,6 +44,8 @@ Log.initLogger(gTopDir, 'Logs', APP_NAME[0], APP_NAME[1], historyCnt=100, fPutLo
 IMG_FD = os.path.join(dirpath, 'img')
 ICO_PATH = os.path.join(IMG_FD, "metro.ico")
 
+TEST_MD = True
+
 # Init the agent object type
 RAILWAY_TYPE_LINE   = 'RL'
 RAILWAY_TYPE_CYCLE  = 'RC'
@@ -76,6 +78,8 @@ LAY_V = 6   # vertical layout
 
 # gTrainImgB = os.path.join(dirpath, IMG_FD, "train.png")
 # gTrainImgH = os.path.join(dirpath, IMG_FD, "trainhead2.png")
+
+gTrackConfig = OrderedDict()
 gTranspPct = 70     # Windows transparent percentage.
 gUpdateRate = 1     # main frame update rate 1 sec.
 

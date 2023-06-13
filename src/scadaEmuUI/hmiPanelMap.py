@@ -43,7 +43,13 @@ class PanelMap(wx.Panel):
         w, h = self.panelSize
         dc.SetBrush(wx.Brush(self.bgColor))
         dc.DrawRectangle(0, 0, w, h)
+        trackSeq = ('weline', 'ccline', 'nsline')
 
+        for i, trackName in enumerate(trackSeq):
+            color = gv.gTrackConfig[trackName]['color']
+            dc.SetPen(wx.Pen(color, width=4, style=wx.PENSTYLE_SOLID))
+            dc.DrawLine(50, 100+160*i, 1700, 100+160*i,)
+            
     #--PanelMap--------------------------------------------------------------------
     def onPaint(self, event):
         """ Draw the whole panel by using the wx device context."""

@@ -196,7 +196,7 @@ class PanelPLC(wx.Panel):
         self.Refresh(False)
 
     def updateHoldingRegs(self, regList):
-        if self.gpioInList == regList: return # no new update
+        if regList is None or self.gpioInList == regList: return # no new update
         for idx in range(min(self.regsNum, len(regList))):
             status = regList[idx]
             if self.gpioInList[idx] != status:
@@ -206,7 +206,7 @@ class PanelPLC(wx.Panel):
         #self.Refresh(False)
 
     def updateCoils(self, coilsList):
-        if self.gpioOuList == coilsList: return  
+        if coilsList is None or self.gpioOuList == coilsList: return  
         for idx in range(min(self.coilsNum, len(coilsList))):
             status = coilsList[idx]
             if self.gpioOuList[idx] != status:
