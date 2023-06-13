@@ -1,22 +1,31 @@
 #!/usr/bin/python
 #-----------------------------------------------------------------------------
-# Name:        uiRun.py
+# Name:        hmiEmuRun.py
 #
-# Purpose:     This module is used as a sample to create the main wx frame.
+# Purpose:     This module is the main wx-frame for the Human Machine Interface
+#              of metro railway and signal SCADA sysetm.
 #
 # Author:      Yuancheng Liu
 #
-# Created:     2019/01/10
-# Copyright:   YC @ Singtel Cyber Security Research & Development Laboratory
-# License:     YC
+# Version:     v0.1
+# Created:     2023/06/13
+# Copyright:   
+# License:     
 #-----------------------------------------------------------------------------
+
 import os
 import sys
 import time
 import wx
 import scadaGobal as gv
-import hmiPanel as pl
+
+import hmiPanel as pnlFunction
+import hmiPanelMap as pnlMap
+import scadaDataMgr as dataMgr
+
+
 PERIODIC = 500      # update in every 500ms
+FRAME_SIZE = (1800, 1000)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -24,7 +33,7 @@ class UIFrame(wx.Frame):
     """ Main UI frame window."""
     def __init__(self, parent, id, title):
         """ Init the UI and parameters """
-        wx.Frame.__init__(self, parent, id, title, size=(1150, 560))
+        wx.Frame.__init__(self, parent, id, title, size=FRAME_SIZE)
         # No boader frame:
         #wx.Frame.__init__(self, parent, id, title, style=wx.MINIMIZE_BOX | wx.STAY_ON_TOP)
         self.SetBackgroundColour(wx.Colour(200, 210, 200))
@@ -33,6 +42,8 @@ class UIFrame(wx.Frame):
         # Build UI sizer
         self.SetSizer(self._buidUISizer())
         # Set the periodic call back
+        hostIp = '127.0.0.1'
+        gv.idataMgr = dataMgr.DataManager(hostIp)
         self.lastPeriodicTime = time.time()
         self.timer = wx.Timer(self)
         self.updateLock = False
@@ -42,17 +53,40 @@ class UIFrame(wx.Frame):
 #--UIFrame---------------------------------------------------------------------
     def _buidUISizer(self):
         """ Build the main UI Sizer. """
-        flagsR = wx.CENTER
-        mSizer = wx.BoxSizer(wx.HORIZONTAL)
+        flagsL = wx.LEFT
+        mSizer = wx.BoxSizer(wx.VERTICAL)
         mSizer.AddSpacer(5)
-        gv.iImagePanel = pl.PanelImge(self)
-        mSizer.Add(gv.iImagePanel, flag=flagsR, border=2)
+        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        label = wx.StaticText(self, label="Railway HMI")
+        label.SetFont(font)
+        mSizer.Add(label, flag=flagsL, border=2)
+        mSizer.AddSpacer(10)
+        gv.iMapPanel = self.mapPanel = pnlMap.PanelMap(self)
+        mSizer.Add(gv.iMapPanel, flag=flagsL, border=2)
+        mSizer.AddSpacer(10)
+        mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(1790, -1),
+                                style=wx.LI_HORIZONTAL), flag=flagsL, border=5)
+
         mSizer.AddSpacer(5)
-        mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(-1, 560),
-                                 style=wx.LI_VERTICAL), flag=flagsR, border=2)
+        label2 = wx.StaticText(self, label="PLC Panels")
+        label2.SetFont(font)
+        mSizer.Add(label2, flag=flagsL, border=2)
         mSizer.AddSpacer(5)
-        gv.iCtrlPanel = pl.PanelCtrl(self)
-        mSizer.Add(gv.iCtrlPanel, flag=flagsR, border=2)
+
+        hbox1 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox1.AddSpacer(10)        
+        self.plcPnl1 = pnlFunction.PanelPLC(self, 'plc1', '127.0.0.1:502')
+        hbox1.Add(self.plcPnl1, flag=flagsL, border=2)
+        hbox1.AddSpacer(10)
+
+        self.plcPnl2 = pnlFunction.PanelPLC(self, 'plc2', '127.0.0.1:503')
+        hbox1.Add(self.plcPnl2, flag=flagsL, border=2)
+        hbox1.AddSpacer(10)
+        
+        self.plcPnl3 = pnlFunction.PanelPLC(self, 'plc3', '127.0.0.1:504')
+        hbox1.Add(self.plcPnl3, flag=flagsL, border=2)
+
+        mSizer.Add(hbox1, flag=flagsL, border=2)
         return mSizer
 
 #--UIFrame---------------------------------------------------------------------
@@ -62,6 +96,14 @@ class UIFrame(wx.Frame):
         if (not self.updateLock) and now - self.lastPeriodicTime >= gv.gUpdateRate:
             print("main frame update at %s" % str(now))
             self.lastPeriodicTime = now
+            if gv.idataMgr: gv.idataMgr.periodic(now)
+            self.plcPnl1.updataPLCdata()
+            self.plcPnl2.updataPLCdata()
+            self.plcPnl3.updataPLCdata()
+
+            self.plcPnl1.updateDisplay()
+            self.plcPnl2.updateDisplay()
+            self.plcPnl3.updateDisplay()
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

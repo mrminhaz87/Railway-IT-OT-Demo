@@ -76,6 +76,8 @@ LAY_V = 6   # vertical layout
 
 # gTrainImgB = os.path.join(dirpath, IMG_FD, "train.png")
 # gTrainImgH = os.path.join(dirpath, IMG_FD, "trainhead2.png")
+gTranspPct = 70     # Windows transparent percentage.
+gUpdateRate = 1     # main frame update rate 1 sec.
 
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.
@@ -95,20 +97,5 @@ def gDebugPrint(msg, prt=True, logType=None):
 iMainFrame = None   # UI MainFrame.
 iCtrlPanel = None   # UI function control panel.
 iMapPanel = None    # UI map display panel
-
-
-#------<IMAGES PATH>-------------------------------------------------------------
-IMG_FD = 'img'
-ICO_PATH = os.path.join(dirpath, IMG_FD, "geoIcon.ico")
-BGIMG_PATH = os.path.join(dirpath, IMG_FD, "SampleImg.png")
-
-#-------<GLOBAL VARIABLES (start with "g")>------------------------------------
-# VARIABLES are the built in data type.
-gTranspPct = 70     # Windows transparent percentage.
-gUpdateRate = 1     # main frame update rate 1 sec.
-
-
-#-------<GLOBAL PARAMTERS>-----------------------------------------------------
-iMainFrame = None   # MainFrame.
-iImagePanel = None  # Image panel.
-iCtrlPanel = None   # control pane
+iPlcClient = None   # modbus client to connect to the PLC
+idataMgr = None
