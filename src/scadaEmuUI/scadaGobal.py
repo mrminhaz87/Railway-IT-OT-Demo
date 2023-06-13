@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------
-# Name:        metroEmuGlobal.py
+# Name:        scadaGlobal.py
 #
 # Purpose:     This module is used as a local config file to set constants, 
 #              global parameters which will be used in the other modules.
@@ -23,7 +23,7 @@ from collections import OrderedDict
 print("Current working directory is : %s" % os.getcwd())
 DIR_PATH = dirpath = os.path.dirname(__file__)
 print("Current source code location : %s" % dirpath)
-APP_NAME = ('SCADAEmu', 'UI')
+APP_NAME = ('SCADAEmu', 'HMI')
 
 TOPDIR = 'src'
 LIBDIR = 'lib'
@@ -44,7 +44,8 @@ Log.initLogger(gTopDir, 'Logs', APP_NAME[0], APP_NAME[1], historyCnt=100, fPutLo
 IMG_FD = os.path.join(dirpath, 'img')
 ICO_PATH = os.path.join(IMG_FD, "metro.ico")
 
-TEST_MD = True
+TEST_MD = False
+PLC_NUM = 1
 
 # Init the agent object type
 RAILWAY_TYPE_LINE   = 'RL'
@@ -53,12 +54,9 @@ TRAIN_TYPE          = 'TR'
 LABEL_TYPE          = 'LB'
 SENSOR_TYPE         = 'SS'
 SINGAL_TYPE         = "SG"
-STATION_TYPE        = 'ST'
-ENV_TYPE            = 'EV'
-JUNCTION_TYPE       = 'JC'
 
 PERIODIC = 300      # update the main in every 300ms
-UDP_PORT = 3001
+MBTCP_PORT = 502
 
 # Init the log type parameters.
 DEBUG_FLG   = False
@@ -76,10 +74,22 @@ LAY_C = 4   # layout at center
 LAY_H = 5   # horizontal layout
 LAY_V = 6   # vertical layout
 
-# gTrainImgB = os.path.join(dirpath, IMG_FD, "train.png")
-# gTrainImgH = os.path.join(dirpath, IMG_FD, "trainhead2.png")
-
 gTrackConfig = OrderedDict()
+
+# PLC connection info
+gPlcInfo = OrderedDict()
+gPlcInfo['PLC-00'] = {'id': 'PLC-00', 'ipaddress': '127.0.0.1',
+                      'port': 502, 'hRegsInfo': (0, 39), 'coilsInfo': (0, 17)}
+
+# PLC display panel information.
+gPlcPnlInfo = OrderedDict()
+gPlcPnlInfo['PLC-00'] = {'id': 'PLC-00', 'ipaddress': '127.0.0.1',
+                         'port': 502, 'tgt': 'PLC-00', 'hRegsInfo': (0, 15), 'coilsInfo': (0, 6)}
+gPlcPnlInfo['PLC-01'] = {'id': 'PLC-01', 'ipaddress': '127.0.0.1',
+                         'port': 503, 'tgt': 'PLC-00', 'hRegsInfo': (15, 30), 'coilsInfo': (6, 12)}
+gPlcPnlInfo['PLC-02'] = {'id': 'PLC-02', 'ipaddress': '127.0.0.1',
+                         'port': 503, 'tgt': 'PLC-00', 'hRegsInfo': (30, 39), 'coilsInfo': (12, 17)}
+
 gTranspPct = 70     # Windows transparent percentage.
 gUpdateRate = 1     # main frame update rate 1 sec.
 

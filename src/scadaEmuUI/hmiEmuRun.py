@@ -23,7 +23,6 @@ import hmiPanel as pnlFunction
 import hmiPanelMap as pnlMap
 import scadaDataMgr as dataMgr
 
-
 PERIODIC = 500      # update in every 500ms
 FRAME_SIZE = (1800, 1000)
 
@@ -31,24 +30,22 @@ FRAME_SIZE = (1800, 1000)
 #-----------------------------------------------------------------------------
 class UIFrame(wx.Frame):
     """ Main UI frame window."""
+
     def __init__(self, parent, id, title):
         """ Init the UI and parameters """
         wx.Frame.__init__(self, parent, id, title, size=FRAME_SIZE)
-        # No boader frame:
-        #wx.Frame.__init__(self, parent, id, title, style=wx.MINIMIZE_BOX | wx.STAY_ON_TOP)
         self.SetBackgroundColour(wx.Colour(200, 210, 200))
         #self.SetTransparent(gv.gTranspPct*255//100)
         self.SetIcon(wx.Icon(gv.ICO_PATH))
         self._initGlobals()
         # Build UI sizer
         self.SetSizer(self._buidUISizer())
-        # Set the periodic call back
-        hostIp = '127.0.0.1'
+        self.updateLock = False
         if not gv.TEST_MD:
-            gv.idataMgr = dataMgr.DataManager(hostIp)
+            gv.idataMgr = dataMgr.DataManager(self, gv.gPlcInfo)
+        # Set the periodic call back
         self.lastPeriodicTime = time.time()
         self.timer = wx.Timer(self)
-        self.updateLock = False
         self.Bind(wx.EVT_TIMER, self.periodic)
         self.timer.Start(PERIODIC)  # every 500 ms
 
@@ -83,18 +80,13 @@ class UIFrame(wx.Frame):
         mSizer.AddSpacer(5)
 
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
-        hbox1.AddSpacer(10)        
-        self.plcPnl1 = pnlFunction.PanelPLC(self, 'plc1', '127.0.0.1:502')
-        hbox1.Add(self.plcPnl1, flag=flagsL, border=2)
-        hbox1.AddSpacer(10)
-
-        self.plcPnl2 = pnlFunction.PanelPLC(self, 'plc2', '127.0.0.1:503')
-        hbox1.Add(self.plcPnl2, flag=flagsL, border=2)
-        hbox1.AddSpacer(10)
+        self.plcPnls = {}
+        for key, val in gv.gPlcPnlInfo.items():
+            hbox1.AddSpacer(10)
+            ipaddr = val['ipaddress'] + ' : ' + str(val['port'])
+            self.plcPnls[key] = pnlFunction.PanelPLC(self, key, ipaddr)
+            hbox1.Add(self.plcPnls[key], flag=flagsL, border=2)
         
-        self.plcPnl3 = pnlFunction.PanelPLC(self, 'plc3', '127.0.0.1:504')
-        hbox1.Add(self.plcPnl3, flag=flagsL, border=2)
-
         mSizer.Add(hbox1, flag=flagsL, border=2)
         return mSizer
 
@@ -107,13 +99,18 @@ class UIFrame(wx.Frame):
             self.lastPeriodicTime = now
             if not gv.TEST_MD:
                 if gv.idataMgr: gv.idataMgr.periodic(now)
-                self.plcPnl1.updataPLCdata()
-                self.plcPnl2.updataPLCdata()
-                self.plcPnl3.updataPLCdata()
-
-                self.plcPnl1.updateDisplay()
-                self.plcPnl2.updateDisplay()
-                self.plcPnl3.updateDisplay()
+                for key in self.plcPnls.keys():
+                    # update the holding registers
+                    tgtPlcID = gv.gPlcPnlInfo[key]['tgt']
+                    rsIdx, reIdx = gv.gPlcPnlInfo[key]['hRegsInfo']
+                    registList = gv.idataMgr.getPlcHRegsData(tgtPlcID, rsIdx, reIdx)
+                    print(registList)
+                    self.plcPnls[key].updateHoldingRegs(registList)
+                    csIdx, ceIdx = gv.gPlcPnlInfo[key]['coilsInfo']
+                    coilsList = gv.idataMgr.getPlcCoilsData(tgtPlcID, csIdx, ceIdx)
+                    print(coilsList)
+                    self.plcPnls[key].updateCoils(coilsList)
+                    self.plcPnls[key].updateDisplay()
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

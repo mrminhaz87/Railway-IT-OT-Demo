@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #-----------------------------------------------------------------------------
-# Name:        DataMgr.py
+# Name:        scadaDataMgr.py
 #
 # Purpose:     Data manager module used to control all the other data processing 
 #              modules and store the interprocess/result data.
@@ -13,9 +13,9 @@
 # License:     n.a
 #-----------------------------------------------------------------------------
 
-import time
-import scadaGobal as gv
+from collections import OrderedDict
 
+import scadaGobal as gv
 import modbusTcpCom
 
 class DataManager(object):
@@ -23,23 +23,47 @@ class DataManager(object):
         handle the data-IO with dataBase and the monitor hub's data fetching/
         changing request.
     """
-    def __init__(self, hostIp) -> None:
-        self.plcClient = modbusTcpCom.modbusTcpClient(hostIp)
-        if self.plcClient.checkConn():
-            gv.gDebugPrint('DataManager: Connected to PLC', logType=gv.LOG_INFO)
-        else:
-            gv.gDebugPrint('DataManager: Fail to connect to PLC', logType=gv.LOG_INFO)
-        self.regsList = []
-        self.coilsList = []
+    def __init__(self, parent, plcInfo) -> None:
+        self.parent = parent
+        self.plcClients = OrderedDict()
+        self.regsDict = {}
+        self.coilsDict = {}
+        self.plcInfo = plcInfo
+        for key, val in plcInfo.items():
+            plcIpaddr = val['ipaddress']
+            plcPort = val['port']
+            self.plcClients[key] = modbusTcpCom.modbusTcpClient(plcIpaddr, tgtPort=plcPort)
+            if self.plcClients[key] .checkConn():
+                gv.gDebugPrint('DataManager: Connected to PLC', logType=gv.LOG_INFO)
+            else:
+                gv.gDebugPrint('DataManager: Fail to connect to PLC', logType=gv.LOG_INFO)
+            self.regsDict[key] = []
+            self.coilsDict[key] = []
+        gv.gDebugPrint('ScadaMgr inited', logType=gv.LOG_INFO)
 
     #--UIFrame---------------------------------------------------------------------
     def periodic(self, now):
         """ Call back every periodic time."""
         gv.gDebugPrint('DataManager: get PLC information', logType=gv.LOG_INFO)
-        self.regsList = self.plcClient.getHoldingRegs(0, 39)
-        self.coilsList = self.plcClient.getCoilsBits(0, 17)
+        for key, val in self.plcClients.items():
+            hRegsAddr, hRegsNum = self.plcInfo[key]['hRegsInfo']
+            self.regsDict[key] = self.plcClients[key].getHoldingRegs(hRegsAddr, hRegsNum)
+            coilsAddr, coilsNum = self.plcInfo[key]['coilsInfo']
+            self.coilsDict[key] = self.plcClients[key].getCoilsBits(coilsAddr, coilsNum)
 
-    def getPLCInfo(self, plcName):
+    def getPlcHRegsData(self, plcid, startIdx, endIdx):
+        if plcid in self.regsDict.keys():
+            return self.regsDict[plcid][startIdx:endIdx]
+        return None
+
+    def getPlcCoilsData(self, plcid, startIdx, endIdx):
+        if plcid in self.coilsDict.keys():
+            return self.coilsDict[plcid][startIdx:endIdx]
+        return None
+
+
+    def getPLCInfo(self, plcid, hregRange, coilsRange):
+        plcName = None
         if plcName == 'plc1':
             if len(self.regsList) > 0 and len(self.coilsList)>0: 
                 return (self.regsList[0:15], self.coilsList[0:6])
