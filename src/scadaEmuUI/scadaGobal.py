@@ -44,7 +44,7 @@ Log.initLogger(gTopDir, 'Logs', APP_NAME[0], APP_NAME[1], historyCnt=100, fPutLo
 IMG_FD = os.path.join(dirpath, 'img')
 ICO_PATH = os.path.join(IMG_FD, "metro.ico")
 
-TEST_MD = False
+TEST_MD = True
 PLC_NUM = 1
 
 # Init the agent object type
@@ -111,5 +111,6 @@ def gDebugPrint(msg, prt=True, logType=None):
 iMainFrame = None   # UI MainFrame.
 iCtrlPanel = None   # UI function control panel.
 iMapPanel = None    # UI map display panel
+iMapMgr = None
 iPlcClient = None   # modbus client to connect to the PLC
 idataMgr = None

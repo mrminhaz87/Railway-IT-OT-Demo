@@ -49,7 +49,28 @@ class PanelMap(wx.Panel):
             color = gv.gTrackConfig[trackName]['color']
             dc.SetPen(wx.Pen(color, width=4, style=wx.PENSTYLE_SOLID))
             dc.DrawLine(50, 100+160*i, 1700, 100+160*i,)
-            
+
+    def _drawSensors(self, dc):
+        dc.SetPen(self.dcDefPen)
+        dc.SetFont(wx.Font(7, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+        dc.SetBrush(wx.Brush('GRAY'))
+        for key, sensorAgent in gv.iMapMgr.getSensors().items():
+            sensorId = sensorAgent.getID()
+            sensorInfoList = sensorAgent.getSensorsInfo()
+            dc.SetTextForeground(wx.Colour('White'))
+            for i, sensorInfo in enumerate(sensorInfoList):
+                pos = sensorInfo['pos']
+                dc.DrawText(sensorId+"-s"+str(i), pos[0]+3, pos[1]+3)
+                state = sensorInfo['state']
+                if state:
+                    color = 'YELLOW' if self.toggle else 'BLUE'
+                    dc.SetBrush(wx.Brush(color))
+                    dc.DrawRectangle(pos[0]-4, pos[1]-4, 8, 8)
+                    dc.SetBrush(wx.Brush('GRAY'))
+                else:
+                    dc.DrawRectangle(pos[0]-4, pos[1]-4, 8, 8)
+
+
     #--PanelMap--------------------------------------------------------------------
     def onPaint(self, event):
         """ Draw the whole panel by using the wx device context."""
@@ -57,6 +78,7 @@ class PanelMap(wx.Panel):
         self.dcDefPen = dc.GetPen()
         # Draw all the components
         self._drawRailWay(dc)
+        self._drawSensors(dc)
 
     def updateDisplay(self, updateFlag=None):
         """ Set/Update the display: if called as updateDisplay() the function will 

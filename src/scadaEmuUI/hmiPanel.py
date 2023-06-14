@@ -211,8 +211,9 @@ class PanelPLC(wx.Panel):
             status = coilsList[idx]
             if self.gpioOuList[idx] != status:
                 self.gpioOuList[idx] = status
+                self.gpioOuLbList[idx].SetLabel('ON' if status else 'OFF')
                 self.gpioOuLbList[idx].SetBackgroundColour(
-                    wx.Colour('GREEN') if status else wx.Colour(120, 120, 120))
+                    wx.Colour('GREEN') if status else wx.Colour(253, 253, 253))
         #self.Refresh(False)
 
     def updataPLCdata(self):

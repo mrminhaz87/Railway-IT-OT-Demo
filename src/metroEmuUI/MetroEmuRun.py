@@ -17,7 +17,7 @@ import os
 import time
 import wx
 import metroEmuGobal as gv
-import railwayMgr as dataMgr
+import railwayMgr as mapMgr
 import railwayPanel as pnlFunction
 import railwayPanelMap as pnlMap
 
@@ -65,7 +65,7 @@ class UIFrame(wx.Frame):
         gv.gTrackConfig['ccline'] = {'id':'ccline', 'num': 3, 'color': wx.Colour(255, 136, 0), 'icon': 'cclabel.png'}
         # Init all the global instance
         if gv.gCollsionTestFlg: gv.gTestMD = False # disable the test mode flag to fetch the signal from PLC
-        gv.iMapMgr = dataMgr.MapMgr(self)
+        gv.iMapMgr = mapMgr.MapMgr(self)
 
 #--UIFrame---------------------------------------------------------------------
     def _buidUISizer(self):

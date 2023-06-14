@@ -20,6 +20,7 @@ import wx
 import scadaGobal as gv
 
 import hmiPanel as pnlFunction
+import hmiMgr as mapMgr
 import hmiPanelMap as pnlMap
 import scadaDataMgr as dataMgr
 
@@ -55,6 +56,7 @@ class UIFrame(wx.Frame):
         gv.gTrackConfig['nsline'] = {'id':'nsline', 'num': 3, 'color': wx.Colour(233, 0, 97), 'icon': 'nslabel.png'}
         gv.gTrackConfig['ccline'] = {'id':'ccline', 'num': 3, 'color': wx.Colour(255, 136, 0), 'icon': 'cclabel.png'}
         # Init all the global instance
+        gv.iMapMgr = mapMgr.MapMgr(self)
 
 #--UIFrame---------------------------------------------------------------------
     def _buidUISizer(self):
@@ -111,6 +113,8 @@ class UIFrame(wx.Frame):
                     print(coilsList)
                     self.plcPnls[key].updateCoils(coilsList)
                     self.plcPnls[key].updateDisplay()
+            self.mapPanel.periodic(now)
+
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
