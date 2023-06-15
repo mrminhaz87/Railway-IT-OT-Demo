@@ -84,22 +84,21 @@ class PanelMap(wx.Panel):
                 id = signalAgent.getID()
                 pos = signalAgent.getPos()
                 state = signalAgent.getState()
-                dir = signalAgent.dir
+                # draw the trigger on sensors
+                tgOnlineStype =wx.PENSTYLE_SOLID if state else wx.PENSTYLE_LONG_DASH
+                dc.SetPen(wx.Pen('RED', width=1, style=tgOnlineStype))
+                for sensorPos in signalAgent.getTGonPos():
+                    dc.DrawLine(pos[0]-10, pos[1], sensorPos[0], sensorPos[1])
+                tgOfflineStype =wx.PENSTYLE_SOLID if not state else wx.PENSTYLE_LONG_DASH
+                dc.SetPen(wx.Pen('GREEN', width=1, style=tgOfflineStype))
+                for sensorPos in signalAgent.getTGoffPos():
+                    dc.DrawLine(pos[0]+10, pos[1], sensorPos[0], sensorPos[1])
+
                 color = 'RED' if state else 'GREEN'
                 dc.SetPen(wx.Pen(color, width=2, style=wx.PENSTYLE_SOLID))
                 x, y = pos[0], pos[1]
-                if dir == gv.LAY_U:
-                    y -= 15 
-                elif dir == gv.LAY_D:
-                    y += 15
-                elif dir == gv.LAY_L:
-                    x -= 15
-                elif dir == gv.LAY_R:
-                    x += 15
-                dc.DrawLine(pos[0], pos[1], x, y)
-                dc.DrawText("S-"+str(id), x-10, y-25)
                 dc.SetBrush(wx.Brush(color))
-                dc.DrawRectangle(x-5, y-5, 10, 10)
+                dc.DrawRectangle(x-10, y-3, 20, 6)
 
 
     #--PanelMap--------------------------------------------------------------------
@@ -109,6 +108,7 @@ class PanelMap(wx.Panel):
         self.dcDefPen = dc.GetPen()
         # Draw all the components
         self._drawRailWay(dc)
+        self._drawSignals(dc)
         self._drawSensors(dc)
 
     def updateDisplay(self, updateFlag=None):
