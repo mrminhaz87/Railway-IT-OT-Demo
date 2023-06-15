@@ -56,12 +56,15 @@ class PanelMap(wx.Panel):
         dc.SetBrush(wx.Brush('GRAY'))
         for key, sensorAgent in gv.iMapMgr.getSensors().items():
             sensorId = sensorAgent.getID()
-            sensorInfoList = sensorAgent.getSensorsInfo()
+            sensorNum = sensorAgent.getSensorsCount()
+            posList = sensorAgent.getSensorPos()
+            stateList = sensorAgent.getSensorsState()
+
             dc.SetTextForeground(wx.Colour('White'))
-            for i, sensorInfo in enumerate(sensorInfoList):
-                pos = sensorInfo['pos']
+            for i in range(sensorNum):
+                pos = posList[i]
                 dc.DrawText(sensorId+"-s"+str(i), pos[0]+3, pos[1]+3)
-                state = sensorInfo['state']
+                state = stateList[i]
                 if state:
                     color = 'YELLOW' if self.toggle else 'BLUE'
                     dc.SetBrush(wx.Brush(color))
@@ -69,6 +72,34 @@ class PanelMap(wx.Panel):
                     dc.SetBrush(wx.Brush('GRAY'))
                 else:
                     dc.DrawRectangle(pos[0]-4, pos[1]-4, 8, 8)
+
+
+#-----------------------------------------------------------------------------
+    def _drawSignals(self, dc):
+        dc.SetPen(self.dcDefPen)
+        dc.SetFont(wx.Font(7, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+        dc.SetBrush(wx.Brush('Green'))
+        for key, signals in gv.iMapMgr.getSignals().items():
+            for signalAgent in signals:
+                id = signalAgent.getID()
+                pos = signalAgent.getPos()
+                state = signalAgent.getState()
+                dir = signalAgent.dir
+                color = 'RED' if state else 'GREEN'
+                dc.SetPen(wx.Pen(color, width=2, style=wx.PENSTYLE_SOLID))
+                x, y = pos[0], pos[1]
+                if dir == gv.LAY_U:
+                    y -= 15 
+                elif dir == gv.LAY_D:
+                    y += 15
+                elif dir == gv.LAY_L:
+                    x -= 15
+                elif dir == gv.LAY_R:
+                    x += 15
+                dc.DrawLine(pos[0], pos[1], x, y)
+                dc.DrawText("S-"+str(id), x-10, y-25)
+                dc.SetBrush(wx.Brush(color))
+                dc.DrawRectangle(x-5, y-5, 10, 10)
 
 
     #--PanelMap--------------------------------------------------------------------

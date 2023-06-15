@@ -161,7 +161,7 @@ class PanelMap(wx.Panel):
             dc.SetTextForeground(wx.Colour('White'))
             for i in range(sensorAgent.getSensorCount()):
                 pos = sensorPos[i]
-                dc.DrawText(sensorId+"-s"+str(i), pos[0]+3, pos[1]+3)
+                dc.DrawText(sensorId+"-s"+str(i), pos[0]+3, pos[1]+5)
                 state = sensorState[i]
                 if state:
                     color = 'YELLOW' if self.toggle else 'BLUE'

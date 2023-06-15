@@ -18,6 +18,8 @@ from collections import OrderedDict
 import scadaGobal as gv
 import modbusTcpCom
 
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 class DataManager(object):
     """ The data manager is a module running parallel with the main thread to 
         handle the data-IO with dataBase and the monitor hub's data fetching/
@@ -59,18 +61,4 @@ class DataManager(object):
     def getPlcCoilsData(self, plcid, startIdx, endIdx):
         if plcid in self.coilsDict.keys():
             return self.coilsDict[plcid][startIdx:endIdx]
-        return None
-
-
-    def getPLCInfo(self, plcid, hregRange, coilsRange):
-        plcName = None
-        if plcName == 'plc1':
-            if len(self.regsList) > 0 and len(self.coilsList)>0: 
-                return (self.regsList[0:15], self.coilsList[0:6])
-        elif plcName == 'plc2':
-            if len(self.regsList) > 0 and len(self.coilsList)>0:
-                return (self.regsList[15:30], self.coilsList[6:12])
-        elif plcName == 'plc3':
-            if len(self.regsList) > 0 and len(self.coilsList)>0:
-                return (self.regsList[30:39], self.coilsList[12:17])
         return None
