@@ -17,11 +17,35 @@
 
 
 
+SCADA-HMI UI
+
+![](doc/hmiUI.png)
+
+
+
+
+
 ### System Design 
 
 The 3 parts will follow below work flow: 
 
 ![](doc/systemWorkflow.png)
+
+For each sensors-Signal set, the circuit logic is below:
+
+![](doc/circuit_logic2.png)
+
+
+
+Verify circuit logic: https://www.circuit-diagram.org/editor/
+
+
+
+
+
+
+
+
 
 ------
 

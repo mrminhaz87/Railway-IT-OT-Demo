@@ -32,10 +32,24 @@ class PanelMap(wx.Panel):
         self.panelSize = panelSize
         #self.bitMaps = self._loadBitMaps()
         self.toggle = False
+        self._loadLabelsImg()
         # Paint the map
         self.Bind(wx.EVT_PAINT, self.onPaint)
         # self.Bind(wx.EVT_LEFT_DOWN, self.onLeftClick)
         self.SetDoubleBuffered(True)  # Set the panel double buffer to void the panel flash during update.
+
+    def _loadLabelsImg(self):
+        self.labelDict = {
+            'weline': [None, (70, 25)],
+            'ccline': [None, (70, 175)],
+            'nsline': [None, (1550, 335)]
+        }
+
+        for key in gv.gTrackConfig.keys():
+            imgName = gv.gTrackConfig[key]['icon']
+            imgPath = os.path.join(gv.IMG_FD, imgName)
+            if os.path.exists(imgPath):
+                self.labelDict[key][0]  = wx.Bitmap(imgPath)
 
 #-----------------------------------------------------------------------------
     def _drawRailWay(self, dc):
@@ -44,11 +58,20 @@ class PanelMap(wx.Panel):
         dc.SetBrush(wx.Brush(self.bgColor))
         dc.DrawRectangle(0, 0, w, h)
         trackSeq = ('weline', 'ccline', 'nsline')
-
         for i, trackName in enumerate(trackSeq):
             color = gv.gTrackConfig[trackName]['color']
             dc.SetPen(wx.Pen(color, width=4, style=wx.PENSTYLE_SOLID))
             dc.DrawLine(50, 100+160*i, 1700, 100+160*i,)
+            dc.SetPen(wx.Pen(color, width=2, style=wx.PENSTYLE_SOLID))
+            dc.DrawCircle(40, 100+160*i, 8)
+            dc.DrawCircle(50, 100+160*i, 8)
+            dc.DrawCircle(1700, 100+160*i, 8)
+            dc.DrawCircle(1710, 100+160*i, 8)
+
+        # draw three track's label
+        for val in self.labelDict.values():
+            bitmap, pos = val
+            dc.DrawBitmap(bitmap, pos[0], pos[1])
 
     def _drawSensors(self, dc):
         dc.SetPen(self.dcDefPen)
@@ -86,10 +109,12 @@ class PanelMap(wx.Panel):
                 pos = signalAgent.getPos()
                 state = signalAgent.getState()
                 # draw the trigger on sensors
+
                 tgOnlineStype =wx.PENSTYLE_SOLID if state else wx.PENSTYLE_LONG_DASH
                 dc.SetPen(wx.Pen('RED', width=1, style=tgOnlineStype))
                 for sensorPos in signalAgent.getTGonPos():
                     dc.DrawLine(pos[0]-10, pos[1], sensorPos[0], sensorPos[1])
+
                 tgOfflineStype =wx.PENSTYLE_SOLID if not state else wx.PENSTYLE_LONG_DASH
                 dc.SetPen(wx.Pen('GREEN', width=1, style=tgOfflineStype))
                 for sensorPos in signalAgent.getTGoffPos():
@@ -101,7 +126,7 @@ class PanelMap(wx.Panel):
                 x, y = pos[0], pos[1]
                 dc.DrawText("S-"+str(id), x, y-25)
                 dc.SetBrush(wx.Brush(color))
-                dc.DrawRectangle(x-10, y-3, 20, 6)
+                dc.DrawRectangle(x-10, y-4, 20, 8)
 
 
     #--PanelMap--------------------------------------------------------------------
