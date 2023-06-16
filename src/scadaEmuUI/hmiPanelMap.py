@@ -68,7 +68,7 @@ class PanelMap(wx.Panel):
                 if state:
                     color = 'YELLOW' if self.toggle else 'BLUE'
                     dc.SetBrush(wx.Brush(color))
-                    dc.DrawRectangle(pos[0]-4, pos[1]-4, 8, 8)
+                    dc.DrawRectangle(pos[0]-6, pos[1]-6, 12, 12)
                     dc.SetBrush(wx.Brush('GRAY'))
                 else:
                     dc.DrawRectangle(pos[0]-4, pos[1]-4, 8, 8)
@@ -77,7 +77,8 @@ class PanelMap(wx.Panel):
 #-----------------------------------------------------------------------------
     def _drawSignals(self, dc):
         dc.SetPen(self.dcDefPen)
-        dc.SetFont(wx.Font(7, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+        dc.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+        dc.SetTextForeground(wx.Colour('White'))
         dc.SetBrush(wx.Brush('Green'))
         for key, signals in gv.iMapMgr.getSignals().items():
             for signalAgent in signals:
@@ -95,8 +96,10 @@ class PanelMap(wx.Panel):
                     dc.DrawLine(pos[0]+10, pos[1], sensorPos[0], sensorPos[1])
 
                 color = 'RED' if state else 'GREEN'
-                dc.SetPen(wx.Pen(color, width=2, style=wx.PENSTYLE_SOLID))
+                #dc.SetPen(wx.Pen(color, width=2, style=wx.PENSTYLE_SOLID))
+                dc.SetPen(self.dcDefPen)
                 x, y = pos[0], pos[1]
+                dc.DrawText("S-"+str(id), x, y-25)
                 dc.SetBrush(wx.Brush(color))
                 dc.DrawRectangle(x-10, y-3, 20, 6)
 

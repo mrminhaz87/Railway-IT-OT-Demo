@@ -34,9 +34,10 @@ class AgentSensors(object):
     
     def updateSensorState(self, idx, state):
         if idx < self.sensorsCount:
-            self.sensorsInfo[idx]['state'] = state
+            self.sensorsStateList[idx] = state
 
     def updateSensorsState(self, statList):
+        print("update sensor: %s, in: %s, %s " % (str( self.id), str(self.sensorsCount), str(len(statList)) ))
         if len(statList) == self.sensorsCount:
             self.sensorsStateList = statList
 
@@ -84,7 +85,10 @@ class AgentSignal(object):
     
     def getTGoffPos(self):
         return self.triggerOffPosList
-        
+    
+    def setState(self, state):
+        self.state = state
+
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class MapMgr(object):
@@ -142,6 +146,46 @@ class MapMgr(object):
                 signal.addTFoffPos(sPosList[idx])
             self.signals[key].append(signal)
 
+        y += 160
+        trackSignalConfig_cc = [
+            {'id': 'cc-0', 'pos':(80+120*0+60, y), 'tiggerS': 'nsline', 'onIdx':(0, 6), 'offIdx':(1, 7) },
+            {'id': 'cc-1', 'pos':(80+120*2+60, y), 'tiggerS': 'nsline', 'onIdx':(4,), 'offIdx':(5,) },
+            {'id': 'cc-2', 'pos':(80+120*4+60, y, y), 'tiggerS': 'nsline', 'onIdx':(2,), 'offIdx':(3,) },
+            {'id': 'cc-3', 'pos':(80+120*6+60, y),  'tiggerS': 'weline', 'onIdx':(7,9), 'offIdx':(8,10) },
+            {'id': 'cc-4', 'pos':(80+120*8+60, y),  'tiggerS': 'weline', 'onIdx':(5,11), 'offIdx':(6,12) },
+            {'id': 'cc-5', 'pos':(80+120*10+60, y),  'tiggerS': 'weline', 'onIdx':(3,13), 'offIdx':(4,14) },
+            {'id': 'cc-6', 'pos':(80+120*12+60, y),  'tiggerS': 'weline', 'onIdx':(1, 15), 'offIdx':(2,16) },
+        ]
+        key = 'ccline'
+        self.signals[key] = []
+        for signalInfo in trackSignalConfig_cc:
+            signal = AgentSignal(self, signalInfo['id'], signalInfo['pos'])
+            sPosList = self.getSensors(trackID=signalInfo['tiggerS']).getSensorPos()
+            for idx in signalInfo['onIdx']:
+                signal.addTGonPos(sPosList[idx])
+            for idx in signalInfo['offIdx']:
+                signal.addTFoffPos(sPosList[idx])
+            self.signals[key].append(signal)
+
+        y += 160
+        trackSignalConfig_ns = [
+            {'id': 'ns-0', 'pos':(80+210*0+100, y), 'tiggerS': 'ccline', 'onIdx':(0,), 'offIdx':(1,) },
+            {'id': 'ns-1', 'pos':(80+210*2+100, y), 'tiggerS': 'ccline', 'onIdx':(0,), 'offIdx':(1,) },
+            {'id': 'ns-2', 'pos':(80+210*4+100, y), 'tiggerS': 'ccline', 'onIdx':(2,), 'offIdx':(3,) },
+            {'id': 'ns-3', 'pos':(80+210*6+100, y), 'tiggerS': 'ccline', 'onIdx':(4,), 'offIdx':(5,) },
+        ]
+        key = 'nsline'
+        self.signals[key] = []
+        for signalInfo in trackSignalConfig_ns:
+            signal = AgentSignal(self, signalInfo['id'], signalInfo['pos'])
+            sPosList = self.getSensors(trackID=signalInfo['tiggerS']).getSensorPos()
+            for idx in signalInfo['onIdx']:
+                signal.addTGonPos(sPosList[idx])
+            for idx in signalInfo['offIdx']:
+                signal.addTFoffPos(sPosList[idx])
+            self.signals[key].append(signal)
+
+
     def getSensors(self, trackID=None):
         if trackID and trackID in self.sensors.keys(): return self.sensors[trackID]
         return self.sensors
@@ -149,3 +193,11 @@ class MapMgr(object):
     def getSignals(self, trackID=None):
         if trackID and trackID in self.signals.keys(): return self.signals[trackID]
         return self.signals
+    
+    def setSensors(self, trackID, stateList):
+        self.sensors[trackID].updateSensorsState(stateList)
+
+    def setSingals(self, trackID, stateList):
+        if len(stateList) <= len(self.signals[trackID]):
+            for i, state in enumerate(stateList):
+                 self.signals[trackID][i].setState(state)

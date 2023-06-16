@@ -52,9 +52,9 @@ class UIFrame(wx.Frame):
 
     def _initGlobals(self):
         # Init the global parameters used only by this module
-        gv.gTrackConfig['weline'] = {'id':'weline', 'num': 4, 'color': wx.Colour(52, 169, 129), 'icon': 'welabel.png'}
-        gv.gTrackConfig['nsline'] = {'id':'nsline', 'num': 3, 'color': wx.Colour(233, 0, 97), 'icon': 'nslabel.png'}
-        gv.gTrackConfig['ccline'] = {'id':'ccline', 'num': 3, 'color': wx.Colour(255, 136, 0), 'icon': 'cclabel.png'}
+        gv.gTrackConfig['weline'] = {'id':'weline', 'sensorIdx': (0, 17), 'signalIdx':(0, 8), 'color': wx.Colour(52, 169, 129), 'icon': 'welabel.png'}
+        gv.gTrackConfig['nsline'] = {'id':'nsline', 'sensorIdx': (17, 25), 'signalIdx':(8, 12), 'color': wx.Colour(233, 0, 97), 'icon': 'nslabel.png'}
+        gv.gTrackConfig['ccline'] = {'id':'ccline', 'sensorIdx': (25, 39), 'signalIdx':(12, 19), 'color': wx.Colour(255, 136, 0), 'icon': 'cclabel.png'}
         # Init all the global instance
         gv.iMapMgr = mapMgr.MapMgr(self)
 
@@ -101,6 +101,7 @@ class UIFrame(wx.Frame):
             self.lastPeriodicTime = now
             if not gv.TEST_MD:
                 if gv.idataMgr: gv.idataMgr.periodic(now)
+                # update the PLC display panel
                 for key in self.plcPnls.keys():
                     # update the holding registers
                     tgtPlcID = gv.gPlcPnlInfo[key]['tgt']
@@ -113,6 +114,18 @@ class UIFrame(wx.Frame):
                     print(coilsList)
                     self.plcPnls[key].updateCoils(coilsList)
                     self.plcPnls[key].updateDisplay()
+                
+                for key in gv.gTrackConfig.keys():
+                    tgtPlcID = 'PLC-00'
+                    rsIdx, reIdx = gv.gTrackConfig[key]['sensorIdx']
+                    registList = gv.idataMgr.getPlcHRegsData(tgtPlcID, rsIdx, reIdx)
+                    print(key)
+                    gv.iMapMgr.setSensors(key, registList)
+                    csIdx, ceIdx = gv.gTrackConfig[key]['signalIdx']
+                    coilsList = gv.idataMgr.getPlcCoilsData(tgtPlcID, csIdx, ceIdx)
+                    gv.iMapMgr.setSingals(key, coilsList)
+
+
             self.mapPanel.periodic(now)
 
 
