@@ -13,24 +13,50 @@ while not client.checkConn():
     print(client.getCoilsBits(0, 4))
     time.sleep(0.5)
 
-print('read the coils')
-print(client.getCoilsBits(0, 4))
+print('Test: read the coils')
+result = client.getCoilsBits(0, 4)
+if result == [True, True, False, False]: 
+    print(" - test pass")
+else:
+    print(" - test Fail, result: %s" %str(result))
 time.sleep(0.5)
 
 print('read the holding registers')
-print(client.getHoldingRegs(0, 4))
-time.sleep(0.5)
-
-print('Set the coils')
-client.setCoilsBit(2, 1)
-time.sleep(0.5)
-print(client.getCoilsBits(0, 4))
+result = client.getHoldingRegs(0, 4)
+if result == [0, 0, 1, 1]: 
+    print(" - test pass")
+else:
+    print(" - test Fail, result: %s" %str(result))
 time.sleep(0.5)
 
 print('Set the holding registers')
 client.setHoldingRegs(1, 1)
 time.sleep(0.5)
-print(client.getHoldingRegs(0, 4))
+result = client.getHoldingRegs(0, 4)
+if result == [0, 1, 1, 1]: 
+    print(" - test pass")
+else:
+    print(" - test Fail, result: %s" %str(result))
 time.sleep(0.5)
+
+print('Test: check auto update coils')
+result = client.getCoilsBits(0, 4)
+if result == [True, False, False, False]: 
+    print(" - test pass")
+else:
+    print(" - test Fail, result: %s" %str(result))
+time.sleep(0.5)
+
+print('Set the coils')
+client.setCoilsBit(1, 1)
+time.sleep(0.5)
+result = client.getCoilsBits(0, 4)
+if result == [True, True, False, False]: 
+    print(" - test pass")
+else:
+    print(" - test Fail, result: %s" %str(result))
+time.sleep(0.5)
+
+
 
 client.close()
