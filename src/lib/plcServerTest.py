@@ -1,6 +1,19 @@
+#!/usr/bin/python
+#-----------------------------------------------------------------------------
+# Name:        plcServerTest.py
+#
+# Purpose:     testcase program used to test lib<modbusTcpCom.py> 
+#
+# Author:      Yuancheng Liu
+#
+# Created:     2023/06/11
+# Version:     v_0.1
+# Copyright:   
+# License:     
+#-----------------------------------------------------------------------------
 import modbusTcpCom
 
-class testLogic(modbusTcpCom.ladderLogic):
+class testLadderLogic(modbusTcpCom.ladderLogic):
 
     def __init__(self, parent) -> None:
         super().__init__(parent)
@@ -14,7 +27,7 @@ class testLogic(modbusTcpCom.ladderLogic):
         self.destCoilsInfo['offset'] = 4
 
     def runLadderLogic(self, regsList, coilList=None):
-        # coils reverse the input registers' state. 
+        # coils will be set ast the reverse state of the input registers' state. 
         result = []
         for state in regsList:
             result.append(not state)
@@ -26,16 +39,14 @@ ALLOW_W_L = ['127.0.0.1']
 hostIp = 'localhost'
 hostPort = 502
 
-testladderlogic = testLogic(None)
-
-
+testladderlogic = testLadderLogic(None)
 dataMgr = modbusTcpCom.plcDataHandler(allowRipList=ALLOW_R_L, allowWipList=ALLOW_W_L)
-
 server = modbusTcpCom.modbusTcpServer(hostIp=hostIp, hostPort=hostPort, dataHandler=dataMgr)
 serverInfo = server.getServerInfo()
 dataMgr.initServerInfo(serverInfo)
 dataMgr.addLadderLogic('testLogic', testladderlogic)
 dataMgr.setAutoUpdate(True)
+# preset some case here: 
 dataMgr.updateOutPutCoils(0, [0, 0, 0, 0])
 dataMgr.updateHoldingRegs(0, [0, 0, 1, 1])
 print('Start server ...')

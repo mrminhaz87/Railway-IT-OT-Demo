@@ -22,7 +22,19 @@
     
     Four modules will be provided in this module: 
 
-    - ladderLogic: A ladder logic obj class 
+    - ladderLogic: An obj class hold the ladder logic calculation algorithm, it will take the 
+        holding register's state, source coils state then generate the destination coils states.
+        For example below ladder logic:
+        --|reg-00|--|reg-01|----------------------(src-coil-00)------------(dest-coil-02)---
+        1. Put the 'and' gate logic of reg-00, reg-01 and src-coil-00 in runLadderLogic() function. 
+        2. Set source register info as {'address': 0, 'offset': 2} in initLadderInfo() function.
+        3. Set source coil info as {'address': 0, 'offset': 1} in initLadderInfo() function.
+        4. Set destination coil info as {'address': 2, 'offset': 1} in initLadderInfo() function.
+        5. Add the ladder obj to plcDataHandler()
+        6. When plcDataHandler holding registers changed, the list [reg-00, reg-01] and [coil-00],
+            will auto passed in the runLadderLogic() function.
+        7. runLadderLogic() will return the calculated coils list result, plcDataHandler will set 
+            the destination coils with the result.
 
     - plcDataHandler: A pyModbusTcp.dataHandler module to keep one allow read white list and one 
         allow write white list to filter the client's coils or registers read and write request.
@@ -30,10 +42,12 @@
         not allowed to change the input directly, we only provide the coil and holding register 
         write functions.
     
-    - 
+    - modbusTcpClient: Modbus-TCP client module to read/write holding register and coils data 
+        from/to the target PLC. 
 
-Returns:
-    _type_: _description_
+    - modbusTcpServer: Modbus-TCP server module will be used by PLC module to handle the modbus 
+        data read/set request. If the input data handler is None, the server will create and keep 
+        one empt databank inside.
 """
 
 import time
@@ -46,11 +60,12 @@ from pyModbusTCP.constants import EXP_ILLEGAL_FUNCTION
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class ladderLogic(object):
-    """ The ladder logic object used by data handler. Only for the registers=> 
-        ladder logic => coils 
+    """ The ladder logic object used by data handler, details refer to the < Program 
+        Design > part.
     """
 
     def __init__(self, parent) -> None:
+        """ Init example: testladderlogic = testLogic(None)"""
         self.parent = parent
         self.holdingRegsInfo = {'address': None, 'offset': None}
         self.srcCoilsInfo = {'address': None, 'offset': None}
@@ -58,11 +73,13 @@ class ladderLogic(object):
         self.initLadderInfo()
 
     def initLadderInfo(self):
-        """ Init the ladder register and coils information. please over write 
-            this function.
+        """ Init the ladder register, src and dest coils information, this function will 
+            be called during the logic init. Please over write this function.
         """
         pass
 
+#-----------------------------------------------------------------------------
+# Define all the get() functions here:
     def getHoldingRegsInfo(self):
         return self.holdingRegsInfo
 
@@ -72,8 +89,12 @@ class ladderLogic(object):
     def getDestCoilsInfo(self):
         return self.destCoilsInfo
 
+#-----------------------------------------------------------------------------
     def runLadderLogic(self, regsList, coilList=None):
-        """ Pass in the register state list and calculate output coils state.
+        """ Pass in the registers state list, source coils state list and 
+            calculate output destination coils state, this function will be called by 
+            plcDataHandler.updateState() function.
+            - Please over write this function.
         """
         return []
 
@@ -123,6 +144,13 @@ class plcDataHandler(DataHandler):
         self.serverInfo = serverInfo
 
     def addLadderLogic(self, ladderKey, logicObj):
+        """ Add a <ladderLogic> obj in the ladder logic, all the ladder logic will be executed 
+            in the add in sequence. So the logic execution piority will follow the add in 
+            sequence, the next logic result will over write the previous one.
+            Args:
+                ladderKey (str): ladder logic name
+                logicObj (ladderLogic): _description_
+        """
         self.ladderDict[ladderKey] = logicObj
 
 #-----------------------------------------------------------------------------
@@ -200,6 +228,9 @@ class plcDataHandler(DataHandler):
 # define all the public functions wich can be called from other module.
     
     def setAutoUpdate(self, updateFlag):
+        """ Set the auto update flag, if 'True', every time the holding registers
+            state changed, the output coils will be updated automatically. 
+        """
         self.autoUpdate = updateFlag
 
     def setAllowReadIpaddresses(self, ipList):
@@ -233,59 +264,78 @@ class plcDataHandler(DataHandler):
     def updateState(self):
         """ Update the PLC state base on the input ladder logic one by one."""
         for key, item in self.ladderDict.items():
-            print("update laddre logic: %s" %str(key))
+            print("updateState(): update ladder logic: %s" %str(key))
+            # get the ladder logic related registers state.
             holdRegsInfo = item.getHoldingRegsInfo()
             if holdRegsInfo['address'] is None or holdRegsInfo['offset'] is None: continue
-            print('1')
             regState = self.data_bank.get_holding_registers(holdRegsInfo['address'], number=holdRegsInfo['offset'], srv_info=self.serverInfo)
+            # get the ladder logic related coils state. 
             srcCoilState = None
             srcCoilInfo = item.getSrcCoilsInfo()
             if srcCoilInfo['address'] is None or srcCoilInfo['offset'] is None:
                 pass
             else:
                 srcCoilState = self.data_bank.get_coils(srcCoilInfo['address'], number=srcCoilInfo['offset'], srv_info=self.serverInfo)
+            # calculate the output coils state and update the coils.
             destCoilState = item.runLadderLogic(regState, coilList=srcCoilState)
-            print('2')
             if destCoilState is None or len(destCoilState) == 0: continue
             destCoidInfo = item.getDestCoilsInfo()
             self.updateOutPutCoils(destCoidInfo['address'], destCoilState)
-            print('3')
             
-
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class modbusTcpClient(object):
     """ Modbus-TCP client module to read/write data from/to PLC."""
     def __init__(self, tgtIp, tgtPort=502, defaultTO=30) -> None:
+        """ Init example: client = modbusTcpCom.modbusTcpClient('127.0.0.1')
+            Args:
+                tgtIp (str): target PLC ip Address. 
+                tgtPort (int, optional): modbus port. Defaults to 502.
+                defaultTO (int, optional): default time out if modbus server doesn't 
+                    response. Defaults to 30 sec.
+        """
         self.tgtIp = tgtIp
         self.tgtPort = tgtPort
-        self.client = ModbusClient(
-            host=self.tgtIp, port=self.tgtPort, auto_open=True)
+        self.client = ModbusClient(host=self.tgtIp, port=self.tgtPort, auto_open=True)
         self.client.timeout = defaultTO  # set time out.
-        # Try to connect to the PLC in 1 sec
+        # Try to connect to the PLC in 1 sec. 
         for _ in range(5):
-            print('Try to login to the PLC unit.')
+            print('Try to login to the PLC unit: %s.' %str(self.tgtIp))
             if self.client.open(): break
             time.sleep(0.2)
         if self.client.is_open:
             print('Success connect to the target PLC: %s' % str(self.tgtIp))
         else:
-            print('Failed to connect to the target PLC: %s' % str(self.tgtIp))
+            print('Fail connect to the target PLC: %s' % str(self.tgtIp))
 
+#-----------------------------------------------------------------------------
     def checkConn(self):
+        """ return the last connection state."""
         return self.client.is_open
 
+#-----------------------------------------------------------------------------
+# Define all the get() functions here:
+# Return value type: 
+#     - return [addressIdx: addressIdx + offset] if read success. 
+#     - return None if error or server not allow client to read.
+
+
     def getCoilsBits(self, addressIdx, offset):
+        """ Get the coils bit list [addressIdx: addressIdx + offset] of the PLC."""
         if self.client.is_open:
             data = self.client.read_coils(addressIdx, offset)
             if data: return list(data)
         return None
     
     def getHoldingRegs(self, addressIdx, offset):
+        """ Get the holding register bit list [addressIdx: addressIdx + offset] of the PLC."""
         if self.client.is_open:
             data = self.client.read_holding_registers(addressIdx, offset)
             if data: return list(data)
         return None
+
+#-----------------------------------------------------------------------------
+# Define all the set() functions here:
 
     def setCoilsBit(self, addressIdx, bitVal):
         if self.client.is_open:
@@ -305,22 +355,40 @@ class modbusTcpClient(object):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class modbusTcpServer(object):
-    """ Modbus-TCP server module simulate a PLC"""
+    """ Modbus-TCP server, used by PLC module to handle the modbus data read/set 
+        request.
+    """
     def __init__(self, hostIp='localhost', hostPort=502, dataHandler=None) -> None:
+        """Init example:
+            dataMgr = modbusTcpCom.plcDataHandler(allowRipList=ALLOW_R_L, allowWipList=ALLOW_W_L)
+            server = modbusTcpCom.modbusTcpServer(hostIp=hostIp, hostPort=hostPort, dataHandler=dataMgr)
+        Args:
+            hostIp (str, optional): '0.0.0.0' or 'localhost'. Defaults to 'localhost'.
+            hostPort (int, optional): modbus port. Defaults to 502.
+            dataHandler (<plcDataHandler>, optional): The handler object to auto process 
+                register and coils change. Defaults to None.
+        """
         self.hostIp = hostIp
         self.hostPort = hostPort
+        self.server = None
         if dataHandler is None:
-            print("PLC logic data handler is not define, init failed, exiting...")
-            exit()
-        self.server = ModbusServer(host=hostIp, port=hostPort, data_hdl=dataHandler)
+            print("PLC logic data handler is not define, use a empty data bank")
+            self.server = ModbusServer(host=hostIp, port=hostPort, data_bank=DataBank())
+        else:
+            self.server = ModbusServer(host=hostIp, port=hostPort, data_hdl=dataHandler)
 
+#-----------------------------------------------------------------------------
     def isRunning(self):
         return self.server.is_run
-    
+
+#-----------------------------------------------------------------------------
+# Define all the get() functions here:
     def getServerInfo(self):
         return self.server.ServerInfo
 
+#-----------------------------------------------------------------------------
     def startServer(self):
+        """ Run the server start loop."""
         print("Start to run the Modbus TCP server: (%s, %s)" %(self.hostIp, str(self.hostPort)))
         self.server.start()
 
