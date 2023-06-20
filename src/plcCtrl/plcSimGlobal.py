@@ -43,6 +43,7 @@ LOG_WARN    = 1
 LOG_ERR     = 2
 LOG_EXCEPT  = 3
 
+PCL_NAME = 'PLC1'
 ALLOW_R_L = ['127.0.0.1', '192.168.0.10']
 ALLOW_W_L = ['127.0.0.1']
 

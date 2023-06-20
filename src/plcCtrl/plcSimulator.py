@@ -3,8 +3,8 @@
 # Name:        plcSimulator.py
 #
 # Purpose:     A simple plc simulation module to connect and control the real-world 
-#              emulator via UDP (to simulate the eletrical signal change) and reply
-#              SCADA system with Modbus TCP.
+#              emulator via UDP (to simulate the eletrical signals change) and handle
+#              SCADA system Modbus TCP request.
 # 
 # Author:      Yuancheng Liu
 #
@@ -43,8 +43,11 @@ def parseIncomeMsg(msg):
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
-
 class tFlipFlopLadderLogic(modbusTcpCom.ladderLogic):
+    """ A T-flip-flop latching relay ladder logic set with 19 ladders. The ladder logic
+        need to be init and passed in the data handler (with handler auto-update flag 
+        set to True).
+    """
 
     def __init__(self, parent) -> None:
         super().__init__(parent)
@@ -56,10 +59,12 @@ class tFlipFlopLadderLogic(modbusTcpCom.ladderLogic):
         self.srcCoilsInfo['offset'] = 19
         self.destCoilsInfo['address'] = 0
         self.destCoilsInfo['offset'] = 19
-
-        # Init the flipflop coils and register config:
+        # Init the flipflop coils and registers config:
+        # For total 39 holding registers connected addresses
+        # address: 0 - 17: weline sensors
+        # address: 18 - 24: nsline sensors
+        # address: 25 - 38: ccline sensors.
         weIdxOffSet, nsIdxOffset, ccIdxOffset = 0, 17, 25
-
         self.ffConfig = [
             # Init all the weline signals flipflop:
             {'coilIdx': 0, 'onRegIdx':(ccIdxOffset+12,), 'offRegIdx':(ccIdxOffset+13,)},
@@ -87,30 +92,30 @@ class tFlipFlopLadderLogic(modbusTcpCom.ladderLogic):
 
 #-----------------------------------------------------------------------------
     def _tfligFlogRun(self, coilState, toggleOnList, toggleOffList):
-        """ function to simulate a normal t-flip-flop latching replay.
+        """ Function to simulate a normal t-flip-flop latching replay to take input
+            and calculate the output based on the current state.
             Args:
-                coilState (_type_): Current output State
-                toggleOnList (_type_): input 
-                toggleOffList (_type_): _description_
-
+                coilState (int/bool): Current output State. 
+                toggleOnList (list(int/bool)): input registers's state list which can toggle
+                    the relay on.
+                toggleOffList (list(int/bool)): input registers's state list which can toggle
+                    the relay off.
             Returns:
-                _type_: _description_
+                bool: the filp-flop positive output.
         """
-        if coilState:
-            for regs in toggleOffList:
-                if regs: return False 
+        if coilState: 
+            if 1 in toggleOffList or True in toggleOffList: return False 
         else:
-            for regs in toggleOnList:
-                if regs: return True
+            if 1 in toggleOnList or True in toggleOnList: return True
         return coilState
 
 #-----------------------------------------------------------------------------
     def runLadderLogic(self, regsList, coilList=None):
         coilsRsl = []
         if len(regsList) != 39 or coilList is None or len(coilList)!=19:
-            print('runLadderLogic(): input not valid')
-            print(regsList)
-            print(coilList)
+            gv.gDebugPrint('runLadderLogic(): input not valid', logType=gv.LOG_WARN)
+            gv.gDebugPrint("Input registers list: %s" %str(regsList))
+            gv.gDebugPrint("Input coils list: %s" %str(coilList))
         else:
             for item in self.ffConfig:
                coilState = coilList[item['coilIdx']]
@@ -123,25 +128,32 @@ class tFlipFlopLadderLogic(modbusTcpCom.ladderLogic):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class modBusService(threading.Thread):
-
+    """ mod bus service hold one datahandler, on databank and one Modbus server 
+        to handler the SCADA system's modbus request.
+    """
     def __init__(self, parent, threadID, name):
         threading.Thread.__init__(self)
         hostIp = 'localhost'
         hostPort = 502
+        # Init the data handler with a databank. 
         self.dataMgr = modbusTcpCom.plcDataHandler(allowRipList=gv.ALLOW_R_L, allowWipList=gv.ALLOW_W_L)
+        # Init the modbus TCP server.
         self.server = modbusTcpCom.modbusTcpServer(hostIp=hostIp, hostPort=hostPort, dataHandler=self.dataMgr)
+        # load the server info into the 
         serverInfo = self.server.getServerInfo()
         self.dataMgr.initServerInfo(serverInfo)
+        # passed in the ladder logic inside the handler.
         self.dataMgr.addLadderLogic('T_flipflop_logic_set', gv.iLadderLogic)
+        # set auto update to true to make the data bank can auto execute  the ladder logic when register state changes.
         self.dataMgr.setAutoUpdate(True)
         gv.iMBhandler = self.dataMgr
         self.daemon = True
 
     def run(self):
         """ Start the udp server's main message handling loop."""
-        print("ModbusTCP service thread run() start.")
+        gv.gDebugPrint("ModbusTCP service thread run() start.", logType=gv.LOG_INFO)
         self.server.startServer()
-        print("Server thread run() end.")
+        gv.gDebugPrint("ModbusTCP service thread run() end.", logType=gv.LOG_INFO)
         self.threadName = None # set the thread name to None when finished.
 
     def stop(self):
@@ -149,84 +161,53 @@ class modBusService(threading.Thread):
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
-class plcAgent(object):
-    """ Map manager to init/control differet elements state on the map."""
+class plcSimulator(object):
+    """ A PlC simulator to provide below functions: 
+        - Create a modbus service running in subthread to handle the SCADA system's 
+            modbus requirment.
+        - Connect to the real world emulator to fetch the sensor state and calculate 
+            the output coils state based on the ladder logic. 
+        - Send the signal setup request to the real world emulator to change the signal.
+    """
     def __init__(self, parent, plcID, realworldIP):
         self.parent = parent
         self.id = plcID
         self.realworld = realworldIP
+        # input sensors state from real world emulator: 
         self.inputState = {
             'weline': [],
             'nsline': [],
             'ccline': [] }
-        
+        # out put coils state to real world emulator:
         self.coilState = {
             'weline': [0, 0, 0, 0, 0, 0, 0, 0 ],
             'nsline': [0, 0, 0, 0],
             'ccline': [0, 0, 0, 0, 0, 0, 0]
         }
         # Init the ladder logic.
-        #self.ladderDict = OrderedDict()
         self.LadderPiority = {
             'weline': ('ccline',),
             'nsline': ('ccline',),
             'ccline': ('weline', 'nsline')
         }
-        # self._initLadderLogic()
         gv.iLadderLogic = tFlipFlopLadderLogic(self)
-
+        # Init the UDP connector to connect to the realworld and test the connection. 
         self.realwordInfo= {
             'ip': realworldIP[0],
             'port': realworldIP[1]
         }
         self.rwConnector = udpCom.udpClient((self.realwordInfo['ip'], self.realwordInfo['port']))
-
         self.recoonectCount = 30
         self.realwordOnline = self._loginRealWord()
-        
         if self.realwordOnline:
             gv.gDebugPrint('Login the realworld successfully', logType=gv.LOG_INFO)
         else:
             gv.gDebugPrint('Cannot connect to the realworld emulator', logType=gv.LOG_INFO)
-        
-        # create the local modbus TCP server
+        # Init the modbus TCP service
         gv.iMBservice = modBusService(self, 1, 'ModbusService')
         gv.iMBservice.start()
 
         self.terminate = False
-
-#-----------------------------------------------------------------------------
-    def _initLadderLogic(self):
-        """ This is a temp test function to implement the ladder logic of PLC, the ladder diagram 
-            logic will be replaced by real ladder config file.
-        """
-        self.ladderDict['weline'] = [
-            {'id': 'we-0', 'tiggerS': 'ccline', 'onIdx':(12,), 'offIdx':(13,) }, 
-            {'id': 'we-1', 'tiggerS': 'ccline', 'onIdx':(12,), 'offIdx':(13,) },
-            {'id': 'we-2', 'tiggerS': 'ccline', 'onIdx':(10,), 'offIdx':(11,) },
-            {'id': 'we-3', 'tiggerS': 'ccline', 'onIdx':(10,), 'offIdx':(11,) },
-            {'id': 'we-4', 'tiggerS': 'ccline', 'onIdx':(8,), 'offIdx':(9,) },
-            {'id': 'we-5', 'tiggerS': 'ccline', 'onIdx':(8,), 'offIdx':(9,) },
-            {'id': 'we-6', 'tiggerS': 'ccline', 'onIdx':(6,), 'offIdx':(7,) },
-            {'id': 'we-7', 'tiggerS': 'ccline', 'onIdx':(6,), 'offIdx':(7,) }
-        ]
-
-        self.ladderDict['nsline'] = [
-            {'id': 'ns-0', 'tiggerS': 'ccline', 'onIdx':(0,), 'offIdx':(1,) },
-            {'id': 'ns-1', 'tiggerS': 'ccline', 'onIdx':(0,), 'offIdx':(1,) },
-            {'id': 'ns-2', 'tiggerS': 'ccline', 'onIdx':(2,), 'offIdx':(3,) },
-            {'id': 'ns-3', 'tiggerS': 'ccline', 'onIdx':(4,), 'offIdx':(5,) }
-        ]
-
-        self.ladderDict['ccline'] = [
-            {'id': 'cc-0', 'tiggerS': 'nsline', 'onIdx':(0, 6), 'offIdx':(1, 7) },
-            {'id': 'cc-1', 'tiggerS': 'nsline', 'onIdx':(4,), 'offIdx':(5,) },
-            {'id': 'cc-2', 'tiggerS': 'nsline', 'onIdx':(2,), 'offIdx':(3,) },
-            {'id': 'cc-3', 'tiggerS': 'weline', 'onIdx':(7,9), 'offIdx':(8,10) },
-            {'id': 'cc-4', 'tiggerS': 'weline', 'onIdx':(5,11), 'offIdx':(6,12) },
-            {'id': 'cc-5', 'tiggerS': 'weline', 'onIdx':(3,13), 'offIdx':(4,14) },
-            {'id': 'cc-6', 'tiggerS': 'weline', 'onIdx':(1, 15), 'offIdx':(2,16) }
-        ]
 
 #-----------------------------------------------------------------------------
     def _loginRealWord(self):
@@ -246,8 +227,8 @@ class plcAgent(object):
         """ Query message to realword emulator
             Args:
                 rqstKey (str): request key (GET/POST/REP)
-                rqstType (_type_): request type string.
-                rqstDict (_type_): request detail dictionary.
+                rqstType (str): request type string.
+                rqstDict (doct): request detail dictionary.
                 dataOnly (bool, optional): flag to indentify whether only return the 
                     data. Defaults to True. return (responseKey, responseType, responseJson) if set
                     to False.
@@ -278,6 +259,7 @@ class plcAgent(object):
 
 #-----------------------------------------------------------------------------
     def getSensorsInfo(self):
+        """ Get sensors state from the real-world simulator. """
         rqstKey = 'GET'
         rqstType = 'sensors'
         rqstDict = {'weline': None,
@@ -285,8 +267,10 @@ class plcAgent(object):
                     'ccline': None}
         result = self._queryToRW(rqstKey, rqstType, rqstDict)
         return result
-    
+
+#-----------------------------------------------------------------------------
     def changeSignalCoil(self):
+        """ Set the signal state to the real-world simulator. """
         rqstKey = 'POST'
         rqstType = 'signals'
         rqstDict = self.coilState
@@ -295,7 +279,12 @@ class plcAgent(object):
     
 #-----------------------------------------------------------------------------
     def periodic(self, now):
-        (_, _, result) = self.getSensorsInfo()
+        sensorInfo = self.getSensorsInfo()
+        if sensorInfo is None:
+            gv.gDebugPrint("Lost connection to the real-world emulator.", logType=gv.LOG_WARN)
+            self.realwordOnline = False
+            return 
+        (_, _, result) = sensorInfo
         time.sleep(0.1)
         for key in result.keys():
             self.inputState[key] = result[key]
@@ -303,11 +292,10 @@ class plcAgent(object):
         self.updateHoldingRegs()
         time.sleep(0.1)
         self.updateCoilOutput()
-        # update the modbus data
-        # self.updateModBusInfo()
-        rst = self.changeSignalCoil()
-        #print(rst)
+        # update the output coils state:
+        self.changeSignalCoil()
 
+#-----------------------------------------------------------------------------
     def updateHoldingRegs(self):
         checkSeq = ('weline', 'nsline', 'ccline')
         holdingRegs = []
@@ -316,12 +304,12 @@ class plcAgent(object):
         gv.gDebugPrint("updateModBusInfo(): update holding registers: %s" %str(holdingRegs), logType=gv.LOG_INFO)
         gv.iMBhandler.updateHoldingRegs(0, holdingRegs)
 
-
+#-----------------------------------------------------------------------------
     def updateCoilOutput(self):
         result = gv.iMBhandler.getCoilState(0, 19)
         self.coilState['weline'] = result[0:8]
         self.coilState['nsline'] = result[8:12]
-        self.coilState['nsline'] = result[12:19]
+        self.coilState['ccline'] = result[12:19]
 
 #-----------------------------------------------------------------------------
     def updateCoilOutput_old(self):
@@ -351,21 +339,6 @@ class plcAgent(object):
                             gv.gDebugPrint(str(sensorTp)+str(idx), logType=gv.LOG_ERR)
 
 #-----------------------------------------------------------------------------
-    def updateModBusInfo(self):
-        checkSeq = ('weline', 'nsline', 'ccline')
-        holdingRegs = []
-        coils = []
-        for key in checkSeq:
-            holdingRegs += self.inputState[key]
-            coils += self.coilState[key]
-        gv.gDebugPrint("updateModBusInfo(): update holding registers: %s" %str(holdingRegs), logType=gv.LOG_INFO)
-        gv.iMBhandler.updateHoldingRegs(0, holdingRegs)
-
-        gv.gDebugPrint("updateModBusInfo(): update coils: %s" %str(coils), logType=gv.LOG_INFO)
-        gv.iMBhandler.updateOutPutCoils(0, coils)
-
-
-#-----------------------------------------------------------------------------
     def run(self):
         while not self.terminate:
             now = time.time()
@@ -383,8 +356,11 @@ class plcAgent(object):
     def stop(self):
         self.terminate = True
 
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 def main():
-    plc = plcAgent(None, 'plc1', gv.gRealWordIP)
+    gv.gDebugPrint("Start Init the PLC: %s" %str(gv.PCL_NAME), logType=gv.LOG_INFO)
+    plc = plcSimulator(None, gv.PCL_NAME, gv.gRealWordIP)
     plc.run()
 
 if __name__ == "__main__":
