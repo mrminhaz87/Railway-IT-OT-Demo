@@ -8,7 +8,7 @@
 # 
 # Author:      Yuancheng Liu
 #
-# Version:     v0.1
+# Version:     v0.2
 # Created:     2023/05/29
 # Copyright:   
 # License:     
@@ -57,11 +57,71 @@ class tFlipFlopLadderLogic(modbusTcpCom.ladderLogic):
         self.destCoilsInfo['address'] = 0
         self.destCoilsInfo['offset'] = 19
 
+        # Init the flipflop coils and register config:
+        weIdxOffSet, nsIdxOffset, ccIdxOffset = 0, 17, 25
+
+        self.ffConfig = [
+            # Init all the weline signals flipflop:
+            {'coilIdx': 0, 'onRegIdx':(ccIdxOffset+12,), 'offRegIdx':(ccIdxOffset+13,)},
+            {'coilIdx': 1, 'onRegIdx':(ccIdxOffset+12,), 'offRegIdx':(ccIdxOffset+13,)},
+            {'coilIdx': 2, 'onRegIdx':(ccIdxOffset+10,), 'offRegIdx':(ccIdxOffset+11,)},
+            {'coilIdx': 3, 'onRegIdx':(ccIdxOffset+10,), 'offRegIdx':(ccIdxOffset+11,)},
+            {'coilIdx': 4, 'onRegIdx':(ccIdxOffset+8,), 'offRegIdx':(ccIdxOffset+9,)},
+            {'coilIdx': 5, 'onRegIdx':(ccIdxOffset+8,), 'offRegIdx':(ccIdxOffset+9,)},
+            {'coilIdx': 6, 'onRegIdx':(ccIdxOffset+6,), 'offRegIdx':(ccIdxOffset+7,)},
+            {'coilIdx': 7, 'onRegIdx':(ccIdxOffset+6,), 'offRegIdx':(ccIdxOffset+7,)},
+            # Init all the nsline signals flipflop:
+            {'coilIdx': 8, 'onRegIdx':(ccIdxOffset+0,), 'offRegIdx':(ccIdxOffset+1,)},
+            {'coilIdx': 9, 'onRegIdx':(ccIdxOffset+0,), 'offRegIdx':(ccIdxOffset+1,)},
+            {'coilIdx': 10, 'onRegIdx':(ccIdxOffset+2,), 'offRegIdx':(ccIdxOffset+3,)},
+            {'coilIdx': 11, 'onRegIdx':(ccIdxOffset+4,), 'offRegIdx':(ccIdxOffset+5,)},
+            # Init all the ccline signal flipflop:
+            {'coilIdx': 12, 'onRegIdx': (nsIdxOffset+0, nsIdxOffset+6), 'offRegIdx': (nsIdxOffset+1, nsIdxOffset+7)},
+            {'coilIdx': 13, 'onRegIdx': (nsIdxOffset+4,), 'offRegIdx': (nsIdxOffset+5,)},
+            {'coilIdx': 14, 'onRegIdx': (nsIdxOffset+2,), 'offRegIdx': (nsIdxOffset+3,)},
+            {'coilIdx': 15, 'onRegIdx': (weIdxOffSet+7, weIdxOffSet+9), 'offRegIdx': (weIdxOffSet+8, weIdxOffSet+10)},
+            {'coilIdx': 16, 'onRegIdx': (weIdxOffSet+5, weIdxOffSet+11), 'offRegIdx': (weIdxOffSet+6, weIdxOffSet+12)},
+            {'coilIdx': 17, 'onRegIdx': (weIdxOffSet+3, weIdxOffSet+13), 'offRegIdx': (weIdxOffSet+4, weIdxOffSet+14)},
+            {'coilIdx': 18, 'onRegIdx': (weIdxOffSet+1, weIdxOffSet+15), 'offRegIdx': (weIdxOffSet+2, weIdxOffSet+16)}
+        ]
+
+#-----------------------------------------------------------------------------
+    def _tfligFlogRun(self, coilState, toggleOnList, toggleOffList):
+        """ function to simulate a normal t-flip-flop latching replay.
+            Args:
+                coilState (_type_): Current output State
+                toggleOnList (_type_): input 
+                toggleOffList (_type_): _description_
+
+            Returns:
+                _type_: _description_
+        """
+        if coilState:
+            for regs in toggleOffList:
+                if regs: return False 
+        else:
+            for regs in toggleOnList:
+                if regs: return True
+        return coilState
+
+#-----------------------------------------------------------------------------
     def runLadderLogic(self, regsList, coilList=None):
+        coilsRsl = []
+        if len(regsList) != 39 or coilList is None or len(coilList)!=19:
+            print('runLadderLogic(): input not valid')
+            print(regsList)
+            print(coilList)
+        else:
+            for item in self.ffConfig:
+               coilState = coilList[item['coilIdx']]
+               onRegListState = [regsList[i] for i in item['onRegIdx']]
+               offRegListState = [regsList[i] for i in item['offRegIdx']]
+               coilsRsl.append(self._tfligFlogRun(coilState, onRegListState, offRegListState) ) 
+        gv.gDebugPrint('Finished calculate all coils: %s' %str(coilsRsl), logType=gv.LOG_INFO)
+        return coilsRsl
         
-
-
-
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 class modBusService(threading.Thread):
 
     def __init__(self, parent, threadID, name):
@@ -72,6 +132,8 @@ class modBusService(threading.Thread):
         self.server = modbusTcpCom.modbusTcpServer(hostIp=hostIp, hostPort=hostPort, dataHandler=self.dataMgr)
         serverInfo = self.server.getServerInfo()
         self.dataMgr.initServerInfo(serverInfo)
+        self.dataMgr.addLadderLogic('T_flipflop_logic_set', gv.iLadderLogic)
+        self.dataMgr.setAutoUpdate(True)
         gv.iMBhandler = self.dataMgr
         self.daemon = True
 
@@ -93,7 +155,6 @@ class plcAgent(object):
         self.parent = parent
         self.id = plcID
         self.realworld = realworldIP
-        
         self.inputState = {
             'weline': [],
             'nsline': [],
@@ -105,14 +166,15 @@ class plcAgent(object):
             'ccline': [0, 0, 0, 0, 0, 0, 0]
         }
         # Init the ladder logic.
-        self.ladderDict = OrderedDict()
+        #self.ladderDict = OrderedDict()
         self.LadderPiority = {
             'weline': ('ccline',),
             'nsline': ('ccline',),
             'ccline': ('weline', 'nsline')
         }
-        self._initLadderLogic()
-        
+        # self._initLadderLogic()
+        gv.iLadderLogic = tFlipFlopLadderLogic(self)
+
         self.realwordInfo= {
             'ip': realworldIP[0],
             'port': realworldIP[1]
@@ -233,18 +295,36 @@ class plcAgent(object):
     
 #-----------------------------------------------------------------------------
     def periodic(self, now):
-        result = self.getSensorsInfo()
+        (_, _, result) = self.getSensorsInfo()
         time.sleep(0.1)
-        for key in result[2].keys():
-            self.inputState[key] = result[2][key]
+        for key in result.keys():
+            self.inputState[key] = result[key]
+        # Update PLC holding registers.
+        self.updateHoldingRegs()
+        time.sleep(0.1)
         self.updateCoilOutput()
         # update the modbus data
-        self.updateModBusInfo()
+        # self.updateModBusInfo()
         rst = self.changeSignalCoil()
         #print(rst)
 
-#-----------------------------------------------------------------------------
+    def updateHoldingRegs(self):
+        checkSeq = ('weline', 'nsline', 'ccline')
+        holdingRegs = []
+        for key in checkSeq:
+            holdingRegs += self.inputState[key]
+        gv.gDebugPrint("updateModBusInfo(): update holding registers: %s" %str(holdingRegs), logType=gv.LOG_INFO)
+        gv.iMBhandler.updateHoldingRegs(0, holdingRegs)
+
+
     def updateCoilOutput(self):
+        result = gv.iMBhandler.getCoilState(0, 19)
+        self.coilState['weline'] = result[0:8]
+        self.coilState['nsline'] = result[8:12]
+        self.coilState['nsline'] = result[12:19]
+
+#-----------------------------------------------------------------------------
+    def updateCoilOutput_old(self):
         """ update the coil output based in the input and ladder logic
         """
         for key in self.ladderDict.keys():

@@ -66,4 +66,5 @@ def gDebugPrint(msg, prt=True, logType=None):
 
 #-------<GLOBAL PARAMTERS>-----------------------------------------------------
 iMBhandler = None   # modbus TCP data handler.
-iMBservice = None   # modbus TCP service   
+iMBservice = None   # modbus TCP service
+iLadderLogic = None

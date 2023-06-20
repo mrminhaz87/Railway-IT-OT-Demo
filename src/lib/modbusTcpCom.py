@@ -227,6 +227,16 @@ class plcDataHandler(DataHandler):
 #-----------------------------------------------------------------------------
 # define all the public functions wich can be called from other module.
     
+    def getHoldingRegState(self, address, offset):
+        if self.data_bank and self.serverInfo:
+            return self.data_bank.get_holding_registers(address, number=offset, srv_info=self.serverInfo)
+        return None 
+
+    def getCoilState(self, address, offset):
+        if self.data_bank and self.serverInfo:
+            return self.data_bank.get_coils(address, number=offset, srv_info=self.serverInfo)
+        return None
+
     def setAutoUpdate(self, updateFlag):
         """ Set the auto update flag, if 'True', every time the holding registers
             state changed, the output coils will be updated automatically. 
@@ -268,14 +278,14 @@ class plcDataHandler(DataHandler):
             # get the ladder logic related registers state.
             holdRegsInfo = item.getHoldingRegsInfo()
             if holdRegsInfo['address'] is None or holdRegsInfo['offset'] is None: continue
-            regState = self.data_bank.get_holding_registers(holdRegsInfo['address'], number=holdRegsInfo['offset'], srv_info=self.serverInfo)
+            regState = self.getHoldingRegState(holdRegsInfo['address'], holdRegsInfo['offset'])
             # get the ladder logic related coils state. 
             srcCoilState = None
             srcCoilInfo = item.getSrcCoilsInfo()
             if srcCoilInfo['address'] is None or srcCoilInfo['offset'] is None:
                 pass
             else:
-                srcCoilState = self.data_bank.get_coils(srcCoilInfo['address'], number=srcCoilInfo['offset'], srv_info=self.serverInfo)
+                srcCoilState = self.getCoilState(srcCoilInfo['address'], srcCoilInfo['offset'])
             # calculate the output coils state and update the coils.
             destCoilState = item.runLadderLogic(regState, coilList=srcCoilState)
             if destCoilState is None or len(destCoilState) == 0: continue
