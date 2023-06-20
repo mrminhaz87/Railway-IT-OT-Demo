@@ -43,6 +43,25 @@ def parseIncomeMsg(msg):
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
+
+class tFlipFlopLadderLogic(modbusTcpCom.ladderLogic):
+
+    def __init__(self, parent) -> None:
+        super().__init__(parent)
+
+    def initLadderInfo(self):
+        self.holdingRegsInfo['address'] = 0
+        self.holdingRegsInfo['offset'] = 39
+        self.srcCoilsInfo['address'] = 0
+        self.srcCoilsInfo['offset'] = 19
+        self.destCoilsInfo['address'] = 0
+        self.destCoilsInfo['offset'] = 19
+
+    def runLadderLogic(self, regsList, coilList=None):
+        
+
+
+
 class modBusService(threading.Thread):
 
     def __init__(self, parent, threadID, name):
