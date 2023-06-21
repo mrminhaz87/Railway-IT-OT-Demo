@@ -1,3 +1,3 @@
 @echo off
-python plcCtrl\signalPlcEmu\plcSimulator.py
+python plcCtrl\signalPlcEmu\plcSimulatorSignal.py
 pause

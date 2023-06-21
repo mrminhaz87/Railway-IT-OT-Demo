@@ -112,10 +112,14 @@ class DataManager(threading.Thread):
             elif reqType == 'stations':
                 respStr = self.fetchStationInfo(reqJsonStr)
                 resp =';'.join(('REP', 'stations', respStr))
+            pass
         elif reqKey=='POST':
             if reqType == 'signals':
                 respStr = self.setSignals(reqJsonStr)
                 resp =';'.join(('REP', 'signals', respStr))
+            elif reqType == 'stations':
+                respStr = self.fetchStationInfo(reqJsonStr)
+                resp =';'.join(('REP', 'stations', respStr))
             pass
             # TODO: Handle all the control request here.
         if isinstance(resp, str): resp = resp.encode('utf-8')
@@ -162,6 +166,20 @@ class DataManager(threading.Thread):
             respStr = json.dumps(reqDict)
         except Exception as err:
             gv.gDebugPrint("setSignals() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
+        return respStr
+
+    #-----------------------------------------------------------------------------
+    def setStationSignals(self, reqJsonStr):
+        reqDict = json.loads(reqJsonStr)
+        respStr = json.dumps({'result': 'failed'})
+        try:
+            if gv.iMapMgr:
+                for key, val in reqDict.items():
+                    gv.iMapMgr.setStationSignal(key, val)
+                respStr = json.dumps({'result': 'success'})
+            respStr = json.dumps(reqDict)
+        except Exception as err:
+            gv.gDebugPrint("setStationSignals() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
         return respStr
 
     #-----------------------------------------------------------------------------

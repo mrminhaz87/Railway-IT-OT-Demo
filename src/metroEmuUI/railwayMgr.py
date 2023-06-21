@@ -379,9 +379,12 @@ class MapMgr(object):
 #-----------------------------------------------------------------------------
 # Define all the set() functions here:
 
-    def setStations(self, trackID=None):
-        if trackID and trackID in self.stations.keys(): return self.stations[trackID]
-        return self.stations
+    def setStationSignal(self, trackID, signalStatList):
+        if trackID in self.stations.keys():
+            for i, stationAgent in enumerate(self.signals[trackID]):
+                if i < len(signalStatList):
+                    stationAgent.setSignalState(signalStatList[i])
+
     
     def setSingals(self, trackID, signalStatList):
         if trackID in self.signals.keys():
