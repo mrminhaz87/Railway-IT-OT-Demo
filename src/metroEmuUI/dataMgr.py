@@ -52,11 +52,18 @@ class DataManager(threading.Thread):
         self.server = udpCom.udpServer(None, gv.UDP_PORT)
         self.lastUpdate = datetime.now()
         self.daemon = True
+        # init the local sensors data record dictionary
         self.sensorsDict = {
             'weline': None,
             'nsline': None, 
             'ccline': None
-        } # the sensors data dictionary
+        }
+        # init the local station data record dictionary
+        self.stationsDict ={
+            'weline': None,
+            'nsline': None, 
+            'ccline': None
+        }
 
     #-----------------------------------------------------------------------------
     def updateSensorsData(self):
@@ -65,6 +72,15 @@ class DataManager(threading.Thread):
                 sensorAgent = gv.iMapMgr.getSensors(trackID=key)
                 self.sensorsDict[key] = sensorAgent.getSensorsState()
 
+    #-----------------------------------------------------------------------------
+    def updateStationsData(self):
+        if gv.iMapMgr:
+            for key in self.stationsDict.keys():
+                self.stationsDict[key] = []
+                for sensorAgent in gv.iMapMgr.getSensors(trackID=key):
+                    state = 1 if sensorAgent.getDockState() else 0
+                    self.stationsDict[key].append(state)
+                
     #-----------------------------------------------------------------------------
     def run(self):
         """ Thread run() function will be called by start(). """
@@ -96,7 +112,6 @@ class DataManager(threading.Thread):
             elif reqType == 'stations':
                 respStr = self.fetchStationInfo(reqJsonStr)
                 resp =';'.join(('REP', 'stations', respStr))
-                
         elif reqKey=='POST':
             if reqType == 'signals':
                 respStr = self.setSignals(reqJsonStr)
@@ -119,6 +134,20 @@ class DataManager(threading.Thread):
             respStr = json.dumps(reqDict)
         except Exception as err:
             gv.gDebugPrint("fetchSensorInfo() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
+        return respStr
+
+    #-----------------------------------------------------------------------------
+    def fetchStationInfo(self, reqJsonStr):
+        reqDict = json.loads(reqJsonStr)
+        self.updateStationsData()
+        respStr= json.dumps({'result': 'failed'})
+        try:
+            for key in reqDict.keys():
+                if key in self.stationsDict.keys():
+                    reqDict[key] = self.stationsDict[key]
+            respStr = json.dumps(reqDict)
+        except Exception as err:
+            gv.gDebugPrint("fetchStationInfo() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
         return respStr
 
     #-----------------------------------------------------------------------------

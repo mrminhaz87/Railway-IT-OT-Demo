@@ -361,6 +361,10 @@ class MapMgr(object):
         if trackID and trackID in self.trains.keys(): return self.trains[trackID]
         return self.trains
 
+    def getStations(self, trackID=None):
+        if trackID and trackID in self.stations.keys(): return self.stations[trackID]
+        return self.stations
+
     def getSignals(self, trackID=None):
         if trackID and trackID in self.signals.keys(): return self.signals[trackID]
         return self.signals
@@ -375,7 +379,7 @@ class MapMgr(object):
 #-----------------------------------------------------------------------------
 # Define all the set() functions here:
 
-    def selfStations(self, trackID=None):
+    def setStations(self, trackID=None):
         if trackID and trackID in self.stations.keys(): return self.stations[trackID]
         return self.stations
     

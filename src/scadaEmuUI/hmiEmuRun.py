@@ -76,7 +76,7 @@ class UIFrame(wx.Frame):
                                 style=wx.LI_HORIZONTAL), flag=flagsL, border=5)
 
         mSizer.AddSpacer(5)
-        label2 = wx.StaticText(self, label="PLC Panels")
+        label2 = wx.StaticText(self, label="PLC Monitor Panels [Signal system]")
         label2.SetFont(font)
         mSizer.Add(label2, flag=flagsL, border=2)
         mSizer.AddSpacer(5)

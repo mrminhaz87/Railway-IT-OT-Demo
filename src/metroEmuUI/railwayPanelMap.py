@@ -202,7 +202,7 @@ class PanelMap(wx.Panel):
     def _drawStation(self, dc):
         dc.SetPen(self.dcDefPen)
         dc.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
-        for key, stations in gv.iMapMgr.selfStations().items():
+        for key, stations in gv.iMapMgr.setStations().items():
             colorCode = gv.iMapMgr.getTracks(trackID=key)['color']
             dc.SetTextForeground(colorCode)
             for station in stations:
