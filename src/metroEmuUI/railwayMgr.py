@@ -176,7 +176,11 @@ class MapMgr(object):
             signal.setTriggerOffSensors(info['tiggerS'], info['offIdx'])
             self.signals['ccline'].append(signal)
 
+#---------------------------------------------------------------------------
     def _initStation(self):
+        """ Init the station based on the configuration file, YC: this function is used to replace the old 
+            _initstation() function which did the hard code station in the code.
+        """
         for key in gv.gTrackConfig.keys():
             stationCfgFile = gv.gTrackConfig[key]['stationCfg']
             stationCfgPath = os.path.join(gv.CFG_FD, stationCfgFile)
@@ -186,10 +190,14 @@ class MapMgr(object):
                     self.stations[key] = []
                     for info in trackStationList:
                         layoutParm = info['layout'] if 'layout' in info.keys() else gv.LAY_H
-                        station = agent.AgentStation(self, info['id'], info['pos'], layout=layoutParm)
+                        signalParm = info['signalLayout'] if 'signalLayout' in info.keys() else gv.LAY_L
+                        station = agent.AgentStation(self, info['id'], info['pos'], layout=layoutParm, signalLayout=signalParm)
                         station.setCheckTrains(self.trains[key])
                         if 'labelPos' in info.keys(): station.setlabelPos(info['labelPos'])
                         self.stations[key].append(station)
+            else:
+                gv.gDebugPrint("The station configure file is not exist, expected file path: %s" % str(stationCfgPath),
+                               logType=gv.LOG_WARN)
 
 #-----------------------------------------------------------------------------
     def _initStation_old(self):

@@ -223,6 +223,18 @@ class PanelMap(wx.Panel):
                     dc.DrawRectangle(x-35, y-7, 70, 14)
                 else: 
                     dc.DrawRectangle(x-7, y-35, 14, 70)
+                # Draw station signal if some train is docking.
+                if station.getSignalState():
+                    dc.SetPen(self.dcDefPen)
+                    dc.SetBrush(wx.Brush('RED'))
+                    if station.getLayout() == gv.LAY_H:
+                        dc.DrawRectangle(x-40, y-6, 8, 12)
+                        dc.DrawRectangle(x+30, y-6, 8, 12)
+                    else: 
+                        dc.DrawRectangle(x-6, y-40, 12, 8)
+                        dc.DrawRectangle(x-6, y+30, 12, 8)
+                    pos = station.getSignalPos()
+                    #dc.DrawCircle(pos[0], pos[1], 10)
 
     #--PanelMap--------------------------------------------------------------------
     def onPaint(self, event):

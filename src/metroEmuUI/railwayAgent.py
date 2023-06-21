@@ -215,20 +215,44 @@ class AgentStation(AgentTarget):
         sense/check on pos on one line. Will add sense multiple point on different 
         tracks later.
     """
-    def __init__(self, parent, tgtID, pos, layout=gv.LAY_H, labelPos=gv.LAY_U):
+    def __init__(self, parent, tgtID, pos, layout=gv.LAY_H, signalLayout=gv.LAY_U):
         super().__init__(parent, tgtID, pos, gv.STATION_TYPE)
         self.dockCount = random.randrange(1, 20) # defines the dock time by refresh cycle (capped at 20)
         self.emptyCount = gv.gMinTrainDist # defines how long the station has been empty for by refresh cycle 
         self.trainList = []
         self.dockState = False
+        self.signalState = False # Train signal to make next train waiting outise the station when some train is docking.
         self.layout = layout
         self.labelPos = (-25, -28) # default delta label location on the map
+        self.signalPos = self._getSingalPos(signalLayout)
+
+    def _getSingalPos(self, layout):
+        x, y = self.getPos()
+        if layout == gv.LAY_U:
+            return(x, y-40)
+        elif layout == gv.LAY_D:
+            return(x, y+40)
+        elif layout == gv.LAY_L:
+            return(x-40, y)
+        elif layout == gv.LAY_R:
+            return(x+40, y)
+        gv.gDebugPrint("_getSingalPos(): The input layout is no valid: %s" %str(layout), logType=gv.LOG_WARN)
+        return None    
     
+    def _checkNearSignal(self, pos, threshold = 20):
+        if self.signalPos is None: 
+            return False
+        dist = math.sqrt((self.signalPos[0] - pos[0])**2 + (self.signalPos[1] - pos[1])**2)
+        return dist <= threshold
+
 #-----------------------------------------------------------------------------
 # Define all the get() functions here:
 
     def getDockState(self):
         return self.dockState
+    
+    def getSignalState(self):
+        return self.signalState
 
     def getEmptyCount(self):
         return self.emptyCount    
@@ -238,6 +262,9 @@ class AgentStation(AgentTarget):
 
     def getLabelPos(self):
         return self.labelPos
+    
+    def getSignalPos(self):
+        return self.signalPos
 
 #-----------------------------------------------------------------------------
 # Define all the set() functions here:
@@ -248,6 +275,12 @@ class AgentStation(AgentTarget):
                 TrainList (list(<AgentTrain>)):  list of AgentTrain obj.
         """
         self.trainList = TrainList
+
+    def setDockState(self, dockState):
+        self.dockState = dockState
+
+    def setSignalState(self, signalState):
+        self.signalState = signalState
 
     def setlabelPos(self, pos):
         self.labelPos = pos
@@ -262,9 +295,11 @@ class AgentStation(AgentTarget):
     def updateTrainsDock(self):
         if len(self.trainList) == 0: return
         for train in self.trainList:
+            # Check Whether the train can dock inside the station.
             midPt = train.getTrainPos(idx=2)
             if self.checkNear(midPt[0], midPt[1], 5):
                 self.dockState = True
+                if gv.gTestMD: self.setSignalState(True)
                 self.dockCount = random.randrange(1, 20)
                 # print("Station: " + str(self.getID()) + " - " + str(self.emptyCount))
                 if train.getDockCount() == 0: 
@@ -277,7 +312,13 @@ class AgentStation(AgentTarget):
                     # Reset empty count when station is occupied
                     self.emptyCount = 0
                 return
+            # Check whether the train need to be stopped by the station signal
+            headPt = train.getTrainPos(idx=0) 
+            if self._checkNearSignal(headPt):
+                train.setWaiting(self.signalState)
+                return 
         self.dockState = False
+        if gv.gTestMD: self.setSignalState(False)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -375,6 +416,7 @@ class AgentTrain(AgentTarget):
         self.pos = self._buildTrainPos()
         self.trainSpeed = trainSpeed    # train speed: pixel/periodic loop
         self.dockCount = 0              # refersh cycle number of a train to stop in the station.
+        self.isWaiting = False          # Train waiting at signal or out side the station.
         self.emgStop = False            # emergency stop.
 
 #-----------------------------------------------------------------------------
@@ -441,6 +483,7 @@ class AgentTrain(AgentTarget):
                 frontTrain (_type_): _description_
                 threshold (int, optional): collision detection distance. Defaults to 40.
         """
+        if self.isWaiting: return False
         ftTail = frontTrain.getTrainPos(idx=-1) # front train tail position.
         if self.checkNear(ftTail[0], ftTail[1], threshold):
             if self.trainSpeed >= 0 and self.dockCount==0:
@@ -513,12 +556,19 @@ class AgentTrain(AgentTarget):
         if self.emgStop: return
         self.trainSpeed = speed
 
+    def setWaiting(self, waitFlg):
+        if self.isWaiting == waitFlg: return
+        self.isWaiting = waitFlg
+        speed = 0 if waitFlg else gv.gTrainDefSpeed
+        self.setTrainSpeed(speed)
+
 #--AgentTrain------------------------------------------------------------------
     def resetTrain(self):
         """ reset the train to the init position."""
         self.trainDestList = self._getDestList(self.initPos)
         self.pos = self._buildTrainPos()
         self.emgStop = False
+        self.isWaiting = False
         self.trainSpeed = 10
         self.dockCount = 0
 
@@ -527,7 +577,7 @@ class AgentTrain(AgentTarget):
         """ Update the current train positions on the map. This function will be 
             called periodicly.
         """
-        if self.emgStop: return
+        if self.emgStop or self.isWaiting: return
         # if dockCount == 1 also move the train to simulate the train start.
         if self.dockCount == 0 or self.dockCount ==1:
             # Train running on the railway:

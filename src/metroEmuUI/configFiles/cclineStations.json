@@ -5,7 +5,8 @@
             320,
             700
         ],
-        "layout": 5
+        "layout": 5,
+        "signalLayout": 3
     },
     {
         "id": "Farrer_Road",
@@ -14,6 +15,7 @@
             300
         ],
         "layout": 6,
+        "signalLayout": 1,
         "labelPos": [
             20,
             -10
@@ -25,7 +27,8 @@
             930,
             200
         ],
-        "layout": 5
+        "layout": 5,
+        "signalLayout": 2
     },
     {
         "id": "Nicoll_Highway",
@@ -34,6 +37,7 @@
             600
         ],
         "layout": 6,
+        "signalLayout": 0,
         "labelPos": [
             20,
             -10
@@ -45,7 +49,8 @@
             1160,
             700
         ],
-        "layout": 5
+        "layout": 5,
+        "signalLayout": 3
     },
     {
         "id": "Harbourfront",
@@ -53,6 +58,7 @@
             710,
             700
         ],
-        "layout": 5
+        "layout": 5,
+        "signalLayout": 3
     }
 ]

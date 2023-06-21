@@ -95,7 +95,8 @@ gTestMD = CONFIG_DICT['TEST_MD']      # test mode flag, True: the simulator will
 # False: The simultor will connect to the PLC, PLC will implement the control logic.
 gTranspPct = 70     # Windows transparent percentage.
 # main frame update rate 0.5 sec.
-gUpdateRate = float(CONFIG_DICT['TEST_MD']) if float(CONFIG_DICT['TEST_MD'])>0 else 0.5
+gUpdateRate = float(CONFIG_DICT['TEST_MD']) if float(CONFIG_DICT['TEST_MD']) > 0 else 0.5
+gTrainDefSpeed = 10 # Train default speed 10 pixels per refersh frame.
 gSensorCount = 0    # number of sensors.
 gMinTrainDist = 80  # min distance between each trains by refresh rate
 gTrackConfig = OrderedDict()

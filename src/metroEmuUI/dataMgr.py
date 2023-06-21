@@ -93,6 +93,10 @@ class DataManager(threading.Thread):
             elif reqType == 'sensors':
                 respStr = self.fetchSensorInfo(reqJsonStr)
                 resp =';'.join(('REP', 'sensors', respStr))
+            elif reqType == 'stations':
+                respStr = self.fetchStationInfo(reqJsonStr)
+                resp =';'.join(('REP', 'stations', respStr))
+                
         elif reqKey=='POST':
             if reqType == 'signals':
                 respStr = self.setSignals(reqJsonStr)
