@@ -35,7 +35,7 @@ class DataManager(object):
             plcIpaddr = val['ipaddress']
             plcPort = val['port']
             self.plcClients[key] = modbusTcpCom.modbusTcpClient(plcIpaddr, tgtPort=plcPort)
-            if self.plcClients[key] .checkConn():
+            if self.plcClients[key].checkConn():
                 gv.gDebugPrint('DataManager: Connected to PLC', logType=gv.LOG_INFO)
             else:
                 gv.gDebugPrint('DataManager: Fail to connect to PLC', logType=gv.LOG_INFO)

@@ -81,14 +81,26 @@ gPlcInfo = OrderedDict()
 gPlcInfo['PLC-00'] = {'id': 'PLC-00', 'ipaddress': '127.0.0.1',
                       'port': 502, 'hRegsInfo': (0, 39), 'coilsInfo': (0, 19)}
 
+gPlcInfo['PLC-03'] = {'id': 'PLC-03', 'ipaddress': '127.0.0.1',
+                      'port': 503, 'hRegsInfo': (0, 22), 'coilsInfo': (0, 22)}
+
 # PLC display panel information.
 gPlcPnlInfo = OrderedDict()
+
+# init junction Plcs
 gPlcPnlInfo['PLC-00'] = {'id': 'PLC-00', 'label': 'PLC-00[Master:slot-0]', 'ipaddress': '127.0.0.1',
                          'port': 502, 'tgt': 'PLC-00', 'hRegsInfo': (0, 15), 'coilsInfo': (0, 7)}
 gPlcPnlInfo['PLC-01'] = {'id': 'PLC-01', 'label': 'PLC-01[Slave:slot-1]', 'ipaddress': '127.0.0.1',
                          'port': 502, 'tgt': 'PLC-00', 'hRegsInfo': (15, 30), 'coilsInfo': (7, 14)}
 gPlcPnlInfo['PLC-02'] = {'id': 'PLC-02',  'label': 'PLC-02[Slave:slot-2]', 'ipaddress': '127.0.0.1',
                          'port': 502, 'tgt': 'PLC-00', 'hRegsInfo': (30, 39), 'coilsInfo': (14, 19)}
+# init station Plcs
+gPlcPnlInfo['PLC-03'] = {'id': 'PLC-03', 'label': 'PLC-03[Master:slot-0]', 'ipaddress': '127.0.0.1',
+                         'port': 503, 'tgt': 'PLC-03', 'hRegsInfo': (0, 8), 'coilsInfo': (0, 8)}
+gPlcPnlInfo['PLC-04'] = {'id': 'PLC-01', 'label': 'PLC-04[Slave:slot-1]', 'ipaddress': '127.0.0.1',
+                         'port': 503, 'tgt': 'PLC-03', 'hRegsInfo': (8, 16), 'coilsInfo': (8, 16)}
+gPlcPnlInfo['PLC-05'] = {'id': 'PLC-02', 'label': 'PLC-05[Slave:slot-2]', 'ipaddress': '127.0.0.1',
+                         'port': 503, 'tgt': 'PLC-03', 'hRegsInfo': (16, 22), 'coilsInfo': (16, 22)}
 
 gTranspPct = 70     # Windows transparent percentage.
 gUpdateRate = 1     # main frame update rate 1 sec.

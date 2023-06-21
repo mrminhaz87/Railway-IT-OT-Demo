@@ -76,22 +76,60 @@ class UIFrame(wx.Frame):
                                 style=wx.LI_HORIZONTAL), flag=flagsL, border=5)
 
         mSizer.AddSpacer(5)
-        label2 = wx.StaticText(self, label="PLC Monitor Panels [Signal system]")
-        label2.SetFont(font)
-        mSizer.Add(label2, flag=flagsL, border=2)
-        mSizer.AddSpacer(5)
+        # label2 = wx.StaticText(self, label="PLC Monitor Panels [Signal system]")
+        # label2.SetFont(font)
+        # mSizer.Add(label2, flag=flagsL, border=2)
+        # mSizer.AddSpacer(5)
 
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         self.plcPnls = {}
-        for key, val in gv.gPlcPnlInfo.items():
-            hbox1.AddSpacer(10)
-            ipaddr = val['ipaddress'] + ' : ' + str(val['port'])
-            self.plcPnls[key] = pnlFunction.PanelPLC(self, val['label'], ipaddr)
-            hbox1.Add(self.plcPnls[key], flag=flagsL, border=2)
+
+        signalSz = self._buildPlcPnlsSizer("PLC Monitor Panels [Signal system]", ('PLC-00', 'PLC-01', 'PLC-02'))
+        hbox1.Add(signalSz, flag=flagsL, border=2)
+        hbox1.AddSpacer(10)
+        hbox1.Add(wx.StaticLine(self, wx.ID_ANY, size=(-1, 400),
+                                style=wx.LI_VERTICAL), flag=flagsL, border=5)
+
+        stationSZ = self._buildPlcPnlsSizer("PLC Monitor Panels [Station]", ('PLC-03', 'PLC-04', 'PLC-05'))
+        hbox1.Add(stationSZ, flag=flagsL, border=2)
+        hbox1.AddSpacer(10)
+        hbox1.Add(wx.StaticLine(self, wx.ID_ANY, size=(-1, 400),
+                        style=wx.LI_VERTICAL), flag=flagsL, border=5)
+        hbox1.AddSpacer(10)
+        label2 = wx.StaticText(self, label="Maintenance-Track Place Holder")
+        label2.SetFont(font)
+        hbox1.Add(label2, flag=flagsL, border=2)
+
+        # for key, val in gv.gPlcPnlInfo.items():
+        #     hbox1.AddSpacer(10)
+        #     ipaddr = val['ipaddress'] + ' : ' + str(val['port'])
+        #     self.plcPnls[key] = pnlFunction.PanelPLC(self, val['label'], ipaddr)
+        #     hbox1.Add(self.plcPnls[key], flag=flagsL, border=2)
         
         mSizer.Add(hbox1, flag=flagsL, border=2)
         return mSizer
 
+#--UIFrame---------------------------------------------------------------------
+    def _buildPlcPnlsSizer(self, PanelTitle, panelKeySeq):
+        flagsL = wx.LEFT
+        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        vSizer = wx.BoxSizer(wx.VERTICAL)
+        label = wx.StaticText(self, label=PanelTitle)
+        label.SetFont(font)
+        vSizer.Add(label, flag=flagsL, border=2)
+        vSizer.AddSpacer(5)
+        hbox1 = wx.BoxSizer(wx.HORIZONTAL)
+        #panelSeq = ('PLC-00', 'PLC-01', 'PLC-02')
+        for key in panelKeySeq:
+            hbox1.AddSpacer(10)
+            panelInfo = gv.gPlcPnlInfo[key]
+            ipaddr = panelInfo['ipaddress'] + ' : ' + str(panelInfo['port'])
+            self.plcPnls[key] = pnlFunction.PanelPLC(self, panelInfo['label'], ipaddr)
+            hbox1.Add(self.plcPnls[key], flag=flagsL, border=2)
+        
+        vSizer.Add(hbox1, flag=flagsL, border=2)
+        return vSizer
+        
 #--UIFrame---------------------------------------------------------------------
     def periodic(self, event):
         """ Call back every periodic time."""
@@ -115,6 +153,7 @@ class UIFrame(wx.Frame):
                     self.plcPnls[key].updateCoils(coilsList)
                     self.plcPnls[key].updateDisplay()
                 
+                # update all the junction sensor and signals
                 for key in gv.gTrackConfig.keys():
                     tgtPlcID = 'PLC-00'
                     rsIdx, reIdx = gv.gTrackConfig[key]['sensorIdx']
@@ -125,6 +164,7 @@ class UIFrame(wx.Frame):
                     coilsList = gv.idataMgr.getPlcCoilsData(tgtPlcID, csIdx, ceIdx)
                     gv.iMapMgr.setSingals(key, coilsList)
 
+                # update all the station sensros and signals
 
             self.mapPanel.periodic(now)
 
