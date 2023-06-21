@@ -22,3 +22,8 @@ TEST_JC_COLLISION:False
 
 # Test train safe distance 
 TEST_TR_DISTANCE:True
+
+# Station config json file
+WE_STATION_CFG:welineStations.json
+NC_STATION_CFG:nslineStations.json
+CC_STATION_CFG:cclineStations.json

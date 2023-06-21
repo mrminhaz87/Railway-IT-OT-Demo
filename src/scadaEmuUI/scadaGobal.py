@@ -44,7 +44,7 @@ Log.initLogger(gTopDir, 'Logs', APP_NAME[0], APP_NAME[1], historyCnt=100, fPutLo
 IMG_FD = os.path.join(dirpath, 'img')
 ICO_PATH = os.path.join(IMG_FD, "metro.ico")
 
-TEST_MD = False
+TEST_MD = True
 PLC_NUM = 1
 
 # Init the agent object type
@@ -83,12 +83,12 @@ gPlcInfo['PLC-00'] = {'id': 'PLC-00', 'ipaddress': '127.0.0.1',
 
 # PLC display panel information.
 gPlcPnlInfo = OrderedDict()
-gPlcPnlInfo['PLC-00'] = {'id': 'PLC-00', 'ipaddress': '127.0.0.1',
+gPlcPnlInfo['PLC-00'] = {'id': 'PLC-00', 'label': 'PLC-00[Master:slot-0]', 'ipaddress': '127.0.0.1',
                          'port': 502, 'tgt': 'PLC-00', 'hRegsInfo': (0, 15), 'coilsInfo': (0, 7)}
-gPlcPnlInfo['PLC-01'] = {'id': 'PLC-01', 'ipaddress': '127.0.0.1',
-                         'port': 503, 'tgt': 'PLC-00', 'hRegsInfo': (15, 30), 'coilsInfo': (7, 14)}
-gPlcPnlInfo['PLC-02'] = {'id': 'PLC-02', 'ipaddress': '127.0.0.1',
-                         'port': 504, 'tgt': 'PLC-00', 'hRegsInfo': (30, 39), 'coilsInfo': (14, 19)}
+gPlcPnlInfo['PLC-01'] = {'id': 'PLC-01', 'label': 'PLC-01[Slave:slot-1]', 'ipaddress': '127.0.0.1',
+                         'port': 502, 'tgt': 'PLC-00', 'hRegsInfo': (15, 30), 'coilsInfo': (7, 14)}
+gPlcPnlInfo['PLC-02'] = {'id': 'PLC-02',  'label': 'PLC-02[Slave:slot-2]', 'ipaddress': '127.0.0.1',
+                         'port': 502, 'tgt': 'PLC-00', 'hRegsInfo': (30, 39), 'coilsInfo': (14, 19)}
 
 gTranspPct = 70     # Windows transparent percentage.
 gUpdateRate = 1     # main frame update rate 1 sec.

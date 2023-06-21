@@ -27,7 +27,7 @@ APP_NAME = ('MetroEmu', 'UI')
 
 TOPDIR = 'src'
 LIBDIR = 'lib'
-
+CFGDIR = 'configFiles'
 #-----------------------------------------------------------------------------
 # Init the logger:
 idx = dirpath.find(TOPDIR)
@@ -41,16 +41,16 @@ Log.initLogger(gTopDir, 'Logs', APP_NAME[0], APP_NAME[1], historyCnt=100, fPutLo
 
 #-----------------------------------------------------------------------------
 # Init the configure file loader.
+CFG_FD = os.path.join(dirpath, CFGDIR)
 import ConfigLoader
 CONFIG_FILE_NAME = 'metroConfig.txt'
-gGonfigPath = os.path.join(dirpath, CONFIG_FILE_NAME)
+gGonfigPath = os.path.join(CFG_FD, CONFIG_FILE_NAME)
 iConfigLoader = ConfigLoader.ConfigLoader(gGonfigPath, mode='r')
 if iConfigLoader is None:
     print("Error: The config file %s is not exist.Program exit!" %str(gGonfigPath))
     exit()
 
 CONFIG_DICT = iConfigLoader.getJson()
-
 
 #------<IMAGES PATH>-------------------------------------------------------------
 IMG_FD = os.path.join(dirpath, 'img')

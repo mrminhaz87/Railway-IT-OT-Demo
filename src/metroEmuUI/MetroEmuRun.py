@@ -60,9 +60,12 @@ class UIFrame(wx.Frame):
 #--UIFrame---------------------------------------------------------------------
     def _initGlobals(self):
         # Init the global parameters used only by this module
-        gv.gTrackConfig['weline'] = {'id':'weline', 'num': 4, 'color': wx.Colour(52, 169, 129), 'icon': 'welabel.png'}
-        gv.gTrackConfig['nsline'] = {'id':'nsline', 'num': 3, 'color': wx.Colour(233, 0, 97), 'icon': 'nslabel.png'}
-        gv.gTrackConfig['ccline'] = {'id':'ccline', 'num': 3, 'color': wx.Colour(255, 136, 0), 'icon': 'cclabel.png'}
+        gv.gTrackConfig['weline'] = {'id':'weline', 'num': 4, 'color': wx.Colour(52, 169, 129), 
+                                     'stationCfg': gv.CONFIG_DICT['WE_STATION_CFG'], 'icon': 'welabel.png'}
+        gv.gTrackConfig['nsline'] = {'id':'nsline', 'num': 3, 'color': wx.Colour(233, 0, 97), 
+                                     'stationCfg': gv.CONFIG_DICT['NC_STATION_CFG'], 'icon': 'nslabel.png'}
+        gv.gTrackConfig['ccline'] = {'id':'ccline', 'num': 3, 'color': wx.Colour(255, 136, 0), 
+                                     'stationCfg': gv.CONFIG_DICT['CC_STATION_CFG'], 'icon': 'cclabel.png'}
         # Init all the global instance
         if gv.gCollsionTestFlg: gv.gTestMD = False # disable the test mode flag to fetch the signal from PLC
         gv.iMapMgr = mapMgr.MapMgr(self)
@@ -84,7 +87,7 @@ class UIFrame(wx.Frame):
         vbox1 = wx.BoxSizer(wx.VERTICAL)
         vbox1.AddSpacer(5)
         font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
-        label = wx.StaticText(self, label= "RealWord Metro System Emulator")
+        label = wx.StaticText(self, label= "RealWorld Metro System Emulator")
         label.SetFont(font)
         vbox1.Add(label, flag=wx.CENTRE, border=2)
         vbox1.AddSpacer(5)

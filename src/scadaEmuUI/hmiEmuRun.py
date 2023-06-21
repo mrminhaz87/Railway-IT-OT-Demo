@@ -86,7 +86,7 @@ class UIFrame(wx.Frame):
         for key, val in gv.gPlcPnlInfo.items():
             hbox1.AddSpacer(10)
             ipaddr = val['ipaddress'] + ' : ' + str(val['port'])
-            self.plcPnls[key] = pnlFunction.PanelPLC(self, key, ipaddr)
+            self.plcPnls[key] = pnlFunction.PanelPLC(self, val['label'], ipaddr)
             hbox1.Add(self.plcPnls[key], flag=flagsL, border=2)
         
         mSizer.Add(hbox1, flag=flagsL, border=2)

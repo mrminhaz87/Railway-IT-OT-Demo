@@ -14,8 +14,8 @@
 #-----------------------------------------------------------------------------
 
 import os
+import json
 import wx
-
 from collections import OrderedDict
 
 import metroEmuGobal as gv
@@ -176,9 +176,24 @@ class MapMgr(object):
             signal.setTriggerOffSensors(info['tiggerS'], info['offIdx'])
             self.signals['ccline'].append(signal)
 
-#-----------------------------------------------------------------------------
     def _initStation(self):
-        """ Init all the train stations. """
+        for key in gv.gTrackConfig.keys():
+            stationCfgFile = gv.gTrackConfig[key]['stationCfg']
+            stationCfgPath = os.path.join(gv.CFG_FD, stationCfgFile)
+            if os.path.exists(stationCfgPath):
+                with open(stationCfgPath) as json_file:
+                    trackStationList = json.load(json_file)
+                    self.stations[key] = []
+                    for info in trackStationList:
+                        layoutParm = info['layout'] if 'layout' in info.keys() else gv.LAY_H
+                        station = agent.AgentStation(self, info['id'], info['pos'], layout=layoutParm)
+                        station.setCheckTrains(self.trains[key])
+                        if 'labelPos' in info.keys(): station.setlabelPos(info['labelPos'])
+                        self.stations[key].append(station)
+
+#-----------------------------------------------------------------------------
+    def _initStation_old(self):
+        """ Init all the train stations. [This function is replayed by the station configure files] """
         # Init all stations on weline.
         trackStation_we = [{'id': 'Tuas_Link', 'pos': (80, 200), 'layout': gv.LAY_H},
                            {'id': 'Jurong_East', 'pos': (360, 600), 'layout': gv.LAY_H},
