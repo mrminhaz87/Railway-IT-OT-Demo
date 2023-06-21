@@ -22,7 +22,7 @@ import os, sys
 print("Current working directory is : %s" % os.getcwd())
 DIR_PATH = dirpath = os.path.dirname(__file__)
 print("Current source code location : %s" % dirpath)
-APP_NAME = ('MetroEmu', 'plcSim')
+APP_NAME = ('plcSimulator', 'stationPlc')
 
 TOPDIR = 'src'
 LIBDIR = 'lib'
@@ -43,7 +43,7 @@ LOG_WARN    = 1
 LOG_ERR     = 2
 LOG_EXCEPT  = 3
 
-PCL_NAME = 'PLC1'
+PCL_NAME = 'PLC4'
 ALLOW_R_L = ['127.0.0.1', '192.168.0.10']
 ALLOW_W_L = ['127.0.0.1']
 
@@ -51,7 +51,7 @@ ALLOW_W_L = ['127.0.0.1']
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.
 gRealWordIP = ('127.0.0.1', 3001)
-gInterval = 0.6
+gInterval = 0.9
 
 def gDebugPrint(msg, prt=True, logType=None):
     if prt: print(msg)

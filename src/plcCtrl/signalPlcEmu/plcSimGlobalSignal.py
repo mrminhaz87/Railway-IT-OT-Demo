@@ -22,7 +22,7 @@ import os, sys
 print("Current working directory is : %s" % os.getcwd())
 DIR_PATH = dirpath = os.path.dirname(__file__)
 print("Current source code location : %s" % dirpath)
-APP_NAME = ('MetroEmu', 'plcSim')
+APP_NAME = ('plcSimulator', 'SignalPlc')
 
 TOPDIR = 'src'
 LIBDIR = 'lib'

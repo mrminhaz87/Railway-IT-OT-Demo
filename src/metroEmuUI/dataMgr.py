@@ -77,8 +77,8 @@ class DataManager(threading.Thread):
         if gv.iMapMgr:
             for key in self.stationsDict.keys():
                 self.stationsDict[key] = []
-                for sensorAgent in gv.iMapMgr.getSensors(trackID=key):
-                    state = 1 if sensorAgent.getDockState() else 0
+                for stationAgent in gv.iMapMgr.getStations(trackID=key):
+                    state = 1 if stationAgent.getDockState() else 0
                     self.stationsDict[key].append(state)
                 
     #-----------------------------------------------------------------------------
@@ -118,7 +118,7 @@ class DataManager(threading.Thread):
                 respStr = self.setSignals(reqJsonStr)
                 resp =';'.join(('REP', 'signals', respStr))
             elif reqType == 'stations':
-                respStr = self.fetchStationInfo(reqJsonStr)
+                respStr = self.setStationSignals(reqJsonStr)
                 resp =';'.join(('REP', 'stations', respStr))
             pass
             # TODO: Handle all the control request here.
