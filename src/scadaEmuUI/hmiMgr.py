@@ -241,6 +241,34 @@ class MapMgr(object):
             station = AgentStation(self, stationInfo['id'], stationInfo['pos'], labelLayout=stationInfo['layout'])
             self.stations[key].append(station)
 
+        y += 160
+        trackStation_cc = [
+                    {'id': 'Buona_Vista', 'pos': (80+120*11+40, y), 'layout': gv.LAY_D},
+                    {'id': 'Farrer_Road', 'pos': (80+120*12+80, y), 'layout': gv.LAY_D},
+                    {'id': 'Serangoon', 'pos': (80+120*3+80, y), 'layout': gv.LAY_U},
+                    {'id': 'Nicoll_Highway', 'pos': (80+120*7+40, y), 'layout': gv.LAY_U},
+                    {'id': 'Bayfront', 'pos': (80+120*7+80, y),'layout': gv.LAY_D},
+                    {'id': 'Harbourfront', 'pos': (80+120*9+80, y),'layout': gv.LAY_D}]
+        key = 'ccline'
+        self.stations[key] = []
+        for stationInfo in trackStation_cc:
+            station = AgentStation(self, stationInfo['id'], stationInfo['pos'], labelLayout=stationInfo['layout'])
+            self.stations[key].append(station)
+
+        y += 160
+        trackStation_ns = [{'id': 'Jurong_East', 'pos': (80+210*6+140, y), 'layout': gv.LAY_D},
+                           {'id': 'Woodlands', 'pos': (80+210*1+70, y), 'layout': gv.LAY_U},
+                           {'id': 'Yishun', 'pos': (80+210*1+140, y), 'layout': gv.LAY_D},
+                           {'id': 'Orchard', 'pos': (80+210*3+70, y), 'layout': gv.LAY_U},
+                           {'id': 'City_Hall', 'pos': (80+210*3+140, y), 'layout': gv.LAY_D},
+                           {'id': 'Bishan', 'pos': (80+210*5+140, y), 'layout': gv.LAY_D}]
+        key = 'nsline'
+        self.stations[key] = []
+        for stationInfo in trackStation_ns:
+            station = AgentStation(self, stationInfo['id'], stationInfo['pos'], labelLayout=stationInfo['layout'])
+            self.stations[key].append(station)
+
+
     def getSensors(self, trackID=None):
         if trackID and trackID in self.sensors.keys(): return self.sensors[trackID]
         return self.sensors

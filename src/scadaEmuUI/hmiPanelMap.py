@@ -139,24 +139,29 @@ class PanelMap(wx.Panel):
                 pos = station.getPos()
                 sensorState = station.getSensorState()
                 signalState = station.getSignalState()
+                dc.SetPen(wx.Pen(gv.gTrackConfig[key]['color']))
+                lboffset = 30 if station.getlabelLayout() == gv.LAY_D else -45
+                lioffest = 25 if station.getlabelLayout() == gv.LAY_D else -25
+                dc.DrawLine(pos[0], pos[1], pos[0], pos[1]+lioffest)
+                dc.DrawText("ST[%s]:%s" %(str(i), str(id)), pos[0]-30, pos[1]+lboffset)
+
                 dc.SetPen(self.dcDefPen)
                 dc.SetBrush(wx.Brush('GRAY'))
                 # Draw the station sensor state
                 if sensorState:
                     color = 'YELLOW' if self.toggle else 'BLUE'
                     dc.SetBrush(wx.Brush(color))
-                    dc.DrawRectangle(pos[0]-6, pos[1]-6, 12, 12)
+                    dc.DrawRectangle(pos[0]-5, pos[1]-5, 10, 10)
                     
                 else:
-                    dc.DrawRectangle(pos[0]-4, pos[1]-4, 8, 8)
+                    dc.DrawRectangle(pos[0]-5, pos[1]-5, 10, 10)
                 # Draw the station signal state
                 color = 'RED' if signalState else 'GREEN'
                 dc.SetPen(wx.Pen(color, width=2, style=wx.PENSTYLE_SOLID))
                 dc.SetBrush(wx.Brush(color, wx.TRANSPARENT))
                 dc.DrawRectangle(pos[0]-10, pos[1]-10, 20, 20)
 
-                lboffset = 40 if station.getlabelLayout() == gv.LAY_D else -45
-                dc.DrawText("ST[%s]:%s" %(str(i), str(id)), pos[0]-30, pos[1]+lboffset)
+
 
     #--PanelMap--------------------------------------------------------------------
     def onPaint(self, event):

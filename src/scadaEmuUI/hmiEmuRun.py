@@ -56,10 +56,10 @@ class UIFrame(wx.Frame):
                                      'stationSensorIdx': (0, 10), 'stationSignalIdx': (0, 10),
                                     'color': wx.Colour(52, 169, 129), 'icon': 'welabel.png'}
         gv.gTrackConfig['nsline'] = {'id': 'nsline', 'sensorIdx': (17, 25), 'signalIdx': (8, 12), 
-                                     'stationSensorIdx': (0, 10), 'stationSignalIdx': (0, 10),
+                                     'stationSensorIdx': (10, 16), 'stationSignalIdx': (10, 16),
                                      'color': wx.Colour(233, 0, 97), 'icon': 'nslabel.png'}
         gv.gTrackConfig['ccline'] = {'id': 'ccline', 'sensorIdx': (25, 39), 'signalIdx': (12, 19), 
-                                     'stationSensorIdx': (0, 10), 'stationSignalIdx': (0, 10),
+                                     'stationSensorIdx': (16, 22), 'stationSignalIdx': (16, 22),
                                      'color': wx.Colour(255, 136, 0), 'icon': 'cclabel.png'}
         # Init all the global instance
         gv.iMapMgr = mapMgr.MapMgr(self)
