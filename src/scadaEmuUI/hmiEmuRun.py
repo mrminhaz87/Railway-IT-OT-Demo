@@ -71,12 +71,12 @@ class UIFrame(wx.Frame):
         mSizer = wx.BoxSizer(wx.VERTICAL)
         mSizer.AddSpacer(5)
         font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
-        label = wx.StaticText(self, label="Railway HMI")
+        label = wx.StaticText(self, label="Railway SCADA HMI")
         label.SetFont(font)
         mSizer.Add(label, flag=flagsL, border=2)
         mSizer.AddSpacer(10)
         gv.iMapPanel = self.mapPanel = pnlMap.PanelMap(self)
-        mSizer.Add(gv.iMapPanel, flag=flagsL, border=2)
+        mSizer.Add(gv.iMapPanel, flag=wx.CENTER, border=2)
         mSizer.AddSpacer(10)
         mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(1790, -1),
                                 style=wx.LI_HORIZONTAL), flag=flagsL, border=5)
@@ -182,7 +182,6 @@ class UIFrame(wx.Frame):
                     gv.iMapMgr.setStationsSignals(key, coilsList)
 
             self.mapPanel.periodic(now)
-
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

@@ -44,8 +44,8 @@ Log.initLogger(gTopDir, 'Logs', APP_NAME[0], APP_NAME[1], historyCnt=100, fPutLo
 IMG_FD = os.path.join(dirpath, 'img')
 ICO_PATH = os.path.join(IMG_FD, "metro.ico")
 
-TEST_MD = False
-PLC_NUM = 1
+TEST_MD = True
+PLC_NUM = 2
 
 # Init the agent object type
 RAILWAY_TYPE_LINE   = 'RL'

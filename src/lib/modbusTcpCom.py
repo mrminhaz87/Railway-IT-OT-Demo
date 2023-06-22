@@ -64,9 +64,10 @@ class ladderLogic(object):
         Design > part.
     """
 
-    def __init__(self, parent) -> None:
+    def __init__(self, parent, ladderName=None) -> None:
         """ Init example: testladderlogic = testLogic(None)"""
         self.parent = parent
+        self.ladderName= ladderName
         self.holdingRegsInfo = {'address': None, 'offset': None}
         self.srcCoilsInfo = {'address': None, 'offset': None}
         self.destCoilsInfo = {'address': None, 'offset': None}
@@ -80,6 +81,10 @@ class ladderLogic(object):
 
 #-----------------------------------------------------------------------------
 # Define all the get() functions here:
+
+    def getLadderName(self):
+        return self.ladderName
+
     def getHoldingRegsInfo(self):
         return self.holdingRegsInfo
 
