@@ -111,6 +111,7 @@ class RealWorldConnector(object):
     def changeRWCoil(self, rqstType='signals', coilDict={}):
         """ Send the current plc coils state to the realwrold emulator."""
         rqstKey = 'POST'
+        print(coilDict)
         if isinstance(coilDict, dict):
             result = self._queryToRW(rqstKey, rqstType, coilDict)
         Log.warning("changeRWCoil(): passed in input parm needs to be a dict() type.")
@@ -193,7 +194,7 @@ class modBusService(threading.Thread):
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
-class plcSimulator(object):
+class plcSimuInterface(object):
     """ A PlC simulator to provide below functions: 
         - Create a modbus service running in subthread to handle the SCADA system's 
             modbus requirment.
@@ -227,7 +228,8 @@ class plcSimulator(object):
         # Init the UDP connector to connect to the realworld and test the connection. 
         self.rwConnector = RealWorldConnector(self, self.realworldAddr)
         # Init the modbus TCP service
-        self.mbService = modBusService(self, 1, 'ModbusService')
+        self.modBusAddr = addressInfoDict['hostaddress'] if 'hostaddress' in addressInfoDict.keys() else ('localhost', 502)
+        self.mbService = modBusService(self, 1, self.dataMgr, hostIP=self.modBusAddr[0], hostPort=self.modBusAddr[1])
         self.mbService.start()
         self.terminate = False
         Log.info('Finished init the PLC: %s' %str(self.id))
@@ -294,7 +296,7 @@ class plcSimulator(object):
         result = self.dataMgr.getCoilState(address, offset)
         for key in self.coilStateRW.keys():
             idx, idxOffset = self.coils2RWMap[key]
-            self.coilStateRW = result[idx:idxOffset]
+            self.coilStateRW[key] = result[idx:idxOffset]
 
 #-----------------------------------------------------------------------------
     def run(self):
@@ -302,6 +304,7 @@ class plcSimulator(object):
             now = time.time()
             if self.rwConnector.isRealWorldOnline():
                 self.periodic(now)
+                time.sleep(0.6)
             else:
                 self.rwConnector.reConnectRW()
                 time.sleep(1)
