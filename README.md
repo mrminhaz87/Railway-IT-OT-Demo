@@ -1,13 +1,11 @@
-# Metro_emulator
+# Metro_Railway_System_Emulator
 
-[under Editing]
+**Project Design :** We want to create a digital twin type Metro  emulation system to simulate multiple trains running on different tracks with the control signals. The system contents 3 parts: 
 
-**Project Design :** We want to create a digital twin type Metro emulation system to simulate multiple trains running on different tracks with the control signals. The system contents 3 part: 
+- Metro railway signal system real word emulator (2D).
 
-- Metro system real word emulator (2D).
-
-- HMI and SCADA system. 
-- PLC and latching relay emulator.
+- HMI and SCADA system for railway and train control. 
+- PLC and latching relay emulators.
 
 
 
@@ -23,13 +21,37 @@ SCADA-HMI UI
 
 
 
+------
+
 
 
 ### System Design 
 
 The 3 parts will follow below work flow: 
 
-![](doc/systemWorkflow.png)
+#### System network design
+
+![](doc/img/networkDesign.png)
+
+#### System data communication network design
+
+![](doc/img/networkCommDesign.png)
+
+
+
+Signal system PLC ladder diagrams set
+
+![](doc/img/signalPlc.png)
+
+
+
+Station system PLC ladder diagram set: 
+
+![](doc/img/stationPlc.png)
+
+Train control PLC config: 
+
+![](doc/img/trainPlc.png)
 
 For each sensors-Signal set, the circuit logic is below:
 
