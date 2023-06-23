@@ -19,17 +19,9 @@ Program design:
     Slave[slot-1], Slave[slot-2]) with thress 16-in 8-out PLCs. The PLC sets will
     take 39 input signal and provide 19 output signal.
 """
-
-import os
-import time
-import json
-import threading
-from datetime import datetime
 from collections import OrderedDict
 
 import plcSimGlobalSignal as gv
-import Log
-import udpCom
 import modbusTcpCom
 import plcSimulator
 
@@ -117,7 +109,8 @@ class tFlipFlopLadderLogic(modbusTcpCom.ladderLogic):
         gv.gDebugPrint('Finished calculate all coils: %s' %str(coilsRsl), logType=gv.LOG_INFO)
         return coilsRsl
         
-
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 class signalPlcSet(plcSimulator.plcSimuInterface):
 
     def __init__(self, parent, plcID, addressInfoDict, ladderObj):

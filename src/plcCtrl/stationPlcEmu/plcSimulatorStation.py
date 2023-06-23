@@ -21,40 +21,20 @@
         control system.
 """
 
-import os
-import time
-import json
-import threading
-from datetime import datetime
 from collections import OrderedDict
 
 import plcSimGlobalStation as gv
-import Log
-import udpCom
 import modbusTcpCom
+import plcSimulator
 
-# Define all the module local untility functions here:
-#-----------------------------------------------------------------------------
-def parseIncomeMsg(msg):
-    """ parse the income message to tuple with 3 element: request key, type and jsonString
-        Args: msg (str): example: 'GET;dataType;{"user":"<username>"}'
-    """
-    req = msg.decode('UTF-8') if not isinstance(msg, str) else msg
-    reqKey = reqType = reqJsonStr= None
-    try:
-        reqKey, reqType, reqJsonStr = req.split(';', 2)
-    except Exception as err:
-        Log.error('parseIncomeMsg(): The income message format is incorrect.')
-        Log.exception(err)
-    return (reqKey.strip(), reqType.strip(), reqJsonStr)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class directConnLadderLogic(modbusTcpCom.ladderLogic):
     """ A Direct connection ladder logic diagram set
     """
-    def __init__(self, parent) -> None:
-        super().__init__(parent)
+    def __init__(self, parent, ladderName) -> None:
+        super().__init__(parent, ladderName=ladderName)
 
     def initLadderInfo(self):
         self.holdingRegsInfo['address'] = 0
@@ -83,41 +63,7 @@ class directConnLadderLogic(modbusTcpCom.ladderLogic):
         
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
-class modBusService(threading.Thread):
-    """ mod bus service hold one datahandler, on databank and one Modbus server 
-        to handler the SCADA system's modbus request.
-    """
-    def __init__(self, parent, threadID, name):
-        threading.Thread.__init__(self)
-        hostIp = 'localhost'
-        hostPort = 503
-        # Init the data handler with a databank. 
-        self.dataMgr = modbusTcpCom.plcDataHandler(allowRipList=gv.ALLOW_R_L, allowWipList=gv.ALLOW_W_L)
-        # Init the modbus TCP server.
-        self.server = modbusTcpCom.modbusTcpServer(hostIp=hostIp, hostPort=hostPort, dataHandler=self.dataMgr)
-        # load the server info into the 
-        serverInfo = self.server.getServerInfo()
-        self.dataMgr.initServerInfo(serverInfo)
-        # passed in the ladder logic inside the handler.
-        self.dataMgr.addLadderLogic('direct_logic_set', gv.iLadderLogic)
-        # set auto update to true to make the data bank can auto execute  the ladder logic when register state changes.
-        self.dataMgr.setAutoUpdate(True)
-        gv.iMBhandler = self.dataMgr
-        self.daemon = True
-
-    def run(self):
-        """ Start the udp server's main message handling loop."""
-        gv.gDebugPrint("ModbusTCP service thread run() start.", logType=gv.LOG_INFO)
-        self.server.startServer()
-        gv.gDebugPrint("ModbusTCP service thread run() end.", logType=gv.LOG_INFO)
-        self.threadName = None # set the thread name to None when finished.
-
-    def stop(self):
-        self.server.stopServer()
-
-#-----------------------------------------------------------------------------
-#-----------------------------------------------------------------------------
-class plcSimulator(object):
+class stationPlcSet(plcSimulator.plcSimuInterface):
     """ A PlC simulator to provide below functions: 
         - Create a modbus service running in subthread to handle the SCADA system's 
             modbus requirment.
@@ -125,171 +71,45 @@ class plcSimulator(object):
             the output coils state based on the ladder logic. 
         - Send the signal setup request to the real world emulator to change the signal.
     """
-    def __init__(self, parent, plcID, realworldIP):
-        self.parent = parent
-        self.id = plcID
-        self.realworld = realworldIP
-        # input sensors state from real world emulator: 
-        self.inputState = {
-            'weline': [],
-            'nsline': [],
-            'ccline': [] }
-        # out put coils state to real world emulator:
-        self.coilState = {
-            'weline': [0]*10,
-            'nsline': [0]*6,
-            'ccline': [0]*6
-        }
-        # Init the ladder logic.
-        self.LadderPiority = {
-            'weline': ('ccline',),
-            'nsline': ('ccline',),
-            'ccline': ('weline', 'nsline')
-        }
-        gv.iLadderLogic = directConnLadderLogic(self)
-        # Init the UDP connector to connect to the realworld and test the connection. 
-        self.realwordInfo= {
-            'ip': realworldIP[0],
-            'port': realworldIP[1]
-        }
-        self.rwConnector = udpCom.udpClient((self.realwordInfo['ip'], self.realwordInfo['port']))
-        self.recoonectCount = 30
-        self.realwordOnline = self._loginRealWord()
-        if self.realwordOnline:
-            gv.gDebugPrint('Login the realworld successfully', logType=gv.LOG_INFO)
-        else:
-            gv.gDebugPrint('Cannot connect to the realworld emulator', logType=gv.LOG_INFO)
-        # Init the modbus TCP service
-        gv.iMBservice = modBusService(self, 1, 'ModbusService')
-        gv.iMBservice.start()
+    def __init__(self, parent, plcID, addressInfoDict, ladderObj):
+        super().__init__(parent, plcID, addressInfoDict, ladderObj)
 
-        self.terminate = False
+    def initInputState(self):
+        self.regsAddrs = (0, 22)
+        self.regSRWfetchKey = 'stations'
+        self.regs2RWmap = OrderedDict()
+        self.regs2RWmap['weline'] = (0, 10)
+        self.regs2RWmap['nsline'] = (10, 16)
+        self.regs2RWmap['ccline'] = (16, 22)
+        self.regsStateRW = OrderedDict()
+        self.regsStateRW['weline'] = [0]*10
+        self.regsStateRW['nsline'] = [0]*6
+        self.regsStateRW['ccline'] = [0]*6
 
-#-----------------------------------------------------------------------------
-    def _loginRealWord(self):
-        """ Try to connect to the realworld emulator."""
-        gv.gDebugPrint("Try to connnect to the  [%s]..." %str(self.realworld), logType=gv.LOG_INFO)
-        rqstKey = 'GET'
-        rqstType = 'login'
-        rqstDict = {'plcID': self.id}
-        result = self._queryToRW(rqstKey, rqstType, rqstDict)
-        if result:
-            gv.gDebugPrint("Scheduler online, state: ready", logType=gv.LOG_INFO)
-            return True
-        return False
-
-#-----------------------------------------------------------------------------
-    def _queryToRW(self, rqstKey, rqstType, rqstDict, response=True):
-        """ Query message to realword emulator
-            Args:
-                rqstKey (str): request key (GET/POST/REP)
-                rqstType (str): request type string.
-                rqstDict (doct): request detail dictionary.
-                dataOnly (bool, optional): flag to indentify whether only return the 
-                    data. Defaults to True. return (responseKey, responseType, responseJson) if set
-                    to False.
-        Returns:
-            _type_: refer to <dataOnly> flag's explaination.
-        """
-        k = t = result = None
-        if rqstKey and rqstType and rqstDict:
-            rqst = ';'.join((rqstKey, rqstType, json.dumps(rqstDict)))
-            if self.rwConnector:
-                resp = self.rwConnector.sendMsg(rqst, resp=response)
-                if resp:
-                    #gv.gDebugPrint('===> resp:%s' %str(resp), logType=gv.LOG_INFO)
-                    k, t, data = parseIncomeMsg(resp)
-                    if k != 'REP': gv.gDebugPrint('The msg reply key %s is invalid' % k, logType=gv.LOG_WARN)
-                    if t != rqstType: gv.gDebugPrint('The reply type doesnt match.%s' %str((rqstType, t)), logType=gv.LOG_WARN)
-                    try:
-                        result = json.loads(data)
-                        self.lastUpdateT = datetime.now()
-                    except Exception as err:
-                        Log.exception('Exception: %s' %str(err))
-                        return None
-                else:
-                    return None
-        else:
-            Log.error("queryBE: input missing: %s" %str(rqstKey, rqstType, rqstDict))
-        return (k, t, result)
-
-#-----------------------------------------------------------------------------
-    def getStationsInfo(self):
-        """ Get sensors state from the real-world simulator. """
-        rqstKey = 'GET'
-        rqstType = 'stations'
-        rqstDict = {'weline': None,
-                    'nsline': None,
-                    'ccline': None}
-        result = self._queryToRW(rqstKey, rqstType, rqstDict)
-        return result
-
-#-----------------------------------------------------------------------------
-    def changeStationSignalCoil(self):
-        """ Set the signal state to the real-world simulator. """
-        rqstKey = 'POST'
-        rqstType = 'stations'
-        rqstDict = self.coilState
-        result = self._queryToRW(rqstKey, rqstType, rqstDict)
-        return result
-    
-#-----------------------------------------------------------------------------
-    def periodic(self, now):
-        sensorInfo = self.getStationsInfo()
-        if sensorInfo is None:
-            gv.gDebugPrint("Lost connection to the real-world emulator.", logType=gv.LOG_WARN)
-            self.realwordOnline = False
-            return 
-        (_, _, result) = sensorInfo
-        time.sleep(0.1)
-        for key in result.keys():
-            self.inputState[key] = result[key]
-        # Update PLC holding registers.
-        self.updateHoldingRegs()
-        time.sleep(0.1)
-        self.updateCoilOutput()
-        # update the output coils state:
-        self.changeStationSignalCoil()
-
-#-----------------------------------------------------------------------------
-    def updateHoldingRegs(self):
-        checkSeq = ('weline', 'nsline', 'ccline')
-        holdingRegs = []
-        for key in checkSeq:
-            holdingRegs += self.inputState[key]
-        gv.gDebugPrint("updateModBusInfo(): update holding registers: %s" %str(holdingRegs), logType=gv.LOG_INFO)
-        gv.iMBhandler.updateHoldingRegs(0, holdingRegs)
-
-#-----------------------------------------------------------------------------
-    def updateCoilOutput(self):
-        result = gv.iMBhandler.getCoilState(0, 22)
-        self.coilState['weline'] = result[0:10]
-        self.coilState['nsline'] = result[10:16]
-        self.coilState['ccline'] = result[16:22]
-
-#-----------------------------------------------------------------------------
-    def run(self):
-        while not self.terminate:
-            now = time.time()
-            if self.realwordOnline:
-                self.periodic(now)
-            else:
-                self.recoonectCount -=1
-                if self.recoonectCount == 0:
-                    gv.gDebugPrint('Try to reconnect to the realworld.', logType=gv.LOG_INFO)
-                    self.realwordOnline = self._loginRealWord()
-                    if not self.realwordOnline: self.recoonectCount = 30
-            time.sleep(gv.gInterval)
-
-#-----------------------------------------------------------------------------
-    def stop(self):
-        self.terminate = True
+    def initCoilState(self):
+        self.coilsAddrs = (0, 22)
+        self.coilsRWSetKey = 'stations'
+        self.coils2RWMap = OrderedDict()
+        self.coils2RWMap['weline'] = (0, 10)
+        self.coils2RWMap['nsline'] = (10, 16)
+        self.coils2RWMap['ccline'] = (16, 22)
+        self.coilStateRW = OrderedDict()
+        self.coilStateRW['weline']  = [False]*10
+        self.coilStateRW['nsline']  = [False]*6 
+        self.coilStateRW['ccline']  = [False]*6 
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 def main():
     gv.gDebugPrint("Start Init the PLC: %s" %str(gv.PCL_NAME), logType=gv.LOG_INFO)
-    plc = plcSimulator(None, gv.PCL_NAME, gv.gRealWordIP)
+    gv.iLadderLogic = directConnLadderLogic(None, ladderName='Direct_connection')
+    addressInfoDict = {
+        'hostaddress': ('localhost', 503),
+        'realworld':gv.gRealWordIP, 
+        'allowread':gv.ALLOW_R_L,
+        'allowwrite': gv.ALLOW_W_L
+    }
+    plc = stationPlcSet(None, gv.PCL_NAME, addressInfoDict,  gv.iLadderLogic)
     plc.run()
 
 if __name__ == "__main__":
