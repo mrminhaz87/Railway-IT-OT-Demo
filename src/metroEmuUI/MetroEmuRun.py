@@ -66,6 +66,8 @@ class UIFrame(wx.Frame):
                                      'stationCfg': gv.CONFIG_DICT['NC_STATION_CFG'], 'icon': 'nslabel.png'}
         gv.gTrackConfig['ccline'] = {'id':'ccline', 'num': 3, 'color': wx.Colour(255, 136, 0), 
                                      'stationCfg': gv.CONFIG_DICT['CC_STATION_CFG'], 'icon': 'cclabel.png'}
+        gv.gTrackConfig['mtline'] = {'id':'mtline', 'num': 0, 'color': wx.Colour(200, 210, 200), 
+                                     'stationCfg': gv.CONFIG_DICT['MT_STATION_CFG'], 'icon': None}
         # Init all the global instance
         if gv.gCollsionTestFlg: gv.gTestMD = False # disable the test mode flag to fetch the signal from PLC
         gv.iMapMgr = mapMgr.MapMgr(self)
@@ -108,6 +110,7 @@ class UIFrame(wx.Frame):
         vbox0.AddSpacer(5)
         for key, panelCfg in gv.gTrackConfig.items():
             img, color = panelCfg['icon'], panelCfg['color']
+            if img is None: continue
             img = os.path.join(gv.IMG_FD, img)
             png = wx.Image(img, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
             sublabel = wx.StaticBitmap(self, -1, png, (10, 5), (png.GetWidth(), png.GetHeight()))

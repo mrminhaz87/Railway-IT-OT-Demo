@@ -98,7 +98,16 @@ class MapMgr(object):
             trackTrainCfg_cc[0]['head'] = (510, 700)
             trackTrainCfg_cc[1]['head'] = (430, 700)
             trackTrainCfg_cc[2]['head'] = (300, 700)
-        self.trains['ccline'] = self._getTrainsList(trackTrainCfg_cc, self.tracks[key]['points'])
+        self.trains[key] = self._getTrainsList(trackTrainCfg_cc, self.tracks[key]['points'])
+        # Init the maintance line 
+        key = 'mtline'
+        self.tracks[key] = {
+            'name' : key,
+            'color': gv.gTrackConfig[key]['color'],
+            'type': gv.RAILWAY_TYPE_CYCLE,
+            'points': [(460, 320), (640, 320), (640, 480), (460, 480)]
+        }
+        self.trains[key] = self._getTrainsList([], [])
 
 #-----------------------------------------------------------------------------
     def _initSensors(self):
@@ -124,6 +133,11 @@ class MapMgr(object):
             (200, 700), (200, 530)
             ]
         self.sensors['ccline'] = agent.AgentSensors(self, 'cc', sensorPos_cc)
+        # Init all the MT-Line sensors
+        sensorPos_mt = [
+            (640, 340), (640, 460)
+            ]
+        self.sensors['mtline'] = agent.AgentSensors(self, 'mt', sensorPos_mt)
 
 #-----------------------------------------------------------------------------
     def _initSignal(self):
@@ -159,7 +173,7 @@ class MapMgr(object):
             signal.setTriggerOffSensors(info['tiggerS'], info['offIdx'])
             self.signals['nsline'] .append(signal)
 
-        # set all the signal on track cline
+        # set all the signal on track ccline
         trackSignalConfig_cc = [
             {'id': 'cc-0', 'pos':(260, 200), 'dir': gv.LAY_U, 'tiggerS': self.sensors['nsline'], 'onIdx':(0, 6), 'offIdx':(1, 7) },
             {'id': 'cc-1', 'pos':(660, 200), 'dir': gv.LAY_U, 'tiggerS': self.sensors['nsline'], 'onIdx':(4,), 'offIdx':(5,) },
@@ -175,6 +189,17 @@ class MapMgr(object):
             signal.setTriggerOnSensors(info['tiggerS'], info['onIdx'])
             signal.setTriggerOffSensors(info['tiggerS'], info['offIdx'])
             self.signals['ccline'].append(signal)
+
+        # set all the singal on track mtline
+        trackSignalConfig_mt = [
+            {'id': 'mt-0', 'pos':(460, 400), 'dir': gv.LAY_R, 'tiggerS': self.sensors['mtline'], 'onIdx':(0,), 'offIdx':(1,) }
+        ]
+        self.signals['mtline'] = []
+        for info in trackSignalConfig_mt:
+            signal = agent.AgentSignal(self, info['id'], info['pos'], dir=info['dir'])
+            signal.setTriggerOnSensors(info['tiggerS'], info['onIdx'])
+            signal.setTriggerOffSensors(info['tiggerS'], info['offIdx'])
+            self.signals['mtline'].append(signal)
 
 #---------------------------------------------------------------------------
     def _initStation(self):
@@ -306,7 +331,9 @@ class MapMgr(object):
                 {'id': 'North-South [NS]', 'img': None, 'pos': (850, 100), 'size': (180, 30),
                 'color': gv.gTrackConfig['nsline']['color'], 'link':((850, 100), (850, 50))},
                 {'id': 'Circle Line [CC]', 'img': None, 'pos': (1260, 650), 'size': (180, 30),
-                'color': gv.gTrackConfig['ccline']['color'], 'link':((1260, 650), (1260, 700))}
+                'color': gv.gTrackConfig['ccline']['color'], 'link':((1260, 650), (1260, 700))},
+                {'id': 'Maintenance Line [MT]', 'img': None, 'pos': (550, 280), 'size': (190, 30),
+                'color': gv.gTrackConfig['mtline']['color'], 'link':((550, 280), (550, 320))}
         ]
         for info in labelCfg:
             label = agent.agentEnv(self, info['id'], info['pos'], None, info['size'], tType=gv.LABEL_TYPE )
@@ -397,7 +424,8 @@ class MapMgr(object):
         piority = {
             'weline': ('ccline',),
             'nsline': ('ccline',),
-            'ccline': ('weline', 'nsline')
+            'ccline': ('weline', 'nsline'),
+            'mtline': ('mtline',)
         }
         for lineKey in piority[key]:
             for signal in self.signals[lineKey]:

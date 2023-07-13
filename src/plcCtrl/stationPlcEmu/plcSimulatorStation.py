@@ -5,7 +5,8 @@
 # Purpose:     A simple plc simulation module to connect and control the real-world 
 #              emulator via UDP (to simulate the eletrical signals change) and handle
 #              SCADA system Modbus TCP request.
-# 
+#              - This module will simulate 3 PLCs connected under master-slave mode
+#               
 # Author:      Yuancheng Liu
 #
 # Version:     v0.2
@@ -26,7 +27,6 @@ from collections import OrderedDict
 import plcSimGlobalStation as gv
 import modbusTcpCom
 import plcSimulator
-
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
