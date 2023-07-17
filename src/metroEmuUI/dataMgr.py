@@ -98,6 +98,7 @@ class DataManager(threading.Thread):
                 bytes: message bytes reply to the monitor hub side.
         """
         gv.gDebugPrint("Incomming message: %s" % str(msg), logType=gv.LOG_INFO)
+        if msg == b'': return None
         # request message format: 
         # data fetch: GET:<key>:<val1>:<val2>...
         # data set: POST:<key>:<val1>:<val2>...

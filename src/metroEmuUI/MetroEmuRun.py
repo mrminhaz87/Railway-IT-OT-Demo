@@ -89,7 +89,7 @@ class UIFrame(wx.Frame):
         configMenu = wx.Menu()
         scenarioItem = wx.MenuItem(configMenu, 100, text = "Load Scenario",kind = wx.ITEM_NORMAL)
         configMenu.Append(scenarioItem)
-        self.Bind(wx.EVT_MENU, self.onLoad, scenarioItem)
+        self.Bind(wx.EVT_MENU, self.onLoadScenario, scenarioItem)
         menubar.Append(configMenu, '&Config')
 
         # Add the about menu.
@@ -167,7 +167,7 @@ class UIFrame(wx.Frame):
             self.mapPanel.periodic(now)
 
 #-----------------------------------------------------------------------------
-    def onLoad(self, event):
+    def onLoadScenario(self, event):
         self.scenarioDialog = wx.SingleChoiceDialog(self,
                                                     'Select Scenario', 
                                                     'Scenario selection', 

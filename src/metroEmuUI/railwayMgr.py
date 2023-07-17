@@ -66,7 +66,7 @@ class MapMgr(object):
                             {'id': 'we02', 'head': (460, 600),'nextPtIdx': 7, 'len': 5},
                             {'id': 'we03', 'head': (1500, 400), 'nextPtIdx': 3, 'len': 5},
                             {'id': 'we04', 'head': (800, 850), 'nextPtIdx': 11, 'len': 5}]
-        if gv.gCollsionTestFlg: trackTrainCfg_we[1] = {'id': 'we02', 'head': (480, 600), 'nextPtIdx': 3, 'len': 5}
+        #if gv.gCollsionTestFlg: trackTrainCfg_we[1] = {'id': 'we02', 'head': (480, 600), 'nextPtIdx': 3, 'len': 5}
         self.trains[key] = self._getTrainsList(trackTrainCfg_we, self.tracks[key]['points'])
         # Init NS-Line and the trains on it.
         key = 'nsline'
@@ -93,11 +93,11 @@ class MapMgr(object):
         trackTrainCfg_cc = [  {'id': 'cc01', 'head': (1000, 200), 'nextPtIdx': 1, 'len': 6},
                             {'id': 'cc02', 'head': (1300, 700), 'nextPtIdx': 3, 'len': 6},
                             {'id': 'cc03', 'head': (300, 700), 'nextPtIdx': 3, 'len': 6}]
-        if gv.gCollsionTestFlg: trackTrainCfg_cc[2] = {'id': 'cc03', 'head': (700, 700), 'nextPtIdx': 3, 'len': 6}
-        if gv.gTrainDistTestFlag:
-            trackTrainCfg_cc[0]['head'] = (510, 700)
-            trackTrainCfg_cc[1]['head'] = (430, 700)
-            trackTrainCfg_cc[2]['head'] = (300, 700)
+        #if gv.gCollsionTestFlg: trackTrainCfg_cc[2] = {'id': 'cc03', 'head': (700, 700), 'nextPtIdx': 3, 'len': 6}
+        #if gv.gTrainDistTestFlag:
+        #    trackTrainCfg_cc[0]['head'] = (510, 700)
+        #    trackTrainCfg_cc[1]['head'] = (430, 700)
+        #    trackTrainCfg_cc[2]['head'] = (300, 700)
         self.trains[key] = self._getTrainsList(trackTrainCfg_cc, self.tracks[key]['points'])
         # Init the maintance line 
         key = 'mtline'
@@ -362,6 +362,7 @@ class MapMgr(object):
             'weline' : [], 
             'nsline' : [],
             'ccline' : [],
+            'mtline' : [],
         }
         for junction in self.junctions:
             junction.updateState()
