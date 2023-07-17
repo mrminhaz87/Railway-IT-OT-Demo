@@ -7,7 +7,7 @@
 #
 # Author:      Yuancheng Liu
 #
-# Version:     v0.1
+# Version:     v0.1.2
 # Created:     2023/05/26
 # Copyright:   
 # License:     
@@ -15,12 +15,13 @@
 
 import os 
 import time
+import json
+
 import wx
 import metroEmuGobal as gv
 import railwayMgr as mapMgr
 import railwayPanel as pnlFunction
 import railwayPanelMap as pnlMap
-
 import dataMgr as dm
 
 FRAME_SIZE = (1800, 1000)
@@ -40,6 +41,9 @@ class UIFrame(wx.Frame):
         #self.SetTransparent(gv.gTranspPct*255//100)
         # Init the global variables:
         self._initGlobals()
+        #
+        self._buildMenuBar()
+
         # Build UI sizer
         self.SetSizer(self._buidUISizer())
         # Set the periodic call back
@@ -55,7 +59,7 @@ class UIFrame(wx.Frame):
         self.timer.Start(gv.PERIODIC)
 
         self.Bind(wx.EVT_CLOSE, self.onClose)
-        gv.gDebugPrint("Metro real world main frame inited.", logType=gv.LOG_INFO)
+        gv.gDebugPrint("Metro-System real world main frame inited.", logType=gv.LOG_INFO)
 
 #--UIFrame---------------------------------------------------------------------
     def _initGlobals(self):
@@ -70,7 +74,32 @@ class UIFrame(wx.Frame):
                                      'stationCfg': gv.CONFIG_DICT['MT_STATION_CFG'], 'icon': None}
         # Init all the global instance
         if gv.gCollsionTestFlg: gv.gTestMD = False # disable the test mode flag to fetch the signal from PLC
+        # Init all the train list
+        # dir_list = os.listdir(gv.gTrainCfgDir)
+        self.trainCfgFiles = [filename for filename in os.listdir(gv.gTrainCfgDir) if filename.endswith('.json')]
+        print(self.trainCfgFiles)
         gv.iMapMgr = mapMgr.MapMgr(self)
+
+#--UIFrame---------------------------------------------------------------------
+    def _buildMenuBar(self):
+        menubar = wx.MenuBar()  # Creat the function menu bar.
+        # Add the config menu
+        
+        # load scenario
+        configMenu = wx.Menu()
+        scenarioItem = wx.MenuItem(configMenu, 100, text = "Load Scenario",kind = wx.ITEM_NORMAL)
+        configMenu.Append(scenarioItem)
+        self.Bind(wx.EVT_MENU, self.onLoad, scenarioItem)
+        menubar.Append(configMenu, '&Config')
+
+        # Add the about menu.
+        helpMenu = wx.Menu()
+        aboutItem = wx.MenuItem(helpMenu, 200,text = "Help",kind = wx.ITEM_NORMAL)
+        helpMenu.Append(aboutItem)
+        self.Bind(wx.EVT_MENU, self.onHelp, aboutItem)
+        menubar.Append(helpMenu, '&About')
+
+        self.SetMenuBar(menubar)
 
 #--UIFrame---------------------------------------------------------------------
     def _buidUISizer(self):
@@ -137,6 +166,37 @@ class UIFrame(wx.Frame):
             # apply the state on the map panel.
             self.mapPanel.periodic(now)
 
+#-----------------------------------------------------------------------------
+    def onLoad(self, event):
+        self.scenarioDialog = wx.SingleChoiceDialog(self,
+                                                    'Select Scenario', 
+                                                    'Scenario selection', 
+                                                    self.trainCfgFiles)
+        resp = self.scenarioDialog.ShowModal()
+        if resp == wx.ID_OK:
+            trainConfigName = self.scenarioDialog.GetStringSelection()
+            trainConfigPath = os.path.join(gv.gTrainCfgDir, trainConfigName)
+            if os.path.exists(trainConfigPath):
+                with open(trainConfigPath) as json_file:
+                    trainConfigDict = json.load(json_file)
+                    if gv.iMapMgr:
+                        self.updateLock = True
+                        gv.iMapMgr.resetTrainsPos(trainConfigDict)
+                        self.updateLock = False
+        self.scenarioDialog.Destroy()
+        self.scenarioDialog = None
+
+#-----------------------------------------------------------------------------
+    def onHelp(self, event):
+        """ Pop-up the Help information window. """
+        wx.MessageBox(' If there is any bug, please contect: \n\n \
+                        Author:      Yuancheng Liu \n \
+                        Email:       liu_yuan_cheng@hotmail.com \n \
+                        Created:     2023/05/02 \n \
+                        GitHub Link: https://github.com/LiuYuancheng/Metro_emulator \n', 
+                    'Help', wx.OK)
+
+#-----------------------------------------------------------------------------
     def onClose(self, evt):
         gv.iDataMgr.stop()
         self.timer.Stop()

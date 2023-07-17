@@ -102,6 +102,7 @@ gMinTrainDist = 80  # min distance between each trains by refresh rate
 gTrackConfig = OrderedDict()
 gCollsionTestFlg = CONFIG_DICT['TEST_JC_COLLISION'] # flag used to enable test the train collision at the junction.
 gTrainDistTestFlag = CONFIG_DICT['TEST_TR_DISTANCE'] # flag used to see if the minimum distance between trains are observed
+gTrainCfgDir = os.path.join(dirpath, CFGDIR, CONFIG_DICT['TR_CFG_FOLDER'])
 
 def gDebugPrint(msg, prt=True, logType=None):
     if prt: print(msg)

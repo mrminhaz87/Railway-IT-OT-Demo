@@ -375,6 +375,17 @@ class MapMgr(object):
         return collsionTrainsDict
 
 #-----------------------------------------------------------------------------
+    def resetTrainsPos(self, trainDict):
+        for key in trainDict.keys():
+            if key in self.tracks.keys():
+                self.trains[key] = self._getTrainsList(trainDict[key], self.tracks[key]['points'])
+        # reInit the items
+        self._initSensors()
+        self._initSignal()
+        self._initStation()
+        self._initJunction()
+
+#-----------------------------------------------------------------------------
 # Define all the get() functions here:
 
     def getEnvItems(self):
