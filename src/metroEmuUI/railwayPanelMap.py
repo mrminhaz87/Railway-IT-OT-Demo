@@ -138,6 +138,7 @@ class PanelMap(wx.Panel):
         trainDict = gv.iMapMgr.getTrains()
         for key, val in trainDict.items():
             for i, train in enumerate(val):
+                
                 trainColor = '#CE8349' if train.getTrainSpeed() == 0 else 'GREEN'
                 if train.getEmgStop():
                     trainColor = 'RED'
@@ -147,6 +148,8 @@ class PanelMap(wx.Panel):
                 # draw the train ID:
                 dc.SetTextForeground(wx.Colour(trainColor))
                 pos = train.getTrainPos(idx=0)
+                # Draw the collsion Icon if collision happens.
+                if self.toggle and train.getCollsionFlg(): dc.DrawBitmap(self.bitMaps['alert'], pos[0], pos[1])
                 dc.DrawText( key+'-'+str(i), pos[0]+5, pos[1]+5)
 
 #-----------------------------------------------------------------------------

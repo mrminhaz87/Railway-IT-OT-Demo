@@ -454,7 +454,12 @@ class MapMgr(object):
             for i, train in enumerate(val):
                 frontTrain = val[(i+1)%len(val)]
                 # Check the collision to the front train 1st. 
-                result = train.checkCollFt(frontTrain)                
+                result = train.checkCollFt(frontTrain)
+                # Handle the collision if the auto avoidance is disabled.
+                if result and (not gv.gCollAvoid):
+                    train.setEmgStop(True)
+                    train.setCollsionFlg(True)
+                    frontTrain.setEmgStop(True)
                 # if collision with the front train, ignore the signal.
                 if not result: train.checkSignal(self.signals[key])        
                 # stop the train if it got collision at any junction.

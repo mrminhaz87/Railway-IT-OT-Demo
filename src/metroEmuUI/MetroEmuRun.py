@@ -73,11 +73,10 @@ class UIFrame(wx.Frame):
         gv.gTrackConfig['mtline'] = {'id':'mtline', 'num': 0, 'color': wx.Colour(200, 210, 200), 
                                      'stationCfg': gv.CONFIG_DICT['MT_STATION_CFG'], 'icon': None}
         # Init all the global instance
-        if gv.gCollsionTestFlg: gv.gTestMD = False # disable the test mode flag to fetch the signal from PLC
+        # if gv.gCollsionTestFlg: gv.gTestMD = False # disable the test mode flag to fetch the signal from PLC
         # Init all the train list
-        # dir_list = os.listdir(gv.gTrainCfgDir)
         self.trainCfgFiles = [filename for filename in os.listdir(gv.gTrainCfgDir) if filename.endswith('.json')]
-        print(self.trainCfgFiles)
+        gv.gDebugPrint("Avalible Scenario file: %s" %str(self.trainCfgFiles), logType=gv.LOG_INFO)
         gv.iMapMgr = mapMgr.MapMgr(self)
 
 #--UIFrame---------------------------------------------------------------------
@@ -152,6 +151,10 @@ class UIFrame(wx.Frame):
         png = wx.Image(img, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         btnSample = wx.StaticBitmap(self, -1, png, (10, 5), (png.GetWidth(), png.GetHeight()))
         vbox0.Add(btnSample, flag=flagsL, border=2)
+        self.collisionCB = wx.CheckBox(self, label = 'Auto collision avoidance')
+        self.collisionCB.SetValue(gv.gCollAvoid)
+        self.collisionCB.Bind(wx.EVT_CHECKBOX, self.onCollisionSet)
+        vbox0.Add(self.collisionCB, flag=flagsL, border=2)
         return vbox0
 
 #--UIFrame---------------------------------------------------------------------
@@ -165,6 +168,11 @@ class UIFrame(wx.Frame):
             gv.iMapMgr.periodic(now)
             # apply the state on the map panel.
             self.mapPanel.periodic(now)
+
+#-----------------------------------------------------------------------------
+    def onCollisionSet(self, event):
+        gv.gCollAvoid = self.collisionCB.IsChecked()
+        gv.gDebugPrint("Trains automated collision avoidance enable: %s" %str(gv.gCollAvoid), logType=gv.LOG_INFO)
 
 #-----------------------------------------------------------------------------
     def onLoadScenario(self, event):

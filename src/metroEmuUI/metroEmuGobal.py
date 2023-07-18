@@ -99,9 +99,12 @@ gUpdateRate = float(CONFIG_DICT['TEST_MD']) if float(CONFIG_DICT['TEST_MD']) > 0
 gTrainDefSpeed = 10 # Train default speed 10 pixels per refersh frame.
 gSensorCount = 0    # number of sensors.
 gMinTrainDist = 80  # min distance between each trains by refresh rate
+gCollAvoid = CONFIG_DICT['COLL_AVOID']    # Auto avoid collision.
+gDockTime = int(CONFIG_DICT['DOCK_TIME'])
+
 gTrackConfig = OrderedDict()
-gCollsionTestFlg = CONFIG_DICT['TEST_JC_COLLISION'] # flag used to enable test the train collision at the junction.
-gTrainDistTestFlag = CONFIG_DICT['TEST_TR_DISTANCE'] # flag used to see if the minimum distance between trains are observed
+#gCollsionTestFlg = CONFIG_DICT['TEST_JC_COLLISION'] # flag used to enable test the train collision at the junction.
+#gTrainDistTestFlag = CONFIG_DICT['TEST_TR_DISTANCE'] # flag used to see if the minimum distance between trains are observed
 gTrainCfgDir = os.path.join(dirpath, CFGDIR, CONFIG_DICT['TR_CFG_FOLDER'])
 
 def gDebugPrint(msg, prt=True, logType=None):

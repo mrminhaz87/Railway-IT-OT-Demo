@@ -217,7 +217,8 @@ class AgentStation(AgentTarget):
     """
     def __init__(self, parent, tgtID, pos, layout=gv.LAY_H, signalLayout=gv.LAY_U):
         super().__init__(parent, tgtID, pos, gv.STATION_TYPE)
-        self.dockCount = random.randrange(1, 20) # defines the dock time by refresh cycle (capped at 20)
+        self.dockCount = gv.gDockTime if gv.gDockTime else random.randint(3, 10)
+        # defines the dock time by refresh cycle (capped at 20)
         self.emptyCount = gv.gMinTrainDist # defines how long the station has been empty for by refresh cycle 
         self.trainList = []
         self.dockState = False
@@ -300,17 +301,19 @@ class AgentStation(AgentTarget):
             if self.checkNear(midPt[0], midPt[1], 5):
                 self.dockState = True
                 if gv.gTestMD: self.setSignalState(True)
-                self.dockCount = random.randrange(1, 20)
                 # print("Station: " + str(self.getID()) + " - " + str(self.emptyCount))
-                if train.getDockCount() == 0: 
-                    distFromFtTrain = self.emptyCount
-                    if distFromFtTrain >= gv.gMinTrainDist:
-                        train.setDockCount(self.dockCount)
-                    else:
-                        minDockCount = gv.gMinTrainDist - distFromFtTrain
-                        train.setDockCount(max(minDockCount, self.dockCount))
-                    # Reset empty count when station is occupied
-                    self.emptyCount = 0
+                # Code to avoid train density high, current customer don't want this function, temporary disabled.
+                # if train.getDockCount() == 0: 
+                #     distFromFtTrain = self.emptyCount
+                #     if distFromFtTrain >= gv.gMinTrainDist:
+                #         train.setDockCount(self.dockCount)
+                #     else:
+                #         minDockCount = gv.gMinTrainDist - distFromFtTrain
+                #         train.setDockCount(max(minDockCount, self.dockCount))
+                #     # Reset empty count when station is occupied
+                #     self.emptyCount = 0
+                if train.getDockCount() == 0:
+                    train.setDockCount(self.dockCount)
                 return
             # Check whether the train need to be stopped by the station signal
             headPt = train.getTrainPos(idx=0) 
@@ -417,6 +420,7 @@ class AgentTrain(AgentTarget):
         self.trainSpeed = trainSpeed    # train speed: pixel/periodic loop
         self.dockCount = 0              # refersh cycle number of a train to stop in the station.
         self.isWaiting = False          # Train waiting at signal or out side the station.
+        self.collsionFlg = False        # Flag to identify whether Train collsion happens.
         self.emgStop = False            # emergency stop.
 
 #-----------------------------------------------------------------------------
@@ -508,6 +512,9 @@ class AgentTrain(AgentTarget):
 #-----------------------------------------------------------------------------
 # Define all the get() functions here:
     
+    def getCollsionFlg(self):
+        return self.collsionFlg
+
     def getDirs(self):
         return self.dirs 
 
@@ -536,6 +543,11 @@ class AgentTrain(AgentTarget):
 
 #-----------------------------------------------------------------------------
 # Define all the set() functions here:
+
+    def setCollsionFlg(self, state):
+        self.collsionFlg = state
+        if self.collsionFlg: self.setEmgStop(True)
+
     def setDockCount(self, count):
         self.dockCount = count
         self.trainSpeed =0
@@ -568,6 +580,7 @@ class AgentTrain(AgentTarget):
         self.trainDestList = self._getDestList(self.initPos)
         self.pos = self._buildTrainPos()
         self.emgStop = False
+        self.collsionFlg = False
         self.isWaiting = False
         self.trainSpeed = 10
         self.dockCount = 0
