@@ -424,12 +424,17 @@ class MapMgr(object):
                 if i < len(stationStatList):
                     stationAgent.setSignalState(stationStatList[i])
 
-    
     def setSingals(self, trackID, signalStatList):
         if trackID in self.signals.keys():
             for i, singal in enumerate(self.signals[trackID]):
                 if i < len(signalStatList):
                     singal.setState(signalStatList[i])
+
+    def setTainsPower(self, trackID, powerStateList):
+        if trackID in self.trains.keys():
+            for i, train in enumerate(self.trains[trackID]):
+                if i < len(powerStateList):
+                    train.getEmgStop(powerStateList[i])
 
 #-----------------------------------------------------------------------------
     def updateSignalState(self, key):
@@ -452,14 +457,17 @@ class MapMgr(object):
         # update the trains position.
         for key, val in self.trains.items():
             for i, train in enumerate(val):
-                frontTrain = val[(i+1)%len(val)]
-                # Check the collision to the front train 1st. 
-                result = train.checkCollFt(frontTrain)
-                # Handle the collision if the auto avoidance is disabled.
-                if result and (not gv.gCollAvoid):
-                    train.setEmgStop(True)
-                    train.setCollsionFlg(True)
-                    frontTrain.setEmgStop(True)
+                if len(val) > 1:
+                    # Check train collision if more than 2 trains on the track
+                    frontTrain = val[(i+1)%len(val)] 
+                    # Check the collision to the front train 1st. 
+                    result = train.checkCollFt(frontTrain)
+                    # Handle the collision if the auto avoidance is disabled.
+                    if result and (not gv.gCollAvoid):
+                        train.setEmgStop(True)
+                        train.setCollsionFlg(True)
+                        frontTrain.setEmgStop(True)
+
                 # if collision with the front train, ignore the signal.
                 if not result: train.checkSignal(self.signals[key])        
                 # stop the train if it got collision at any junction.

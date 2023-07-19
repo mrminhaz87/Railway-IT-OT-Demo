@@ -8,12 +8,11 @@
 # Author:      Yuancheng Liu
 #
 # Created:     2023/06/07
-# Version:     v_0.1
+# Version:     v_0.1.2
 # Copyright:   n.a
 # License:     n.a
 #-----------------------------------------------------------------------------
 
-import os
 import time
 import json
 import threading
@@ -43,7 +42,7 @@ def parseIncomeMsg(msg):
 class DataManager(threading.Thread):
     """ The data manager is a module running parallel with the main thread to 
         handle the data-IO with dataBase and the monitor hub's data fetching/
-        changing request.
+        change request.
     """
     def __init__(self, parent) -> None:
         threading.Thread.__init__(self)
@@ -56,14 +55,24 @@ class DataManager(threading.Thread):
         self.sensorsDict = {
             'weline': None,
             'nsline': None, 
-            'ccline': None
+            'ccline': None,
+            'mtline': None
         }
         # init the local station data record dictionary
-        self.stationsDict ={
+        self.stationsDict = {
             'weline': None,
             'nsline': None, 
-            'ccline': None
+            'ccline': None,
+            'mtline': None
         }
+        # init the local train speed state dictionary
+        self.trainsDict = {
+            'weline': None,
+            'nsline': None, 
+            'ccline': None,
+            'mtline': None
+        }
+        gv.gDebugPrint("datamanager init finished.", logType=gv.LOG_INFO)
 
     #-----------------------------------------------------------------------------
     def updateSensorsData(self):
@@ -80,7 +89,16 @@ class DataManager(threading.Thread):
                 for stationAgent in gv.iMapMgr.getStations(trackID=key):
                     state = 1 if stationAgent.getDockState() else 0
                     self.stationsDict[key].append(state)
-                
+
+    #-----------------------------------------------------------------------------
+    def updateTrainsData(self):
+        if gv.iMapMgr:
+            for key in self.stationsDict.keys():
+                self.trainsDict[key] = []
+                for train in gv.iMapMgr.getTrains(trackID=key):
+                    state = 0 if train.getTrainSpeed() == 0 else 1
+                    self.trainsDict[key] .append(state)
+                    
     #-----------------------------------------------------------------------------
     def run(self):
         """ Thread run() function will be called by start(). """
@@ -113,6 +131,9 @@ class DataManager(threading.Thread):
             elif reqType == 'stations':
                 respStr = self.fetchStationInfo(reqJsonStr)
                 resp =';'.join(('REP', 'stations', respStr))
+            elif reqType == 'trains':
+                respStr = self.fetchTrainInfo(reqJsonStr)
+                resp =';'.join(('REP', 'trains', respStr))
             pass
         elif reqKey=='POST':
             if reqType == 'signals':
@@ -121,6 +142,9 @@ class DataManager(threading.Thread):
             elif reqType == 'stations':
                 respStr = self.setStationSignals(reqJsonStr)
                 resp =';'.join(('REP', 'stations', respStr))
+            elif reqType == 'trains':
+                respStr = self.setTrainsPower(reqJsonStr)
+                resp =';'.join(('REP', 'trains', respStr))
             pass
             # TODO: Handle all the control request here.
         if isinstance(resp, str): resp = resp.encode('utf-8')
@@ -145,7 +169,7 @@ class DataManager(threading.Thread):
     def fetchStationInfo(self, reqJsonStr):
         reqDict = json.loads(reqJsonStr)
         self.updateStationsData()
-        respStr= json.dumps({'result': 'failed'})
+        respStr = json.dumps({'result': 'failed'})
         try:
             for key in reqDict.keys():
                 if key in self.stationsDict.keys():
@@ -153,6 +177,20 @@ class DataManager(threading.Thread):
             respStr = json.dumps(reqDict)
         except Exception as err:
             gv.gDebugPrint("fetchStationInfo() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
+        return respStr
+
+    #-----------------------------------------------------------------------------
+    def fetchTrainInfo(self, reqJsonStr):
+        reqDict = json.loads(reqJsonStr)
+        self.updateTrainsData()
+        respStr = json.dumps({'result': 'failed'})
+        try:
+            for key in reqDict.keys():
+                if key in self.trainsDict.keys():
+                    reqDict[key] = self.trainsDict[key]
+            respStr = json.dumps(reqDict)
+        except Exception as err:
+            gv.gDebugPrint("fetchTrainInfo() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
         return respStr
 
     #-----------------------------------------------------------------------------
@@ -167,6 +205,20 @@ class DataManager(threading.Thread):
             respStr = json.dumps(reqDict)
         except Exception as err:
             gv.gDebugPrint("setSignals() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
+        return respStr
+
+    #-----------------------------------------------------------------------------
+    def setTrainsPower(self, reqJsonStr):
+        reqDict = json.loads(reqJsonStr)
+        respStr = json.dumps({'result': 'failed'})
+        try:
+            if gv.iMapMgr:
+                for key, val in reqDict.items():
+                    gv.iDataMgr.setTainsPower(key, val)
+                respStr = json.dumps({'result': 'success'})
+            respStr = json.dumps(reqDict)
+        except Exception as err:
+            gv.gDebugPrint("setTrainsPower() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
         return respStr
 
     #-----------------------------------------------------------------------------

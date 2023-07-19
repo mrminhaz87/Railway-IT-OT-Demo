@@ -1,5 +1,4 @@
-# This is the config file template for the module <MetroEmuRun.py>, to use it,
-# set your own parameters and change the file name to metroConfig.txt.
+# This is the config file template for the module <monitorApp.py>
 # Setup the paramter with below format (every line follow <key>:<val> format, the
 # key can not be changed):
 
@@ -14,16 +13,19 @@ TEST_MD:True
 UDP_PORT:3001
 
 # Init the UI update interval:
-UI_INTERVAL:0.4
+UI_INTERVAL:0.8
 
-# Init the test scenario enable/disable flag"
-# Test junction collision.
-TEST_JC_COLLISION:False
+# Init Control paramters
+COLL_AVOID:False
+# Set train dock time: ==0 train will stay in station in a random Interval, > 0 num of time 
+# circle train will stay in 
+DOCK_TIME:5
 
-# Test train safe distance 
-TEST_TR_DISTANCE:True
+# Train config json file.
+TR_CFG_FOLDER:TrainLocation
 
 # Station config json file
 WE_STATION_CFG:welineStations.json
 NC_STATION_CFG:nslineStations.json
 CC_STATION_CFG:cclineStations.json
+MT_STATION_CFG:mtlineStations.json
