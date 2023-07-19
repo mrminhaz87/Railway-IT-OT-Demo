@@ -113,9 +113,10 @@ class RealWorldConnector(object):
         rqstKey = 'POST'
         print(coilDict)
         if isinstance(coilDict, dict):
-            result = self._queryToRW(rqstKey, rqstType, coilDict)
-        Log.warning("changeRWCoil(): passed in input parm needs to be a dict() type.")
-        return result
+            return self._queryToRW(rqstKey, rqstType, coilDict)
+        else:
+            Log.warning("changeRWCoil(): passed in input parm needs to be a dict() type.get %s" %str(coilDict))
+            return None
 
 #-----------------------------------------------------------------------------
     def _queryToRW(self, rqstKey, rqstType, rqstDict, response=True):
@@ -264,7 +265,6 @@ class plcSimuInterface(object):
         """ Set the signal state to the real-world simulator. """
         result =  self.rwConnector.changeRWCoil(rqstType=self.coilsRWSetKey, 
                                                 coilDict= self.coilStateRW)
-
         return result
     
 #-----------------------------------------------------------------------------
@@ -278,9 +278,9 @@ class plcSimuInterface(object):
         # Update PLC holding registers.
         self.updateHoldingRegs()
         time.sleep(0.1)
-        self.updateCoilOutput()
+        coilUpdated = self.updateCoilOutput()
         # update the output coils state:
-        self.changeRWSignalCoil()
+        if coilUpdated: self.changeRWSignalCoil()
 
 #-----------------------------------------------------------------------------
     def updateHoldingRegs(self):
@@ -294,10 +294,13 @@ class plcSimuInterface(object):
     def updateCoilOutput(self):
         address, offset = self.coilsAddrs
         result = self.dataMgr.getCoilState(address, offset)
+        updatedFlg = False
         for key in self.coilStateRW.keys():
             idx, idxOffset = self.coils2RWMap[key]
+            if self.coilStateRW[key] == result[idx:idxOffset]: continue
             self.coilStateRW[key] = result[idx:idxOffset]
-
+            updatedFlg = True
+        return updatedFlg
 #-----------------------------------------------------------------------------
     def run(self):
         while not self.terminate:
