@@ -47,7 +47,7 @@ class onlyCoilLadderLogic(modbusTcpCom.ladderLogic):
 #-----------------------------------------------------------------------------
     def runLadderLogic(self, regsList, coilList=None):
         print(regsList)
-        return []
+        return None
         
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -61,7 +61,6 @@ class trainPowerPlcSet(plcSimulator.plcSimuInterface):
     """
     def __init__(self, parent, plcID, addressInfoDict, ladderObj):
         super().__init__(parent, plcID, addressInfoDict, ladderObj)
-        self.powerChangeFlg = False
 
     def initInputState(self):
         self.regsAddrs = (0, 10)
@@ -86,13 +85,6 @@ class trainPowerPlcSet(plcSimulator.plcSimuInterface):
         self.coilStateRW['weline']  = [False]*4
         self.coilStateRW['nsline']  = [False]*3 
         self.coilStateRW['ccline']  = [False]*3 
-
-    def changeRWSignalCoil(self):
-        if self.powerChangeFlg:
-            super.changeRWSignalCoil()
-
-
-
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
