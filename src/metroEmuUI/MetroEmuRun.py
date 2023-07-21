@@ -24,7 +24,7 @@ import railwayPanel as pnlFunction
 import railwayPanelMap as pnlMap
 import dataMgr as dm
 
-FRAME_SIZE = (1800, 1000)
+FRAME_SIZE = (1800, 1030)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -46,9 +46,11 @@ class UIFrame(wx.Frame):
 
         # Build UI sizer
         self.SetSizer(self._buidUISizer())
+
+        self.statusbar = self.CreateStatusBar(1)
+        self.statusbar.SetStatusText('Test mode: %s' %str(gv.gTestMD))
         # Set the periodic call back
         self.updateLock = False
-
         # Define the data manager parallel thread.
         gv.iDataMgr = dm.DataManager(self)
         gv.iDataMgr.start()
@@ -57,7 +59,6 @@ class UIFrame(wx.Frame):
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.periodic)
         self.timer.Start(gv.PERIODIC)
-
         self.Bind(wx.EVT_CLOSE, self.onClose)
         gv.gDebugPrint("Metro-System real world main frame inited.", logType=gv.LOG_INFO)
 
@@ -197,7 +198,7 @@ class UIFrame(wx.Frame):
 #-----------------------------------------------------------------------------
     def onHelp(self, event):
         """ Pop-up the Help information window. """
-        wx.MessageBox(' If there is any bug, please contect: \n\n \
+        wx.MessageBox(' If there is any bug, please contact: \n\n \
                         Author:      Yuancheng Liu \n \
                         Email:       liu_yuan_cheng@hotmail.com \n \
                         Created:     2023/05/02 \n \

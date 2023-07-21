@@ -2,21 +2,20 @@
 #-----------------------------------------------------------------------------
 # Name:        railWayPanelMap.py
 #
-# Purpose:     This module is used to display the top view of the main railway 
-#              system current state.
+# Purpose:     This module is used to display the state animation of the railway 
+#              system, such as trains movement, sensors detection state, station
+#              docking state and singal changes ...
 # 
 # Author:      Yuancheng Liu
 #
-# Version:     v0.1
+# Version:     v0.1.2
 # Created:     2023/06/01
-# Copyright:   
-# License:     
+# Copyright:   Copyright (c) 2023 LiuYuancheng
+# License:     MIT License
 #-----------------------------------------------------------------------------
 
 import os
 import wx
-import math
-
 import metroEmuGobal as gv
 
 DEF_PNL_SIZE = (1600, 900)
@@ -24,7 +23,7 @@ DEF_PNL_SIZE = (1600, 900)
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class PanelMap(wx.Panel):
-    """ RailWay top view map"""
+    """ RailWay system map panel."""
     def __init__(self, parent, panelSize=DEF_PNL_SIZE):
         wx.Panel.__init__(self, parent, size=panelSize)
         self.bgColor = wx.Colour(30, 40, 62)
@@ -35,18 +34,22 @@ class PanelMap(wx.Panel):
         # Paint the map
         self.Bind(wx.EVT_PAINT, self.onPaint)
         # self.Bind(wx.EVT_LEFT_DOWN, self.onLeftClick)
-        self.SetDoubleBuffered(True)  # Set the panel double buffer to void the panel flash during update.
+        # Set the panel double buffer to void the panel flash during update.
+        self.SetDoubleBuffered(True)
 
 #-----------------------------------------------------------------------------
     def _loadBitMaps(self):
-        """ load the internal usage bitmaps."""
+        """ Load the internal usage pictures as bitmaps."""
         imgDict = {}
-        img = os.path.join(gv.IMG_FD, 'Alert.png')
-        png = wx.Image(img, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        imgDict['alert'] = png
+        imgPath = os.path.join(gv.IMG_FD, 'Alert.png')
+        if os.path.exists(imgPath):
+            png = wx.Image(imgPath, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+            imgDict['alert'] = png
         return imgDict
 
 #-----------------------------------------------------------------------------
+# Define all the _draw() map components paint functions.
+    
     def _drawEnvItems(self, dc):
         """ Draw the environment items."""
         dc.SetPen(self.dcDefPen)

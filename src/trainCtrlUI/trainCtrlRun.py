@@ -42,7 +42,6 @@ class UIFrame(wx.Frame):
         if not gv.TEST_MD:
             gv.idataMgr = dataMgr.DataManager(self, gv.gPlcInfo)
 
-
         self.statusbar = self.CreateStatusBar(1)
         self.statusbar.SetStatusText('Test mode: %s' %str(gv.TEST_MD))
         # Set the periodic call back
@@ -51,15 +50,12 @@ class UIFrame(wx.Frame):
         self.updateLock = False
         self.Bind(wx.EVT_TIMER, self.periodic)
         self.timer.Start(PERIODIC)  # every 500 ms
-
         
         self.trainPwrState = [True]*10
         TrainTgtPlcID = 'PLC-06'
         csIdx, ceIdx = (0, 10)
         for idx in range(csIdx, ceIdx):
             gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, self.trainPwrState[idx])
-
-            
 
 #--UIFrame---------------------------------------------------------------------
     def _initGlobals(self):

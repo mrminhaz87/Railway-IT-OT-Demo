@@ -25,7 +25,7 @@ import hmiPanelMap as pnlMap
 import scadaDataMgr as dataMgr
 
 PERIODIC = 500      # update in every 500ms
-FRAME_SIZE = (1800, 1020)
+FRAME_SIZE = (1800, 1030)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -42,6 +42,10 @@ class UIFrame(wx.Frame):
         self._buildMenuBar()
         # Build UI sizer
         self.SetSizer(self._buidUISizer())
+
+        self.statusbar = self.CreateStatusBar(1)
+        self.statusbar.SetStatusText('Test mode: %s' %str(gv.TEST_MD))
+
         self.updateLock = False
         if not gv.TEST_MD:
             gv.idataMgr = dataMgr.DataManager(self, gv.gPlcInfo)
@@ -214,7 +218,7 @@ class UIFrame(wx.Frame):
 #-----------------------------------------------------------------------------
     def onHelp(self, event):
         """ Pop-up the Help information window. """
-        wx.MessageBox(' If there is any bug, please contect: \n\n \
+        wx.MessageBox(' If there is any bug, please contact: \n\n \
                         Author:      Yuancheng Liu \n \
                         Email:       liu_yuan_cheng@hotmail.com \n \
                         Created:     2023/05/02 \n \
