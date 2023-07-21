@@ -25,7 +25,7 @@ import hmiPanelMap as pnlMap
 import scadaDataMgr as dataMgr
 
 PERIODIC = 500      # update in every 500ms
-FRAME_SIZE = (1800, 1000)
+FRAME_SIZE = (1800, 1020)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -39,6 +39,7 @@ class UIFrame(wx.Frame):
         #self.SetTransparent(gv.gTranspPct*255//100)
         self.SetIcon(wx.Icon(gv.ICO_PATH))
         self._initGlobals()
+        self._buildMenuBar()
         # Build UI sizer
         self.SetSizer(self._buidUISizer())
         self.updateLock = False
@@ -63,6 +64,22 @@ class UIFrame(wx.Frame):
                                      'color': wx.Colour(255, 136, 0), 'icon': 'cclabel.png'}
         # Init all the global instance
         gv.iMapMgr = mapMgr.MapMgr(self)
+
+
+#--UIFrame---------------------------------------------------------------------
+    def _buildMenuBar(self):
+        menubar = wx.MenuBar()  # Creat the function menu bar.
+        # Add the config menu
+        
+        # Add the about menu.
+        helpMenu = wx.Menu()
+        aboutItem = wx.MenuItem(helpMenu, 200,text = "Help",kind = wx.ITEM_NORMAL)
+        helpMenu.Append(aboutItem)
+        self.Bind(wx.EVT_MENU, self.onHelp, aboutItem)
+        menubar.Append(helpMenu, '&About')
+
+        self.SetMenuBar(menubar)
+
 
 #--UIFrame---------------------------------------------------------------------
     def _buidUISizer(self):
@@ -182,6 +199,16 @@ class UIFrame(wx.Frame):
                     gv.iMapMgr.setStationsSignals(key, coilsList)
 
             self.mapPanel.periodic(now)
+
+#-----------------------------------------------------------------------------
+    def onHelp(self, event):
+        """ Pop-up the Help information window. """
+        wx.MessageBox(' If there is any bug, please contect: \n\n \
+                        Author:      Yuancheng Liu \n \
+                        Email:       liu_yuan_cheng@hotmail.com \n \
+                        Created:     2023/05/02 \n \
+                        GitHub Link: https://github.com/LiuYuancheng/Metro_emulator \n', 
+                    'Help', wx.OK)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

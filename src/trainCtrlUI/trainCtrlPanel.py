@@ -26,7 +26,7 @@ class PanelTrain(wx.Panel):
     def __init__(self, parent):
         """ Init the panel."""
         wx.Panel.__init__(self, parent, size=(650, 300))
-        self.SetBackgroundColour(wx.Colour(200, 210, 200))
+        self.SetBackgroundColour(wx.Colour(39, 40, 62))
         self.SetSizer(self._buidUISizer())
 
 #--PanelMultInfo---------------------------------------------------------------
@@ -41,6 +41,7 @@ class PanelTrain(wx.Panel):
         font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
         label = wx.StaticText(self, label="Train Information")
         label.SetFont(font)
+        label.SetForegroundColour(wx.Colour("WHITE"))
         vbox0.Add(label, flag=flagsL, border=2)
         vbox0.AddSpacer(10)
 
@@ -61,6 +62,7 @@ class PanelTrain(wx.Panel):
         self.grid.SetColLabelValue(4, 'DC-Voltage[V]')
         self.grid.SetColSize(4, 120)
         self.grid.SetColLabelValue(5, 'Power-State')
+        self.grid.SetColSize(5, 120)
         vbox0.Add(self.grid, flag=flagsL, border=2)
         sizer.Add(vbox0, flag=flagsL, border=2)
         return sizer

@@ -28,10 +28,12 @@ class UIFrame(wx.Frame):
         wx.Frame.__init__(self, parent, id, title, size=FRAME_SIZE)
         # No boader frame:
         self.SetBackgroundColour(wx.Colour(39, 40, 62))
+        self.SetIcon(wx.Icon(gv.ICO_PATH))
         #self.SetTransparent(gv.gTranspPct*255//100)
         self._initGlobals()
-        self.SetIcon(wx.Icon(gv.ICO_PATH))
+        
         # Build UI sizer
+        self._buildMenuBar()
         self.SetSizer(self._buidUISizer())
 
         self.statusbar = self.CreateStatusBar(1)
@@ -52,6 +54,21 @@ class UIFrame(wx.Frame):
         # Init all the global instance
         # if gv.gCollsionTestFlg: gv.gTestMD = False # disable the test mode flag to fetch the signal from PLC
         # Init all the train list
+
+#--UIFrame---------------------------------------------------------------------
+    def _buildMenuBar(self):
+        menubar = wx.MenuBar()  # Creat the function menu bar.
+        # Add the config menu
+        
+        # Add the about menu.
+        helpMenu = wx.Menu()
+        aboutItem = wx.MenuItem(helpMenu, 200,text = "Help",kind = wx.ITEM_NORMAL)
+        helpMenu.Append(aboutItem)
+        self.Bind(wx.EVT_MENU, self.onHelp, aboutItem)
+        menubar.Append(helpMenu, '&About')
+
+        self.SetMenuBar(menubar)
+
 
 #--UIFrame---------------------------------------------------------------------
     def _buidUISizer(self):
@@ -136,6 +153,18 @@ class UIFrame(wx.Frame):
         if (not self.updateLock) and now - self.lastPeriodicTime >= gv.gUpdateRate:
             print("main frame update at %s" % str(now))
             self.lastPeriodicTime = now
+
+#-----------------------------------------------------------------------------
+    def onHelp(self, event):
+        """ Pop-up the Help information window. """
+        wx.MessageBox(' If there is any bug, please contect: \n\n \
+                        Author:      Yuancheng Liu \n \
+                        Email:       liu_yuan_cheng@hotmail.com \n \
+                        Created:     2023/05/02 \n \
+                        GitHub Link: https://github.com/LiuYuancheng/Metro_emulator \n', 
+                    'Help', wx.OK)
+
+
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
