@@ -10,12 +10,15 @@
 # Copyright:   YC @ Singtel Cyber Security Research & Development Laboratory
 # License:     YC
 #-----------------------------------------------------------------------------
+
 import os
 import sys
 import time
 import wx
 import trainCtrlGlobal as gv
 import trainCtrlPanel as pnlFunction
+import trainDataMgr as dataMgr
+
 PERIODIC = 500      # update in every 500ms
 FRAME_SIZE = (1200, 650)
 
@@ -35,6 +38,9 @@ class UIFrame(wx.Frame):
         # Build UI sizer
         self._buildMenuBar()
         self.SetSizer(self._buidUISizer())
+        self.updateLock = False
+        if not gv.TEST_MD:
+            gv.idataMgr = dataMgr.DataManager(self, gv.gPlcInfo)
 
         self.statusbar = self.CreateStatusBar(1)
         self.statusbar.SetStatusText('Test mode: %s' %str(gv.TEST_MD))
@@ -153,6 +159,20 @@ class UIFrame(wx.Frame):
         if (not self.updateLock) and now - self.lastPeriodicTime >= gv.gUpdateRate:
             print("main frame update at %s" % str(now))
             self.lastPeriodicTime = now
+            if not gv.TEST_MD:
+                if gv.idataMgr: gv.idataMgr.periodic(now)
+                for key in self.plcPnls.keys():
+                    # update the holding registers
+                    tgtPlcID = gv.gPlcPnlInfo[key]['tgt']
+                    rsIdx, reIdx = gv.gPlcPnlInfo[key]['hRegsInfo']
+                    registList = gv.idataMgr.getPlcHRegsData(tgtPlcID, rsIdx, reIdx)
+                    print(registList)
+                    self.plcPnls[key].updateHoldingRegs(registList)
+                    csIdx, ceIdx = gv.gPlcPnlInfo[key]['coilsInfo']
+                    coilsList = gv.idataMgr.getPlcCoilsData(tgtPlcID, csIdx, ceIdx)
+                    print(coilsList)
+                    self.plcPnls[key].updateCoils(coilsList)
+                    self.plcPnls[key].updateDisplay()
 
 #-----------------------------------------------------------------------------
     def onHelp(self, event):
@@ -160,11 +180,9 @@ class UIFrame(wx.Frame):
         wx.MessageBox(' If there is any bug, please contect: \n\n \
                         Author:      Yuancheng Liu \n \
                         Email:       liu_yuan_cheng@hotmail.com \n \
-                        Created:     2023/05/02 \n \
+                        Created:     2023/07/20 \n \
                         GitHub Link: https://github.com/LiuYuancheng/Metro_emulator \n', 
                     'Help', wx.OK)
-
-
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
