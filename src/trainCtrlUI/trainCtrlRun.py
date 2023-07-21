@@ -15,9 +15,9 @@ import sys
 import time
 import wx
 import trainCtrlGlobal as gv
-import trainCtrlPanel as pl
+import trainCtrlPanel as pnlFunction
 PERIODIC = 500      # update in every 500ms
-FRAME_SIZE = (1800, 1000)
+FRAME_SIZE = (1200, 650)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -27,11 +27,15 @@ class UIFrame(wx.Frame):
         """ Init the UI and parameters """
         wx.Frame.__init__(self, parent, id, title, size=FRAME_SIZE)
         # No boader frame:
-        self.SetBackgroundColour(wx.Colour(200, 210, 200))
+        self.SetBackgroundColour(wx.Colour(39, 40, 62))
         #self.SetTransparent(gv.gTranspPct*255//100)
+        self._initGlobals()
         self.SetIcon(wx.Icon(gv.ICO_PATH))
         # Build UI sizer
         self.SetSizer(self._buidUISizer())
+
+        self.statusbar = self.CreateStatusBar(1)
+        self.statusbar.SetStatusText('Test mode: %s' %str(gv.TEST_MD))
         # Set the periodic call back
         self.lastPeriodicTime = time.time()
         self.timer = wx.Timer(self)
@@ -40,20 +44,90 @@ class UIFrame(wx.Frame):
         self.timer.Start(PERIODIC)  # every 500 ms
 
 #--UIFrame---------------------------------------------------------------------
+    def _initGlobals(self):
+        # Init the global parameters used only by this module
+        gv.gTrackConfig['weline'] = {'id':'weline', 'num': 4, 'color': wx.Colour(52, 169, 129), 'icon': 'welabel.png'}
+        gv.gTrackConfig['nsline'] = {'id':'nsline', 'num': 3, 'color': wx.Colour(233, 0, 97), 'icon': 'nslabel.png'}
+        gv.gTrackConfig['ccline'] = {'id':'ccline', 'num': 3, 'color': wx.Colour(255, 136, 0), 'icon': 'cclabel.png'}
+        # Init all the global instance
+        # if gv.gCollsionTestFlg: gv.gTestMD = False # disable the test mode flag to fetch the signal from PLC
+        # Init all the train list
+
+#--UIFrame---------------------------------------------------------------------
     def _buidUISizer(self):
         """ Build the main UI Sizer. """
-        flagsR = wx.CENTER
+        flagsL = wx.LEFT
         mSizer = wx.BoxSizer(wx.HORIZONTAL)
         mSizer.AddSpacer(5)
-        gv.iImagePanel = pl.PanelImge(self)
-        mSizer.Add(gv.iImagePanel, flag=flagsR, border=2)
-        mSizer.AddSpacer(5)
+        vbox0 = wx.BoxSizer(wx.VERTICAL)
+        vbox0.AddSpacer(5)
+        gv.iInfoPanel = pnlFunction.PanelTrain(self)
+        vbox0.Add(gv.iInfoPanel, flag=flagsL, border=2)
+        tPwrSZ = self._buildTrainCtrlSizer()
+        vbox0.Add(tPwrSZ, flag=flagsL, border=2)
+        mSizer.Add(vbox0, flag=flagsL, border=2)
+        mSizer.AddSpacer(15)
         mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(-1, 560),
-                                 style=wx.LI_VERTICAL), flag=flagsR, border=2)
-        mSizer.AddSpacer(5)
-        gv.iCtrlPanel = pl.PanelCtrl(self)
-        mSizer.Add(gv.iCtrlPanel, flag=flagsR, border=2)
+                            style=wx.LI_VERTICAL), flag=flagsL, border=2)
+        
+        self.plcPnls = {}
+        plcSZ = self._buildPlcPnlsSizer("PLC Monitor Panels [Train]", 
+                                ('PLC-06', 'PLC-07'))
+        mSizer.Add(plcSZ, flag=flagsL, border=2)
         return mSizer
+
+
+    def _buildTrainCtrlSizer(self):
+        flagsL = wx.LEFT
+        vbox0 = wx.BoxSizer(wx.VERTICAL)
+        vbox0.AddSpacer(5)
+        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        label = wx.StaticText(self, label="Trains Power Control")
+        label.SetFont(font)
+        label.SetForegroundColour(wx.Colour("WHITE"))
+        vbox0.Add(label, flag=flagsL, border=2)
+        vbox0.AddSpacer(5)
+        for key, panelCfg in gv.gTrackConfig.items():
+            img, color = panelCfg['icon'], panelCfg['color']
+            if img is None: continue
+            img = os.path.join(gv.IMG_FD, img)
+            png = wx.Image(img, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+            sublabel = wx.StaticBitmap(self, -1, png, (10, 5), (png.GetWidth(), png.GetHeight()))
+            hbox = wx.BoxSizer(wx.HORIZONTAL)
+            hbox.Add(sublabel, flag=flagsL, border=2)
+            
+            for i in range(panelCfg['num']):
+                trainPanel = pnlFunction.PanelTainCtrl(self, panelCfg['id'], i, bgColor=color)
+                hbox.Add(trainPanel, flag=flagsL, border=2)
+                hbox.AddSpacer(5)
+            vbox0.Add(hbox, flag=flagsL, border=2)
+            vbox0.AddSpacer(5)
+        return vbox0
+
+
+#--UIFrame---------------------------------------------------------------------
+    def _buildPlcPnlsSizer(self, PanelTitle, panelKeySeq):
+        flagsL = wx.LEFT
+        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        vSizer = wx.BoxSizer(wx.VERTICAL)
+        vSizer.AddSpacer(5)
+        label = wx.StaticText(self, label=PanelTitle)
+        label.SetFont(font)
+        label.SetForegroundColour(wx.Colour("WHITE"))
+        vSizer.Add(label, flag=flagsL, border=2)
+        vSizer.AddSpacer(5)
+        hbox1 = wx.BoxSizer(wx.HORIZONTAL)
+        #panelSeq = ('PLC-00', 'PLC-01', 'PLC-02')
+        for key in panelKeySeq:
+            hbox1.AddSpacer(10)
+            panelInfo = gv.gPlcPnlInfo[key]
+            ipaddr = panelInfo['ipaddress'] + ' : ' + str(panelInfo['port'])
+            self.plcPnls[key] = pnlFunction.PanelPLC(self, panelInfo['label'], ipaddr)
+            hbox1.Add(self.plcPnls[key], flag=flagsL, border=2)
+        
+        vSizer.Add(hbox1, flag=flagsL, border=2)
+        return vSizer
+
 
 #--UIFrame---------------------------------------------------------------------
     def periodic(self, event):

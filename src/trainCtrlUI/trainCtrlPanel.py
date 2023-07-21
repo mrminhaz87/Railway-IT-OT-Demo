@@ -9,6 +9,7 @@
 # Copyright:   YC @ Singtel Cyber Security Research & Development Laboratory
 # License:     YC
 #-----------------------------------------------------------------------------
+import os
 import wx
 import wx.grid
 
@@ -24,7 +25,7 @@ class PanelTrain(wx.Panel):
     """
     def __init__(self, parent):
         """ Init the panel."""
-        wx.Panel.__init__(self, parent, size=(800, 350))
+        wx.Panel.__init__(self, parent, size=(650, 300))
         self.SetBackgroundColour(wx.Colour(200, 210, 200))
         self.SetSizer(self._buidUISizer())
 
@@ -44,15 +45,15 @@ class PanelTrain(wx.Panel):
         vbox0.AddSpacer(10)
 
         self.grid = wx.grid.Grid(self, -1)
-        self.grid.CreateGrid(11, 6)
+        self.grid.CreateGrid(12, 6)
         # Set the Grid size.
-        self.grid.SetRowLabelSize(0)
+        self.grid.SetRowLabelSize(40)
         #self.grid.SetColSize(0, 50)
         #self.grid.SetColSize(1, 65)
         #self.grid.SetColSize(2, 65)
         # Set the Grid's labels.
         self.grid.SetColLabelValue(0, 'Train-ID')
-        self.grid.SetColLabelValue(1, 'Track')
+        self.grid.SetColLabelValue(1, 'Railway-ID')
         self.grid.SetColLabelValue(2, 'Speed[km/h]')
         self.grid.SetColSize(2, 100)
         self.grid.SetColLabelValue(3, 'Current[A]')
@@ -60,8 +61,6 @@ class PanelTrain(wx.Panel):
         self.grid.SetColLabelValue(4, 'DC-Voltage[V]')
         self.grid.SetColSize(4, 120)
         self.grid.SetColLabelValue(5, 'Power-State')
-
-        #self.grid.Bind(wx.grid.EVT_GRID_LABEL_LEFT_CLICK, self.highLightMap)
         vbox0.Add(self.grid, flag=flagsL, border=2)
         sizer.Add(vbox0, flag=flagsL, border=2)
         return sizer
@@ -257,77 +256,65 @@ class PanelPLC(wx.Panel):
             self.gpioOuLbList[idx].SetBackgroundColour(color)
             self.Refresh(False) # needed after the status update.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
-class PanelImge(wx.Panel):
-    """ Panel to display image. """
+class PanelTainCtrl(wx.Panel):
+    """ Train control Panel control panel."""
 
-    def __init__(self, parent, panelSize=(640, 480)):
-        wx.Panel.__init__(self, parent, size=panelSize)
-        self.SetBackgroundColour(wx.Colour(200, 200, 200))
-        self.panelSize = panelSize
-        self.bmp = wx.Bitmap(gv.BGIMG_PATH, wx.BITMAP_TYPE_ANY)
-        self.Bind(wx.EVT_PAINT, self.onPaint)
-        self.SetDoubleBuffered(True)
+    def __init__(self, parent, trackID, trainID, bgColor=wx.Colour(200, 210, 200)):
+        wx.Panel.__init__(self, parent)
+        self.SetBackgroundColour(bgColor)
+        self.trackID = trackID
+        self.trainID = trainID
+        self.SetSizer(self._buidUISizer())
 
-#--PanelImge--------------------------------------------------------------------
-    def onPaint(self, evt):
-        """ Draw the map on the panel."""
-        dc = wx.PaintDC(self)
-        w, h = self.panelSize
-        dc.DrawBitmap(self._scaleBitmap(self.bmp, w, h), 0, 0)
-        dc.SetPen(wx.Pen('RED'))
-        dc.DrawText('This is a sample image', w//2, h//2)
+#-----------------------------------------------------------------------------
+    def _buidUISizer(self):
+        """ build the control panel sizer. """
+        flagsL = wx.LEFT
+        startBmp = wx.Bitmap(os.path.join(gv.IMG_FD, 'reset32.png'), wx.BITMAP_TYPE_ANY)
+        stoptBmp = wx.Bitmap(os.path.join(gv.IMG_FD, 'emgStop32.png'), wx.BITMAP_TYPE_ANY)
+        font = wx.Font(11, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        vbox = wx.BoxSizer(wx.VERTICAL)
+        label = wx.StaticText(self, label=" %s - %s" %(self.trackID, str(self.trainID)))
+        label.SetFont(font)
+        label.SetForegroundColour(wx.WHITE)
+        vbox.Add(label, flag=flagsL, border=2)
 
-#--PanelImge--------------------------------------------------------------------
-    def _scaleBitmap(self, bitmap, width, height):
-        """ Resize a input bitmap.(bitmap-> image -> resize image -> bitmap)"""
-        #image = wx.ImageFromBitmap(bitmap) # used below 2.7
-        image = bitmap.ConvertToImage()
-        image = image.Scale(width, height, wx.IMAGE_QUALITY_HIGH)
-        #result = wx.BitmapFromImage(image) # used below 2.7
-        result = wx.Bitmap(image, depth=wx.BITMAP_SCREEN_DEPTH)
-        return result
+        vbox.Add(wx.StaticLine(self, wx.ID_ANY, size=(90, -1),
+                                 style=wx.LI_HORIZONTAL), flag=flagsL, border=2)
+        vbox.AddSpacer(2)
+        hbox0 =  wx.BoxSizer(wx.HORIZONTAL)
+        # Add the start button.
+        self.recbtn1 = wx.BitmapButton(self, bitmap=startBmp,
+                                       size=(startBmp.GetWidth()+10, startBmp.GetHeight()+10))
+        self.recbtn1.Bind(wx.EVT_BUTTON, self.startTrain)
+        hbox0.Add(self.recbtn1, flag=flagsL, border=2)
+        # Add the emergency stop button.
+        self.recbtn2 = wx.BitmapButton(self, bitmap=stoptBmp,
+                                       size=(stoptBmp.GetWidth()+10, stoptBmp.GetHeight()+10))
+        self.recbtn2.Bind(wx.EVT_BUTTON, self.stopTrain)
+        hbox0.Add(self.recbtn2, flag=flagsL, border=2)
+        hbox0.AddSpacer(5)
+        vbox.Add(hbox0, flag=flagsL, border=2)
+        return vbox
+    
+    #-----------------------------------------------------------------------------
+    def startTrain(self, event):
+        event.GetEventObject().GetId() 
+        if gv.iMapMgr:
+            gv.gDebugPrint('Start train: %s on track: %s' %(str(self.trainID), self.trackID))
+            trains = gv.iMapMgr.getTrains(trackID=self.trackID)
+            trainAgent = trains[self.trainID]
+            trainAgent.setEmgStop(False)
 
-#--PanelImge--------------------------------------------------------------------
-    def _scaleBitmap2(self, bitmap, width, height):
-        """ Resize a input bitmap.(bitmap-> image -> resize image -> bitmap)"""
-        image = wx.ImageFromBitmap(bitmap) # used below 2.7
-        image = image.Scale(width, height, wx.IMAGE_QUALITY_HIGH)
-        result = wx.BitmapFromImage(image) # used below 2.7
-        return result
-
-#--PanelImge--------------------------------------------------------------------
-    def updateBitmap(self, bitMap):
-        """ Update the panel bitmap image."""
-        if not bitMap: return
-        self.bmp = bitMap
-
-#--PanelMap--------------------------------------------------------------------
-    def updateDisplay(self, updateFlag=None):
-        """ Set/Update the display: if called as updateDisplay() the function will 
-            update the panel, if called as updateDisplay(updateFlag=?) the function
-            will set the self update flag.
-        """
-        self.Refresh(False)
-        self.Update()
+    #-----------------------------------------------------------------------------
+    def stopTrain(self, event):
+        if gv.iMapMgr:
+            gv.gDebugPrint('Stop train: %s on track: %s' %(str(self.trainID), self.trackID))
+            trains = gv.iMapMgr.getTrains(trackID=self.trackID)
+            trainAgent = trains[self.trainID]
+            trainAgent.setEmgStop(True)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
