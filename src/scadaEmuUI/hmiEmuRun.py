@@ -53,15 +53,26 @@ class UIFrame(wx.Frame):
 
     def _initGlobals(self):
         # Init the global parameters used only by this module
-        gv.gTrackConfig['weline'] = {'id': 'weline', 'sensorIdx': (0, 17), 'signalIdx': (0, 8), 
-                                     'stationSensorIdx': (0, 10), 'stationSignalIdx': (0, 10),
+        gv.gTrackConfig['weline'] = {'id': 'weline',
+                                    # weline junction sensors connected to holding register idx on PLC-00/01/02
+                                    'sensorIdx': (0, 17), 'signalIdx': (0, 8), 
+                                    # weline station sensors connected to holding register idx on PLC-03/04/05
+                                    'stationSensorIdx': (0, 10), 'stationSignalIdx': (0, 10),
                                     'color': wx.Colour(52, 169, 129), 'icon': 'welabel.png'}
-        gv.gTrackConfig['nsline'] = {'id': 'nsline', 'sensorIdx': (17, 25), 'signalIdx': (8, 12), 
-                                     'stationSensorIdx': (10, 16), 'stationSignalIdx': (10, 16),
-                                     'color': wx.Colour(233, 0, 97), 'icon': 'nslabel.png'}
-        gv.gTrackConfig['ccline'] = {'id': 'ccline', 'sensorIdx': (25, 39), 'signalIdx': (12, 19), 
-                                     'stationSensorIdx': (16, 22), 'stationSignalIdx': (16, 22),
-                                     'color': wx.Colour(255, 136, 0), 'icon': 'cclabel.png'}
+        
+        gv.gTrackConfig['nsline'] = {'id': 'nsline',
+                                    # nsline junction sensors connected to holding register idx on PLC-00/01/02
+                                    'sensorIdx': (17, 25), 'signalIdx': (8, 12),
+                                    # nsline station sensors connected to holding register idx on PLC-03/04/05
+                                    'stationSensorIdx': (10, 16), 'stationSignalIdx': (10, 16),
+                                    'color': wx.Colour(233, 0, 97), 'icon': 'nslabel.png'}
+        
+        gv.gTrackConfig['ccline'] = {'id': 'ccline', 
+                                    # ccline junction sensors connected to holding register idx on PLC-00/01/02
+                                    'sensorIdx': (25, 39), 'signalIdx': (12, 19),
+                                    # ccline station sensors connected to holding register idx on PLC-03/04/05
+                                    'stationSensorIdx': (16, 22), 'stationSignalIdx': (16, 22),
+                                    'color': wx.Colour(255, 136, 0), 'icon': 'cclabel.png'}
         # Init all the global instance
         gv.iMapMgr = mapMgr.MapMgr(self)
 

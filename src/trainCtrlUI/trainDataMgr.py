@@ -13,6 +13,7 @@
 # License:     n.a
 #-----------------------------------------------------------------------------
 
+import time
 from collections import OrderedDict
 
 import trainCtrlGlobal as gv
@@ -52,6 +53,12 @@ class DataManager(object):
             self.regsDict[key] = self.plcClients[key].getHoldingRegs(hRegsAddr, hRegsNum)
             coilsAddr, coilsNum = self.plcInfo[key]['coilsInfo']
             self.coilsDict[key] = self.plcClients[key].getCoilsBits(coilsAddr, coilsNum)
+
+    def setPlcCoilsData(self, plcid, idx, val):
+        if plcid in self.plcClients.keys():
+            gv.gDebugPrint('DataManager: set PLC coil:%s' %str((plcid, idx, val)), logType=gv.LOG_INFO)
+            self.plcClients[plcid].setCoilsBit(idx, val)
+            time.sleep(0.1)
 
     def getPlcHRegsData(self, plcid, startIdx, endIdx):
         if plcid in self.regsDict.keys():

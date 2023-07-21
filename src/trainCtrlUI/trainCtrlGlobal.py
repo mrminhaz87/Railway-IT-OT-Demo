@@ -67,7 +67,7 @@ gPlcPnlInfo['PLC-06'] = {'id': 'PLC-06', 'label': 'PLC-05[Master:slot-0]', 'ipad
                          'port': 504, 'tgt': 'PLC-06', 'hRegsInfo': (0, 8), 'coilsInfo': (0, 8)}
 
 gPlcPnlInfo['PLC-07'] = {'id': 'PLC-07', 'label': 'PLC-06[Slave:slot-1]', 'ipaddress': '127.0.0.1',
-                         'port': 504, 'tgt': 'PLC-06', 'hRegsInfo': (0, 2), 'coilsInfo': (0, 2)}
+                         'port': 504, 'tgt': 'PLC-06', 'hRegsInfo': (8, 10), 'coilsInfo': (8, 10)}
 
 gTranspPct = 70     # Windows transparent percentage.
 gUpdateRate = 1     # main frame update rate 1 sec.

@@ -97,7 +97,7 @@ class DataManager(threading.Thread):
                 self.trainsDict[key] = []
                 for train in gv.iMapMgr.getTrains(trackID=key):
                     state = 0 if train.getTrainSpeed() == 0 else 1
-                    self.trainsDict[key] .append(state)
+                    self.trainsDict[key].append(state)
                     
     #-----------------------------------------------------------------------------
     def run(self):
@@ -214,7 +214,7 @@ class DataManager(threading.Thread):
         try:
             if gv.iMapMgr:
                 for key, val in reqDict.items():
-                    gv.iDataMgr.setTainsPower(key, val)
+                    gv.iMapMgr.setTainsPower(key, val)
                 respStr = json.dumps({'result': 'success'})
             respStr = json.dumps(reqDict)
         except Exception as err:

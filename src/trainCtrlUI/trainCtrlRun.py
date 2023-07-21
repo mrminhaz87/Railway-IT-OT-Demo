@@ -42,6 +42,7 @@ class UIFrame(wx.Frame):
         if not gv.TEST_MD:
             gv.idataMgr = dataMgr.DataManager(self, gv.gPlcInfo)
 
+
         self.statusbar = self.CreateStatusBar(1)
         self.statusbar.SetStatusText('Test mode: %s' %str(gv.TEST_MD))
         # Set the periodic call back
@@ -51,12 +52,29 @@ class UIFrame(wx.Frame):
         self.Bind(wx.EVT_TIMER, self.periodic)
         self.timer.Start(PERIODIC)  # every 500 ms
 
+        
+        self.trainPwrState = [True]*10
+        TrainTgtPlcID = 'PLC-06'
+        csIdx, ceIdx = (0, 10)
+        for idx in range(csIdx, ceIdx):
+            gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, self.trainPwrState[idx])
+
+            
+
 #--UIFrame---------------------------------------------------------------------
     def _initGlobals(self):
         # Init the global parameters used only by this module
-        gv.gTrackConfig['weline'] = {'id':'weline', 'num': 4, 'color': wx.Colour(52, 169, 129), 'icon': 'welabel.png'}
-        gv.gTrackConfig['nsline'] = {'id':'nsline', 'num': 3, 'color': wx.Colour(233, 0, 97), 'icon': 'nslabel.png'}
-        gv.gTrackConfig['ccline'] = {'id':'ccline', 'num': 3, 'color': wx.Colour(255, 136, 0), 'icon': 'cclabel.png'}
+        gv.gTrackConfig['weline'] = {'id':'weline', 'num': 4, 
+                                     'trainCoilIdx': (0, 4),
+                                     'color': wx.Colour(52, 169, 129), 'icon': 'welabel.png'}
+        
+        gv.gTrackConfig['nsline'] = {'id':'nsline', 'num': 3, 
+                                     'trainCoilIdx': (4,7),
+                                     'color': wx.Colour(233, 0, 97), 'icon': 'nslabel.png'}
+        
+        gv.gTrackConfig['ccline'] = {'id':'ccline', 'num': 3, 
+                                     'trainCoilIdx': (4,7),
+                                     'color': wx.Colour(255, 136, 0), 'icon': 'cclabel.png'}
         # Init all the global instance
         # if gv.gCollsionTestFlg: gv.gTestMD = False # disable the test mode flag to fetch the signal from PLC
         # Init all the train list
@@ -99,7 +117,7 @@ class UIFrame(wx.Frame):
         mSizer.Add(plcSZ, flag=flagsL, border=2)
         return mSizer
 
-
+#--UIFrame---------------------------------------------------------------------
     def _buildTrainCtrlSizer(self):
         flagsL = wx.LEFT
         vbox0 = wx.BoxSizer(wx.VERTICAL)
@@ -177,7 +195,7 @@ class UIFrame(wx.Frame):
 #-----------------------------------------------------------------------------
     def onHelp(self, event):
         """ Pop-up the Help information window. """
-        wx.MessageBox(' If there is any bug, please contect: \n\n \
+        wx.MessageBox(' If there is any bug, please contact: \n\n \
                         Author:      Yuancheng Liu \n \
                         Email:       liu_yuan_cheng@hotmail.com \n \
                         Created:     2023/07/20 \n \

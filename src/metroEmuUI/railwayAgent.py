@@ -417,11 +417,11 @@ class AgentTrain(AgentTarget):
         # Init the train head and tail points at the horizontal position.
         #self.pos = [[initPos[0] + 10*i, initPos[1]] for i in range(self.trainLen)]
         self.pos = self._buildTrainPos()
-        self.trainSpeed = trainSpeed    # train speed: pixel/periodic loop
+        self.trainSpeed = trainSpeed if gv.gTestMD else 0 # train speed: pixel/periodic loop
         self.dockCount = 0              # refersh cycle number of a train to stop in the station.
         self.isWaiting = False          # Train waiting at signal or out side the station.
         self.collsionFlg = False        # Flag to identify whether Train collsion happens.
-        self.emgStop = False            # emergency stop.
+        self.emgStop = False if gv.gTestMD else True   # emergency stop.
 
 #-----------------------------------------------------------------------------
     def _buildTrainPos(self):

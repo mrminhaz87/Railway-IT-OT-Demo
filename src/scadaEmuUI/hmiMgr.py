@@ -122,8 +122,6 @@ class AgentStation(object):
     def setSignalState(self, state):
         self.signalState = state
 
-
-
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class MapMgr(object):

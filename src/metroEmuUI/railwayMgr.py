@@ -434,7 +434,8 @@ class MapMgr(object):
         if trackID in self.trains.keys():
             for i, train in enumerate(self.trains[trackID]):
                 if i < len(powerStateList):
-                    train.getEmgStop(powerStateList[i])
+                    stopflg = not powerStateList[i]
+                    train.setEmgStop(stopflg)
 
 #-----------------------------------------------------------------------------
     def updateSignalState(self, key):
