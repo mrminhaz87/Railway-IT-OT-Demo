@@ -44,7 +44,7 @@ IMG_FD = os.path.join(dirpath, 'img')
 ICO_PATH = os.path.join(IMG_FD, "metro.ico")
 BGIMG_PATH = os.path.join(dirpath, IMG_FD, "SampleImg.png")
 
-TEST_MD = False
+TEST_MD = True
 PLC_NUM = 2
 
 PERIODIC = 300      # update the main in every 300ms

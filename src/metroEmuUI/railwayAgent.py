@@ -8,10 +8,10 @@
 # 
 # Author:      Yuancheng Liu
 #
-# Version:     v0.1
+# Version:     v0.1.2
 # Created:     2023/05/26
-# Copyright:   
-# License:     
+# Copyright:   Copyright (c) 2023 LiuYuancheng
+# License:     MIT License
 #-----------------------------------------------------------------------------
 
 import math

@@ -54,8 +54,9 @@ class UIFrame(wx.Frame):
         self.trainPwrState = [True]*10
         TrainTgtPlcID = 'PLC-06'
         csIdx, ceIdx = (0, 10)
-        for idx in range(csIdx, ceIdx):
-            gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, self.trainPwrState[idx])
+        if gv.idataMgr:
+            for idx in range(csIdx, ceIdx):
+                gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, self.trainPwrState[idx])
 
 #--UIFrame---------------------------------------------------------------------
     def _initGlobals(self):

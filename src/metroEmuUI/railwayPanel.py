@@ -7,10 +7,10 @@
 #              
 # Author:      Yuancheng Liu
 #
-# Version:     v0.1
+# Version:     v0.1.2
 # Created:     2023/06/01
-# Copyright:   
-# License:     
+# Copyright:   Copyright (c) 2023 LiuYuancheng
+# License:     MIT License
 #-----------------------------------------------------------------------------
 
 import os 
