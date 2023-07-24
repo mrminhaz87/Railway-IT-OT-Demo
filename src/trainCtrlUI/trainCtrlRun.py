@@ -61,20 +61,24 @@ class UIFrame(wx.Frame):
 #--UIFrame---------------------------------------------------------------------
     def _initGlobals(self):
         # Init the global parameters used only by this module
-        gv.gTrackConfig['weline'] = {'id':'weline', 'num': 4, 
+        gv.gTrackConfig['weline'] = {'id':'weline', 'num': 4,
+                                     'trainHregIdx': (0, 4), 
                                      'trainCoilIdx': (0, 4),
                                      'color': wx.Colour(52, 169, 129), 'icon': 'welabel.png'}
         
-        gv.gTrackConfig['nsline'] = {'id':'nsline', 'num': 3, 
+        gv.gTrackConfig['nsline'] = {'id':'nsline', 'num': 3,
+                                     'trainHregIdx': (4,7), 
                                      'trainCoilIdx': (4,7),
                                      'color': wx.Colour(233, 0, 97), 'icon': 'nslabel.png'}
         
-        gv.gTrackConfig['ccline'] = {'id':'ccline', 'num': 3, 
-                                     'trainCoilIdx': (4,7),
+        gv.gTrackConfig['ccline'] = {'id':'ccline', 'num': 3,
+                                     'trainHregIdx': (7,10),
+                                     'trainCoilIdx': (7,10),
                                      'color': wx.Colour(255, 136, 0), 'icon': 'cclabel.png'}
         # Init all the global instance
         # if gv.gCollsionTestFlg: gv.gTestMD = False # disable the test mode flag to fetch the signal from PLC
         # Init all the train list
+        gv.iMapMgr = dataMgr.MapManager(self)
 
 #--UIFrame---------------------------------------------------------------------
     def _buildMenuBar(self):
@@ -188,6 +192,18 @@ class UIFrame(wx.Frame):
                     print(coilsList)
                     self.plcPnls[key].updateCoils(coilsList)
                     self.plcPnls[key].updateDisplay()
+                # update the display Info
+                if gv.iMapMgr:
+                    regdataList = gv.idataMgr.getAllPlcRegsData()
+                    coildataList = gv.idataMgr.getAllPlcCoisData()
+                    for key in gv.gTrackConfig.keys():
+                        rsIdx, reIdx = gv.gTrackConfig[key]['trainHregIdx']
+                        gv.iMapMgr.updateTrainsSpeed(key, regdataList[rsIdx:reIdx])
+                        csIdx, ceIdx = gv.gTrackConfig[key]['trainCoilIdx']
+                        gv.iMapMgr.updateTrainsPwr(key, coildataList[csIdx:ceIdx] )
+                    
+            if gv.iMapMgr:
+                gv.iInfoPanel.updateTrainInfoGrid()
 
 #-----------------------------------------------------------------------------
     def onHelp(self, event):

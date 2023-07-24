@@ -44,7 +44,7 @@ IMG_FD = os.path.join(dirpath, 'img')
 ICO_PATH = os.path.join(IMG_FD, "metro.ico")
 BGIMG_PATH = os.path.join(dirpath, IMG_FD, "SampleImg.png")
 
-TEST_MD = True
+TEST_MD = False
 PLC_NUM = 2
 
 PERIODIC = 300      # update the main in every 300ms
@@ -70,7 +70,7 @@ gPlcPnlInfo['PLC-07'] = {'id': 'PLC-07', 'label': 'PLC-06[Slave:slot-1]', 'ipadd
                          'port': 504, 'tgt': 'PLC-06', 'hRegsInfo': (8, 10), 'coilsInfo': (8, 10)}
 
 gTranspPct = 70     # Windows transparent percentage.
-gUpdateRate = 1     # main frame update rate 1 sec.
+gUpdateRate = 2     # main frame update rate 1 sec.
 
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.

@@ -77,7 +77,7 @@ class MapMgr(object):
             'points': [(300, 50), (1200, 50), (1200, 300), (800, 300), (800, 600), (700, 600), 
                        (700, 100), (400, 100), (400, 450), (300, 450)]
         }
-        trackTrainCfg_ns = [{'id': 'ns01', 'head': (1160, 50), 'nextPtIdx': 1, 'len': 4},
+        trackTrainCfg_ns = [{'id': 'ns01', 'head': (1120, 50), 'nextPtIdx': 1, 'len': 4},
                             {'id': 'ns02', 'head': (1100, 300), 'nextPtIdx': 3, 'len': 4},
                             {'id': 'ns03', 'head': (600, 100), 'nextPtIdx': 7, 'len': 4}]
 

@@ -67,32 +67,27 @@ class PanelTrain(wx.Panel):
         sizer.Add(vbox0, flag=flagsL, border=2)
         return sizer
 
-#--PanelMultInfo---------------------------------------------------------------
-    def updateSensorIndicator(self, idx, state):
-        """ Update the sensor indictor's status Green:online, Gray:Offline."""
-        color = wx.Colour("GREEN") if state else wx.Colour(120, 120, 120)
-        self.senIndList[idx].SetBackgroundColour(color)
 
 #--PanelMultInfo---------------------------------------------------------------
-    def updateSensorGrid(self, idx, dataList):
-        """ Update the sensor Grid's display based on the sensor index. """
-        if len(dataList) != 3:
-            print("PanelMultInfo: Sensor Grid fill in data element missing.")
-            return
-        # Udpate the grid cells' data.
-        totPllNum = totPllAvg = 0
-        for i, item in enumerate(dataList):
-            dataStr = "{0:.4f}".format(item) if isinstance(
-                item, float) else str(item)
-            self.grid.SetCellValue(idx, i, dataStr)
-            if i == 1: totPllNum += item
-            if i == 2: totPllAvg += item
-        # update the total numbers. 
-        self.grid.SetCellValue(4, 0, str(self.sensorCount))
-        self.grid.SetCellValue(4, 1, "{0:.4f}".format(totPllNum))
-        self.grid.SetCellValue(4, 2, "{0:.4f}".format(totPllAvg))
+    def updateTrainInfoGrid(self):
+        lineIdx = 0
+        for key in gv.gTrackConfig.keys():
+            trainsInfo = gv.iMapMgr.getTrainsInfo(key)
+            colorVal = gv.gTrackConfig[key]['color']
+            #gv.gDebugPrint(str(trainsInfo), logType=gv.LOG_INFO)
+            for data in trainsInfo:
+                self.grid.SetCellValue(lineIdx, 0, ' '+ str(data['id']))
+                self.grid.SetCellValue(lineIdx, 1, key)
+                self.grid.SetCellBackgroundColour(lineIdx, 1, colorVal)
+                self.grid.SetCellValue(lineIdx, 2, ' '+ str(data['speed']) + ' km/h')
+                self.grid.SetCellValue(lineIdx, 3, ' '+ str(data['current']) + ' A')
+                self.grid.SetCellValue(lineIdx, 4, ' '+ str(data['voltage']) + ' V')
+                pwdFlg = 'ON' if data['power'] else 'OFF'
+                bgColor = wx.Colour('GREEN') if data['power'] else wx.Colour('RED')
+                self.grid.SetCellValue(lineIdx, 5, ' '+ str(pwdFlg))
+                self.grid.SetCellBackgroundColour(lineIdx, 5, bgColor)
+                lineIdx += 1
         self.grid.ForceRefresh()  # refresh all the grid's cell at one time ?
-
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

@@ -203,9 +203,10 @@ class plcSimuInterface(object):
             the output coils state based on the ladder logic. 
         - Send the signal setup request to the real world emulator to change the signal.
     """
-    def __init__(self, parent, plcID, addressInfoDict, ladderObj):
+    def __init__(self, parent, plcID, addressInfoDict, ladderObj, updateInt=0.5):
         self.parent = parent
         self.id = plcID
+        self.updateInt = updateInt
         self.realworldAddr = addressInfoDict['realworld'] if 'realworld' in addressInfoDict.keys() else ('127.0.0.1', 3001)
         self.allowReadAddr = addressInfoDict['allowread'] if 'allowread' in addressInfoDict.keys() else None
         self.allowWriteAddr = addressInfoDict['allowwrite'] if 'allowwrite' in addressInfoDict.keys() else None
@@ -272,16 +273,17 @@ class plcSimuInterface(object):
         sensorInfo = self.getRWInputInfo()
         if sensorInfo is None: return
         (_, _, result) = sensorInfo
-        time.sleep(0.1)
+        time.sleep(0.2)
         for key in result.keys():
             self.regsStateRW[key] = result[key]
         # Update PLC holding registers.
         self.updateHoldingRegs()
-        time.sleep(0.1)
+        time.sleep(0.2)
         coilUpdated = self.updateCoilOutput()
         # update the output coils state:
         if coilUpdated: self.changeRWSignalCoil()
-
+        time.sleep(self.updateInt)
+        
 #-----------------------------------------------------------------------------
     def updateHoldingRegs(self):
         holdingRegs = []

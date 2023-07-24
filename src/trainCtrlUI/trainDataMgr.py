@@ -28,10 +28,10 @@ class TrainAgent(object):
 
     def __init__(self, trainID, designVoltage) -> None:
         self.id = trainID
-        self.speed = 0 
+        self.speed = 0 if not gv.TEST_MD else 1
         self.current = 0 
         self.designVoltage = designVoltage
-        self.powerFlag = False
+        self.powerFlag = False if not gv.TEST_MD else True
 
     def setSpeed(self, speed):
         self.speed = speed
@@ -70,10 +70,12 @@ class TrainAgent(object):
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
-class ControlManager(object):
+class MapManager(object):
 
-    def __init__(self) -> None:
+    def __init__(self, parent) -> None:
         self.trainInfoDict = OrderedDict()
+        self._initTrains()
+        print(self.trainInfoDict)
 
     def _initTrains(self):
         # init all the weline trains
@@ -81,11 +83,11 @@ class ControlManager(object):
         self._initTrain(trackID, trainNum, designVoltage)
 
         # init all the nsline trains
-        trackID, trainNum, designVoltage = 'nsline', 4, 750
+        trackID, trainNum, designVoltage = 'nsline', 3, 750
         self._initTrain(trackID, trainNum, designVoltage)
 
         # init all the cclineTrains
-        trackID, trainNum, designVoltage = 'ccline', 4, 750
+        trackID, trainNum, designVoltage = 'ccline', 3, 750
         self._initTrain(trackID, trainNum, designVoltage)
 
     def _initTrain(self, trackID, trainNum, designVoltage):
@@ -94,6 +96,27 @@ class ControlManager(object):
             trainID = '-'.join((trackID, str(i)))
             train = TrainAgent(trainID, designVoltage)
             self.trainInfoDict[trackID].append(train)
+
+    def updateTrainsSpeed(self, trackID, speedList):
+        if trackID in self.trainInfoDict.keys():
+            idxRange = min(len(speedList), len(self.trainInfoDict[trackID]))
+            for idx in range(idxRange):
+                train = self.trainInfoDict[trackID][idx]
+                train.setSpeed(speedList[idx])
+                
+    def updateTrainsPwr(self, trackID, speedList):
+        if trackID in self.trainInfoDict.keys():
+            idxRange = min(len(speedList), len(self.trainInfoDict[trackID]))
+            for idx in range(idxRange):
+                train = self.trainInfoDict[trackID][idx]
+                train.setPower(speedList[idx])
+
+    def getTrainsInfo(self, trackID):
+        result = []
+        if trackID in self.trainInfoDict.keys():
+            for train in self.trainInfoDict[trackID]:
+                result.append(train.getTrainInfo())
+        return result
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -145,3 +168,15 @@ class DataManager(object):
         if plcid in self.coilsDict.keys():
             return self.coilsDict[plcid][startIdx:endIdx]
         return None
+
+    def getAllPlcRegsData(self):
+        result = []
+        for val in self.regsDict.values():
+            result += val
+        return result
+    
+    def getAllPlcCoisData(self):
+        result = []
+        for val in self.coilsDict.values():
+            result += val
+        return result
