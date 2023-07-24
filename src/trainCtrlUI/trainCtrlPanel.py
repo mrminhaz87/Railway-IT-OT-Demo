@@ -285,33 +285,34 @@ class PanelTainCtrl(wx.Panel):
         # Add the start button.
         self.recbtn1 = wx.BitmapButton(self, bitmap=startBmp,
                                        size=(startBmp.GetWidth()+10, startBmp.GetHeight()+10))
-        self.recbtn1.Bind(wx.EVT_BUTTON, self.startTrain)
+        self.recbtn1.Bind(wx.EVT_BUTTON, self.turnOnTrainPwr)
         hbox0.Add(self.recbtn1, flag=flagsL, border=2)
         # Add the emergency stop button.
         self.recbtn2 = wx.BitmapButton(self, bitmap=stoptBmp,
                                        size=(stoptBmp.GetWidth()+10, stoptBmp.GetHeight()+10))
-        self.recbtn2.Bind(wx.EVT_BUTTON, self.stopTrain)
+        self.recbtn2.Bind(wx.EVT_BUTTON, self.turnOffTrain)
         hbox0.Add(self.recbtn2, flag=flagsL, border=2)
         hbox0.AddSpacer(5)
         vbox.Add(hbox0, flag=flagsL, border=2)
         return vbox
     
     #-----------------------------------------------------------------------------
-    def startTrain(self, event):
-        event.GetEventObject().GetId() 
-        if gv.iMapMgr:
-            gv.gDebugPrint('Start train: %s on track: %s' %(str(self.trainID), self.trackID))
-            trains = gv.iMapMgr.getTrains(trackID=self.trackID)
-            trainAgent = trains[self.trainID]
-            trainAgent.setEmgStop(False)
+    def turnOnTrainPwr(self, event):
+        gv.gDebugPrint(' Turn on train power: %s on track: %s' %(str(self.trainID), self.trackID))
+        if gv.idataMgr:
+            TrainTgtPlcID = 'PLC-06'
+            startIdx = gv.gTrackConfig[self.trackID]['trainCoilIdx'][0]
+            idx = startIdx + int(self.trainID)
+            gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, True)
 
     #-----------------------------------------------------------------------------
-    def stopTrain(self, event):
-        if gv.iMapMgr:
-            gv.gDebugPrint('Stop train: %s on track: %s' %(str(self.trainID), self.trackID))
-            trains = gv.iMapMgr.getTrains(trackID=self.trackID)
-            trainAgent = trains[self.trainID]
-            trainAgent.setEmgStop(True)
+    def turnOffTrain(self, event):
+        gv.gDebugPrint(' Turn off train power: %s on track: %s' %(str(self.trainID), self.trackID))
+        if gv.idataMgr:
+            TrainTgtPlcID = 'PLC-06'
+            startIdx = gv.gTrackConfig[self.trackID]['trainCoilIdx'][0]
+            idx = startIdx + int(self.trainID)
+            gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, False)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

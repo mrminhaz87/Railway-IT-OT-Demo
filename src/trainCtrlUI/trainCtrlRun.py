@@ -12,7 +12,6 @@
 #-----------------------------------------------------------------------------
 
 import os
-import sys
 import time
 import wx
 import trainCtrlGlobal as gv
@@ -169,7 +168,6 @@ class UIFrame(wx.Frame):
         
         vSizer.Add(hbox1, flag=flagsL, border=2)
         return vSizer
-
 
 #--UIFrame---------------------------------------------------------------------
     def periodic(self, event):

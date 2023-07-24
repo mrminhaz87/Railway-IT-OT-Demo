@@ -42,7 +42,6 @@ Log.initLogger(gTopDir, 'Logs', APP_NAME[0], APP_NAME[1], historyCnt=100, fPutLo
 #------<IMAGES PATH>-------------------------------------------------------------
 IMG_FD = os.path.join(dirpath, 'img')
 ICO_PATH = os.path.join(IMG_FD, "metro.ico")
-BGIMG_PATH = os.path.join(dirpath, IMG_FD, "SampleImg.png")
 
 TEST_MD = False
 PLC_NUM = 2
@@ -62,6 +61,7 @@ gTrackConfig = OrderedDict()
 gPlcInfo = OrderedDict()
 gPlcInfo['PLC-06'] = {'id': 'PLC-06', 'ipaddress': '127.0.0.1',
                       'port': 504, 'hRegsInfo': (0, 10), 'coilsInfo': (0, 10)}
+
 gPlcPnlInfo = OrderedDict()
 gPlcPnlInfo['PLC-06'] = {'id': 'PLC-06', 'label': 'PLC-05[Master:slot-0]', 'ipaddress': '127.0.0.1',
                          'port': 504, 'tgt': 'PLC-06', 'hRegsInfo': (0, 8), 'coilsInfo': (0, 8)}
@@ -89,7 +89,7 @@ def gDebugPrint(msg, prt=True, logType=None):
 #-------<GLOBAL PARAMTERS>-----------------------------------------------------
 iMainFrame = None   # UI MainFrame.
 iCtrlPanel = None   # UI function control panel.
-iInfoPanel = None    # UI map display panel
+iInfoPanel = None   # UI map display panel
 iMapMgr = None
 iPlcClient = None   # modbus client to connect to the PLC
 idataMgr = None
