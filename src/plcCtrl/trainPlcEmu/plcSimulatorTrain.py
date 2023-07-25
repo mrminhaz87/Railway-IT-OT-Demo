@@ -89,7 +89,7 @@ class trainPowerPlcSet(plcSimulator.plcSimuInterface):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 def main():
-    gv.gDebugPrint("Start Init the PLC: %s" %str(gv.PCL_NAME), logType=gv.LOG_INFO)
+    gv.gDebugPrint("Start Init the PLC: %s" %str(gv.PLC_NAME), logType=gv.LOG_INFO)
     gv.iLadderLogic = onlyCoilLadderLogic(None, ladderName='only_coil_control')
     addressInfoDict = {
         'hostaddress': ('localhost', 504),
@@ -97,7 +97,7 @@ def main():
         'allowread':gv.ALLOW_R_L,
         'allowwrite': gv.ALLOW_W_L
     }
-    plc = trainPowerPlcSet(None, gv.PCL_NAME, addressInfoDict,  gv.iLadderLogic)
+    plc = trainPowerPlcSet(None, gv.PLC_NAME, addressInfoDict,  gv.iLadderLogic)
     plc.run()
 
 if __name__ == "__main__":

@@ -44,7 +44,7 @@ LOG_ERR     = 2
 LOG_EXCEPT  = 3
 
 # Init the PLC info.
-PCL_NAME = 'PLC-03'
+PLC_NAME = 'PLC-03'
 ALLOW_R_L = ['127.0.0.1', '192.168.0.10']
 ALLOW_W_L = ['127.0.0.1']
 

@@ -5,13 +5,14 @@
 # Purpose:     A simple plc simulation module to connect and control the real-world 
 #              emulator via UDP (to simulate the eletrical signals change) and handle
 #              SCADA system Modbus TCP request.
+#              This module will simulate the sensors-signals-auto-control system. 
 # 
 # Author:      Yuancheng Liu
 #
-# Version:     v0.2
 # Created:     2023/05/29
-# Copyright:   
-# License:     
+# Version:     v0.1.2
+# Copyright:   Copyright (c) 2023 Singapore National Cybersecurity R&D Lab LiuYuancheng
+# License:     MIT License
 #-----------------------------------------------------------------------------
 """ 
 Program design:
@@ -29,7 +30,7 @@ import plcSimulator
 #-----------------------------------------------------------------------------
 class tFlipFlopLadderLogic(modbusTcpCom.ladderLogic):
     """ A T-flip-flop latching relay ladder logic set with 19 ladders. The ladder logic
-        need to be init and passed in the data handler (with handler auto-update flag 
+        needs to be init and passed in the data handler (with handler auto-update flag 
         set to True).
     """
 
@@ -49,6 +50,7 @@ class tFlipFlopLadderLogic(modbusTcpCom.ladderLogic):
         # address: 18 - 24: nsline sensors
         # address: 25 - 38: ccline sensors.
         weIdxOffSet, nsIdxOffset, ccIdxOffset = 0, 17, 25
+        # init all the flip flop maping table.
         self.ffConfig = [
             # Init all the weline signals flipflop:
             {'coilIdx': 0, 'onRegIdx':(ccIdxOffset+12,), 'offRegIdx':(ccIdxOffset+13,)},
@@ -77,7 +79,8 @@ class tFlipFlopLadderLogic(modbusTcpCom.ladderLogic):
 #-----------------------------------------------------------------------------
     def _tfligFlogRun(self, coilState, toggleOnList, toggleOffList):
         """ Function to simulate a normal t-flip-flop latching replay to take input
-            and calculate the output based on the current state.
+            and calculate the output based on the current state. If there is N register
+            state changed, this ladder logic will execute N times.
             Args:
                 coilState (int/bool): Current output State. 
                 toggleOnList (list(int/bool)): input registers's state list which can toggle
@@ -98,8 +101,8 @@ class tFlipFlopLadderLogic(modbusTcpCom.ladderLogic):
         coilsRsl = []
         if len(regsList) != 39 or coilList is None or len(coilList)!=19:
             gv.gDebugPrint('runLadderLogic(): input not valid', logType=gv.LOG_WARN)
-            gv.gDebugPrint("Input registers list: %s" %str(regsList))
-            gv.gDebugPrint("Input coils list: %s" %str(coilList))
+            gv.gDebugPrint("Input registers list: %s" %str(regsList), logType=gv.LOG_INFO)
+            gv.gDebugPrint("Input coils list: %s" %str(coilList), logType=gv.LOG_INFO)
         else:
             for item in self.ffConfig:
                coilState = coilList[item['coilIdx']]
@@ -113,8 +116,8 @@ class tFlipFlopLadderLogic(modbusTcpCom.ladderLogic):
 #-----------------------------------------------------------------------------
 class signalPlcSet(plcSimulator.plcSimuInterface):
 
-    def __init__(self, parent, plcID, addressInfoDict, ladderObj):
-        super().__init__(parent, plcID, addressInfoDict, ladderObj)
+    def __init__(self, parent, plcID, addressInfoDict, ladderObj, updateInt=0.6):
+        super().__init__(parent, plcID, addressInfoDict, ladderObj, updateInt=updateInt)
 
     def initInputState(self):
         self.regsAddrs = (0, 39)
@@ -143,7 +146,7 @@ class signalPlcSet(plcSimulator.plcSimuInterface):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 def main():
-    #gv.gDebugPrint("Start Init the PLC: %s" %str(gv.PCL_NAME), logType=gv.LOG_INFO)
+    #gv.gDebugPrint("Start Init the PLC: %s" %str(gv.PLC_NAME), logType=gv.LOG_INFO)
     gv.iLadderLogic = tFlipFlopLadderLogic(None, ladderName='T_flipflop_logic_set')
     addressInfoDict = {
         'hostaddress': ('localhost', 502),
@@ -151,7 +154,8 @@ def main():
         'allowread':gv.ALLOW_R_L,
         'allowwrite': gv.ALLOW_W_L
     }
-    plc = signalPlcSet(None, gv.PCL_NAME, addressInfoDict,  gv.iLadderLogic)
+    plc = signalPlcSet(None, gv.PLC_NAME, addressInfoDict,  
+                       gv.iLadderLogic, updateInt=gv.gInterval)
     plc.run()
 
 if __name__ == "__main__":

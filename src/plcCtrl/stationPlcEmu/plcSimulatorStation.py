@@ -101,7 +101,7 @@ class stationPlcSet(plcSimulator.plcSimuInterface):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 def main():
-    gv.gDebugPrint("Start Init the PLC: %s" %str(gv.PCL_NAME), logType=gv.LOG_INFO)
+    gv.gDebugPrint("Start Init the PLC: %s" %str(gv.PLC_NAME), logType=gv.LOG_INFO)
     gv.iLadderLogic = directConnLadderLogic(None, ladderName='Direct_connection')
     addressInfoDict = {
         'hostaddress': ('localhost', 503),
@@ -109,7 +109,7 @@ def main():
         'allowread':gv.ALLOW_R_L,
         'allowwrite': gv.ALLOW_W_L
     }
-    plc = stationPlcSet(None, gv.PCL_NAME, addressInfoDict,  gv.iLadderLogic)
+    plc = stationPlcSet(None, gv.PLC_NAME, addressInfoDict,  gv.iLadderLogic)
     plc.run()
 
 if __name__ == "__main__":
