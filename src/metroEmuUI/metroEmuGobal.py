@@ -7,8 +7,9 @@
 # Author:      Yuancheng Liu
 #
 # Created:     2010/08/26
-# Copyright:   
-# License:     
+# Version:     v_0.1.2
+# Copyright:   Copyright (c) 2023 LiuYuancheng
+# License:     MIT License
 #-----------------------------------------------------------------------------
 """
 For good coding practice, follow the following naming convention:
@@ -95,12 +96,14 @@ gTestMD = CONFIG_DICT['TEST_MD']      # test mode flag, True: the simulator will
 # False: The simultor will connect to the PLC, PLC will implement the control logic.
 gTranspPct = 70     # Windows transparent percentage.
 # main frame update rate 0.5 sec.
-gUpdateRate = float(CONFIG_DICT['TEST_MD']) if float(CONFIG_DICT['TEST_MD']) > 0 else 0.5
+gUpdateRate = float(CONFIG_DICT['UI_INTERVAL']) if float(CONFIG_DICT['UI_INTERVAL']) > 0 else 0.5
 gTrainDefSpeed = 10 # Train default speed 10 pixels per refersh frame.
 gSensorCount = 0    # number of sensors.
 gMinTrainDist = 80  # min distance between each trains by refresh rate
 gCollAvoid = CONFIG_DICT['COLL_AVOID']    # Auto avoid collision.
 gDockTime = int(CONFIG_DICT['DOCK_TIME'])
+
+gPlcTimeout = int(CONFIG_DICT['PLC_TIMEOUT'])
 
 gTrackConfig = OrderedDict()
 #gCollsionTestFlg = CONFIG_DICT['TEST_JC_COLLISION'] # flag used to enable test the train collision at the junction.

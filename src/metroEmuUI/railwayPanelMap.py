@@ -15,6 +15,8 @@
 #-----------------------------------------------------------------------------
 
 import os
+import time
+
 import wx
 import metroEmuGobal as gv
 
@@ -72,6 +74,39 @@ class PanelMap(wx.Panel):
                 dc.SetBrush(wx.Brush(color))
                 dc.DrawRectangle(pos[0]-size[0]//2, pos[1]-size[1]//2, size[0], size[1])
                 dc.DrawText(str(id), pos[0]-size[0]//2+6, pos[1]-size[1]//2+6)
+        # Draw the current date and time
+        dc.SetFont(wx.Font(14, wx.DEFAULT, wx.NORMAL, wx.BOLD))
+        dc.SetTextForeground(wx.Colour('GREEN'))
+        dc.DrawText(time.strftime("%b %d %Y %H:%M:%S", time.localtime(time.time())), 1300, 40)
+        
+        # Draw the PLC state:
+        if gv.iDataMgr:
+            dc.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD))
+            plcStateDict = gv.iDataMgr.getLastPlcsConnectionState()
+            # draw sensor plc state
+            timeStr, state = plcStateDict['sensors']
+            textColor = wx.Colour('GREEN') if state else wx.Colour('RED')
+            dc.SetTextForeground(textColor)
+            connState = 'online' if state else 'offline'
+            dc.DrawText('Last update Time: '+str(timeStr), 80, 740)
+            dc.DrawText('Connection State: '+str(connState), 80, 755)
+
+            # draw sensor plc state
+            timeStr, state = plcStateDict['stations']
+            textColor = wx.Colour('GREEN') if state else wx.Colour('RED')
+            dc.SetTextForeground(textColor)
+            connState = 'online' if state else 'offline'
+            dc.DrawText('Last update Time: '+str(timeStr), 80, 800)
+            dc.DrawText('Connection State: '+str(connState), 80, 815)
+
+            # draw trains plc state
+            timeStr, state = plcStateDict['trains']
+            textColor = wx.Colour('GREEN') if state else wx.Colour('RED')
+            dc.SetTextForeground(textColor)
+            connState = 'online' if state else 'offline'
+            dc.DrawText('Last update Time: '+str(timeStr), 80, 860)
+            dc.DrawText('Connection State: '+str(connState), 80, 875)
+
 
 #-----------------------------------------------------------------------------
     def _drawJunction(self, dc):

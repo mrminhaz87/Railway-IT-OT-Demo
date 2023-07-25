@@ -316,7 +316,11 @@ class MapMgr(object):
                    {'id':'JurongEast-Jem', 'img':'city_0.png', 'pos':(360, 520), 'size':(80, 80)},
                    {'id':'CityHall-01', 'img':'city_2.png', 'pos':(750, 520), 'size':(90, 80)},
                    {'id':'CityHall-02', 'img':'city_1.png', 'pos':(850, 600), 'size':(80, 60)},
-                   {'id':'Legend', 'img':'legend.png', 'pos':(1450, 820), 'size':(200, 150)}
+                   {'id':'Legend', 'img':'legend.png', 'pos':(1450, 820), 'size':(200, 150)},
+                   {'id':'Sensor-Signal-PLCs[PLC-00, PLC-01, PLC-02]', 'img': 'plcIcon.png', 'pos':(50, 750), 'size':(50,30)},
+                   {'id':'Station-PLCs[PLC-03, PLC-04, PLC-05]', 'img': 'plcIcon.png', 'pos':(50, 810), 'size':(50,30)},
+                   {'id':'Train-PLCs[PLC-06, PLC-07]', 'img': 'plcIcon.png', 'pos':(50, 870), 'size':(50,30)},
+                   {'id':'Date & Time', 'img': 'time.png', 'pos':(1270, 50), 'size':(30,30)}
                    ]
         for info in envCfg:
             imgPath = os.path.join(gv.IMG_FD, info['img'])

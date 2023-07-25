@@ -7,7 +7,7 @@
 # Test mode:
 # True: use the real word internal logic to simulator the control logic. 
 # False: connect to PLC let plc control the signals 
-TEST_MD:True
+TEST_MD:False
 
 # Init the dataManager port for PCL to fetch and set data. 
 UDP_PORT:3001
@@ -16,10 +16,15 @@ UDP_PORT:3001
 UI_INTERVAL:0.8
 
 # Init Control paramters
-COLL_AVOID:False
+COLL_AVOID:True
+
 # Set train dock time: ==0 train will stay in station in a random Interval, > 0 num of time 
 # circle train will stay in 
 DOCK_TIME:5
+
+# Init Plc connection time out, if plc is not connect in num of seconds, the system will
+# treate it as offline
+PLC_TIMEOUT: 3
 
 # Train config json file.
 TR_CFG_FOLDER:TrainLocation

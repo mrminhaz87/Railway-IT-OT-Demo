@@ -57,7 +57,7 @@ class DataManager(threading.Thread):
             'ccline': None,
             'mtline': None
         }
-        self.sensorPlcUpdateT = time.time()
+        self.sensorPlcUpdateT = 0
         # init the local station data record dictionary
         self.stationsDict = {
             'weline': None,
@@ -65,7 +65,7 @@ class DataManager(threading.Thread):
             'ccline': None,
             'mtline': None
         }
-        self.stationPlcUpdateT = time.time()
+        self.stationPlcUpdateT = 0
         # init the local train speed state dictionary
         self.trainsDict = {
             'weline': None,
@@ -73,7 +73,7 @@ class DataManager(threading.Thread):
             'ccline': None,
             'mtline': None
         }
-        self.trainPlcUpdateT= time.time()
+        self.trainPlcUpdateT= 0
         gv.gDebugPrint("datamanager init finished.", logType=gv.LOG_INFO)
 
     #-----------------------------------------------------------------------------
@@ -121,6 +121,19 @@ class DataManager(threading.Thread):
         except Exception as err:
             gv.gDebugPrint("fetchTrainInfo() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
         return respStr
+
+    #-----------------------------------------------------------------------------
+    def getLastPlcsConnectionState(self):
+        #print time.strftime("%b %d %Y %H:%M:%S", time.localtime(time.time))
+        crtTime = time.time()
+        sensorPlcOnline = crtTime - self.sensorPlcUpdateT < gv.gPlcTimeout
+        stationPlcOnline = crtTime - self.stationPlcUpdateT < gv.gPlcTimeout
+        trainPlcOnline = crtTime - self.trainPlcUpdateT < gv.gPlcTimeout
+        return {
+            'sensors': (time.strftime("%H:%M:%S", time.localtime(self.sensorPlcUpdateT)), sensorPlcOnline), 
+            'stations': (time.strftime("%H:%M:%S", time.localtime(self.stationPlcUpdateT)), stationPlcOnline), 
+            'trains': (time.strftime("%H:%M:%S", time.localtime(self.trainPlcUpdateT)), trainPlcOnline), 
+        }
 
     #-----------------------------------------------------------------------------
     def msgHandler(self, msg):
