@@ -10,7 +10,7 @@
 #
 # Version:     v0.1.2
 # Created:     2023/06/01
-# Copyright:   Copyright (c) 2023 LiuYuancheng
+# Copyright:   Copyright (c) 2023 Singapore National Cybersecurity R&D Lab LiuYuancheng
 # License:     MIT License
 #-----------------------------------------------------------------------------
 
@@ -187,7 +187,7 @@ class PanelMap(wx.Panel):
                 dc.SetTextForeground(wx.Colour(trainColor))
                 pos = train.getTrainPos(idx=0)
                 # Draw the collsion Icon if collision happens.
-                if self.toggle and train.getCollsionFlg(): dc.DrawBitmap(self.bitMaps['alert'], pos[0], pos[1])
+                if self.toggle and train.getCollsionFlg(): dc.DrawBitmap(self.bitMaps['alert'], pos[0]-20, pos[1]-20)
                 dc.DrawText( key+'-'+str(i), pos[0]+5, pos[1]+5)
 
 #-----------------------------------------------------------------------------

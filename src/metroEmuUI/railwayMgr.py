@@ -9,7 +9,7 @@
 #
 # Version:     v0.1.2
 # Created:     2023/05/29
-# Copyright:   Copyright (c) 2023 LiuYuancheng
+# Copyright:   Copyright (c) 2023 Singapore National Cybersecurity R&D Lab LiuYuancheng
 # License:     MIT License
 #-----------------------------------------------------------------------------
 
@@ -77,7 +77,7 @@ class MapMgr(object):
             'points': [(300, 50), (1200, 50), (1200, 300), (800, 300), (800, 600), (700, 600), 
                        (700, 100), (400, 100), (400, 450), (300, 450)]
         }
-        trackTrainCfg_ns = [{'id': 'ns01', 'head': (1120, 50), 'nextPtIdx': 1, 'len': 4},
+        trackTrainCfg_ns = [{'id': 'ns01', 'head': (1000, 50), 'nextPtIdx': 1, 'len': 4},
                             {'id': 'ns02', 'head': (1100, 300), 'nextPtIdx': 3, 'len': 4},
                             {'id': 'ns03', 'head': (600, 100), 'nextPtIdx': 7, 'len': 4}]
 
@@ -90,7 +90,7 @@ class MapMgr(object):
             'type': gv.RAILWAY_TYPE_CYCLE,
             'points': [(200, 200), (1400, 200), (1400, 700), (200, 700)]
         }
-        trackTrainCfg_cc = [  {'id': 'cc01', 'head': (1000, 200), 'nextPtIdx': 1, 'len': 6},
+        trackTrainCfg_cc = [  {'id': 'cc01', 'head': (1100, 200), 'nextPtIdx': 1, 'len': 6},
                             {'id': 'cc02', 'head': (1300, 700), 'nextPtIdx': 3, 'len': 6},
                             {'id': 'cc03', 'head': (300, 700), 'nextPtIdx': 3, 'len': 6}]
         #if gv.gCollsionTestFlg: trackTrainCfg_cc[2] = {'id': 'cc03', 'head': (700, 700), 'nextPtIdx': 3, 'len': 6}

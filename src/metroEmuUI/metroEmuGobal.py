@@ -8,7 +8,7 @@
 #
 # Created:     2010/08/26
 # Version:     v_0.1.2
-# Copyright:   Copyright (c) 2023 LiuYuancheng
+# Copyright:   Copyright (c) 2023 Singapore National Cybersecurity R&D Lab LiuYuancheng
 # License:     MIT License
 #-----------------------------------------------------------------------------
 """

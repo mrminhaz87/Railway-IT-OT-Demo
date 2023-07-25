@@ -9,7 +9,7 @@
 #
 # Version:     v0.1.2
 # Created:     2023/05/26
-# Copyright:   Copyright (c) 2023 LiuYuancheng
+# Copyright:   Copyright (c) 2023 Singapore National Cybersecurity R&D Lab LiuYuancheng
 # License:     MIT License 
 #-----------------------------------------------------------------------------
 
@@ -41,12 +41,11 @@ class UIFrame(wx.Frame):
         #self.SetTransparent(gv.gTranspPct*255//100)
         # Init the global variables:
         self._initGlobals()
-        #
+        # Build the top menu bar.
         self._buildMenuBar()
-
         # Build UI sizer
         self.SetSizer(self._buidUISizer())
-
+        # Add the bottom status bar under single line mode.
         self.statusbar = self.CreateStatusBar(1)
         self.statusbar.SetStatusText('Test mode: %s' %str(gv.gTestMD))
         # Set the periodic call back

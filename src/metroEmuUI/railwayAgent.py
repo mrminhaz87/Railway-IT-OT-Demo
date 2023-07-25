@@ -10,7 +10,7 @@
 #
 # Version:     v0.1.2
 # Created:     2023/05/26
-# Copyright:   Copyright (c) 2023 LiuYuancheng
+# Copyright:   Copyright (c) 2023 Singapore National Cybersecurity R&D Lab LiuYuancheng
 # License:     MIT License
 #-----------------------------------------------------------------------------
 

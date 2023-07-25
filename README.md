@@ -9,7 +9,7 @@
 
 
 
-2D metro emulator UI: 
+2D Railway[Metro] System real-world emulator UI: 
 
 ![](doc/interface.png)
 
