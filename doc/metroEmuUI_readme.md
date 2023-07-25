@@ -8,7 +8,12 @@
 
 ### Introduction 
 
-2D Railway System Real-world Emulator User Interface
+The 2D Railway[Metro] System Real-world Emulator is part of the Railway IT/OT System security test platform. It is a OT system visualizer to simulate different kind of railway operation scenarios.  You can refer the system topology diagram to check its function in the system by below link:
+
+-  [Railway IT/OT System security test platform system structure diagram](img/networkCommDesign.png)
+- [Railway IT/OT System security test platform network topology diagram](img/networkDesign.png)
+
+**2D Railway System Real-world Emulator User Interface:**
 
 ![](video/connectionHub5.gif)
 
@@ -102,6 +107,54 @@ Network interface requirement:
 ```
 
 
+
+------
+
+### Program Usage
+
+
+
+##### Edit Configuration File 
+
+Open config file `metroConfig.txt`,  if you want to run this program individually, set the test mode flag `TEST_MD` to True. If you want to connect to other modules such as the PLCs, please set the flag to False.
+
+
+
+##### Program Execution 
+
+After follow the instruction in the file `metroConfig.txt` to setup all the parameters, you can run the program: 
+
+```
+python MetroEmuRun.py
+```
+
+or double click the file `runMetroEmuUI_win.bat`
+
+
+
+##### Interface Usage
+
+Please to refer to the [2D Railway[Metro] System Real-world Emulator User Manual]() to check the detail usage for all the functions. Below are some of the usage functions: 
+
+**Function 1**: Change Train power or reset train position: 
+
+ ![](img/metroEmulator/trainPwrCtrl.png)
+
+**Function 2:**  ON/OFF the train collision auto-avoidance : 
+
+![](img/metroEmulator/collisionAvoid.png)
+
+**Function 3 :** Load Pre-saved scenario in the system
+
+![](img/metroEmulator/loadScenario.png)
+
+
+
+------
+
+#### Problem and Solution
+
+Refer to `doc/ProblemAndSolution.md`
 
 
 
