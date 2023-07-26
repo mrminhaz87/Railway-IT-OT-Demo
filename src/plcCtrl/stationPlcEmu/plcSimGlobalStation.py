@@ -7,8 +7,9 @@
 # Author:      Yuancheng Liu
 #
 # Created:     2010/08/26
-# Copyright:   
-# License:     
+# Version:     v0.1.2
+# Copyright:   Copyright (c) 2023 Singapore National Cybersecurity R&D Lab LiuYuancheng
+# License:     MIT License
 #-----------------------------------------------------------------------------
 """
 For good coding practice, follow the following naming convention:
@@ -26,6 +27,7 @@ APP_NAME = ('plcSimulator', 'StationPlc')
 
 TOPDIR = 'src'
 LIBDIR = 'lib'
+CONFIG_FILE_NAME = 'plcConfig.txt'
 
 idx = dirpath.find(TOPDIR)
 gTopDir = dirpath[:idx + len(TOPDIR)] if idx != -1 else dirpath   # found it - truncate right after TOPDIR
@@ -43,16 +45,27 @@ LOG_WARN    = 1
 LOG_ERR     = 2
 LOG_EXCEPT  = 3
 
-# Init the PLC info.
-PLC_NAME = 'PLC-03'
-ALLOW_R_L = ['127.0.0.1', '192.168.0.10']
-ALLOW_W_L = ['127.0.0.1']
+#-----------------------------------------------------------------------------
+# Init the configure file loader.
+import ConfigLoader
+gGonfigPath = os.path.join(dirpath, CONFIG_FILE_NAME)
+iConfigLoader = ConfigLoader.ConfigLoader(gGonfigPath, mode='r')
+if iConfigLoader is None:
+    print("Error: The config file %s is not exist.Program exit!" %str(gGonfigPath))
+    exit()
+CONFIG_DICT = iConfigLoader.getJson()
 
+# Init the PLC info.
+PLC_NAME = CONFIG_DICT['PLC_NAME']
+ALLOW_R_L = CONFIG_DICT['ALLOW_R_L']
+ALLOW_W_L = CONFIG_DICT['ALLOW_W_L']
 
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.
 gRealWordIP = ('127.0.0.1', 3001)
-gInterval = 0.9
+gRealWordIP = (CONFIG_DICT['RW_IP'], int(CONFIG_DICT['RW_PORT']))
+gInterval = float(CONFIG_DICT['CLK_INT'])
+gModBusIP = (CONFIG_DICT['MD_BUS_IP'], int(CONFIG_DICT['MD_BUS_PORT']))
 
 def gDebugPrint(msg, prt=True, logType=None):
     if prt: print(msg)
@@ -64,7 +77,6 @@ def gDebugPrint(msg, prt=True, logType=None):
         Log.exception(msg)
     elif logType == LOG_INFO or DEBUG_FLG:
         Log.info(msg)
-
 
 #-------<GLOBAL PARAMTERS>-----------------------------------------------------
 iMBhandler = None   # modbus TCP data handler.

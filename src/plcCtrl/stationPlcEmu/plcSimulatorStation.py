@@ -31,7 +31,8 @@ import plcSimulator
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class directConnLadderLogic(modbusTcpCom.ladderLogic):
-    """ A Direct connection ladder logic diagram set
+    """ A direct connection ladder logic diagram set, holding registers will 
+        trigger the connected coils.
     """
     def __init__(self, parent, ladderName) -> None:
         super().__init__(parent, ladderName=ladderName)
@@ -43,8 +44,7 @@ class directConnLadderLogic(modbusTcpCom.ladderLogic):
         self.srcCoilsInfo['offset'] = None
         self.destCoilsInfo['address'] = 0
         self.destCoilsInfo['offset'] = 22
-        # Init the flipflop coils and registers config:
-        # For total 39 holding registers connected addresses
+        # For total 22 holding registers connected addresses
         # address: 0 - 9: weline stations
         # address: 10 - 15: nsline stations
         # address: 16 - 21: ccline sensors.
@@ -71,8 +71,9 @@ class stationPlcSet(plcSimulator.plcSimuInterface):
             the output coils state based on the ladder logic. 
         - Send the signal setup request to the real world emulator to change the signal.
     """
-    def __init__(self, parent, plcID, addressInfoDict, ladderObj):
-        super().__init__(parent, plcID, addressInfoDict, ladderObj)
+    def __init__(self, parent, plcID, addressInfoDict, ladderObj, updateInt=0.6):
+        super().__init__(parent, plcID, addressInfoDict, ladderObj, 
+                         updateInt=updateInt)
 
     def initInputState(self):
         self.regsAddrs = (0, 22)
@@ -104,12 +105,13 @@ def main():
     gv.gDebugPrint("Start Init the PLC: %s" %str(gv.PLC_NAME), logType=gv.LOG_INFO)
     gv.iLadderLogic = directConnLadderLogic(None, ladderName='Direct_connection')
     addressInfoDict = {
-        'hostaddress': ('localhost', 503),
+        'hostaddress': gv.gModBusIP,
         'realworld':gv.gRealWordIP, 
         'allowread':gv.ALLOW_R_L,
         'allowwrite': gv.ALLOW_W_L
     }
-    plc = stationPlcSet(None, gv.PLC_NAME, addressInfoDict,  gv.iLadderLogic)
+    plc = stationPlcSet(None, gv.PLC_NAME, addressInfoDict,
+                        gv.iLadderLogic, updateInt=gv.gInterval)
     plc.run()
 
 if __name__ == "__main__":
