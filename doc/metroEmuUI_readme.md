@@ -29,6 +29,8 @@ The emulator contents below components and function:
 
 **Program version:** `v0.1.2`
 
+Code base: https://github.com/LiuYuancheng/Metro_emulator/tree/main/src/metroEmuUI
+
 
 
 ------
@@ -72,6 +74,8 @@ The program user interface design detail is shown below:
 | 10   | railwayPanelMap.py               | python3       | Real-world display panel                                     |
 | 11   | dataMgr.py                       | python3       | PLC data controller                                          |
 |      |                                  |               |                                                              |
+
+Libraries  required code base: https://github.com/LiuYuancheng/Metro_emulator/tree/main/src/lib 
 
 
 

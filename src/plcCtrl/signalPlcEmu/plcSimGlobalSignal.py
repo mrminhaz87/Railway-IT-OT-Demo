@@ -65,8 +65,8 @@ ALLOW_W_L = CONFIG_DICT['ALLOW_W_L']
 # VARIABLES are the built in data type.
 gRealWordIP = (CONFIG_DICT['RW_IP'], int(CONFIG_DICT['RW_PORT']))
 gInterval = float(CONFIG_DICT['CLK_INT'])
-
 gModBusIP = (CONFIG_DICT['MD_BUS_IP'], int(CONFIG_DICT['MD_BUS_PORT']))
+
 def gDebugPrint(msg, prt=True, logType=None):
     if prt: print(msg)
     if logType == LOG_WARN:

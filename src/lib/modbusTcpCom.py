@@ -315,13 +315,13 @@ class modbusTcpClient(object):
         self.client.timeout = defaultTO  # set time out.
         # Try to connect to the PLC in 1 sec. 
         for _ in range(5):
-            print('Try to login to the PLC unit: %s.' %str(self.tgtIp))
+            print('Try to login to the PLC unit: %s.' %str((self.tgtIp, self.tgtPort)))
             if self.client.open(): break
             time.sleep(0.2)
         if self.client.is_open:
-            print('Success connect to the target PLC: %s' % str(self.tgtIp))
+            print('Success connect to the target PLC: %s' % str((self.tgtIp, self.tgtPort)))
         else:
-            print('Fail connect to the target PLC: %s' % str(self.tgtIp))
+            print('Fail connect to the target PLC: %s' % str((self.tgtIp,self.tgtPort)))
 
 #-----------------------------------------------------------------------------
     def checkConn(self):

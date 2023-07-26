@@ -149,7 +149,7 @@ def main():
     #gv.gDebugPrint("Start Init the PLC: %s" %str(gv.PLC_NAME), logType=gv.LOG_INFO)
     gv.iLadderLogic = tFlipFlopLadderLogic(None, ladderName='T_flipflop_logic_set')
     addressInfoDict = {
-        'hostaddress': ('localhost', 502),
+        'hostaddress': gv.gModBusIP,
         'realworld':gv.gRealWordIP, 
         'allowread':gv.ALLOW_R_L,
         'allowwrite': gv.ALLOW_W_L
