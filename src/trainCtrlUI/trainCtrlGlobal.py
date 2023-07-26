@@ -7,8 +7,9 @@
 # Author:      Yuancheng Liu
 #
 # Created:     2010/08/26
-# Copyright:   
-# License:     
+# Version:     v0.1.2
+# Copyright:   Copyright (c) 2023 LiuYuancheng
+# License:     MIT License  
 #-----------------------------------------------------------------------------
 """
 For good coding practice, follow the following naming convention:
@@ -27,6 +28,7 @@ APP_NAME = ('TrainCtrl', 'HMI')
 
 TOPDIR = 'src'
 LIBDIR = 'lib'
+CONFIG_FILE_NAME = 'trainHMIConfig.txt'
 
 #-----------------------------------------------------------------------------
 # Init the logger:
@@ -39,16 +41,6 @@ if os.path.exists(gLibDir):
 import Log
 Log.initLogger(gTopDir, 'Logs', APP_NAME[0], APP_NAME[1], historyCnt=100, fPutLogsUnderDate=True)
 
-#------<IMAGES PATH>-------------------------------------------------------------
-IMG_FD = os.path.join(dirpath, 'img')
-ICO_PATH = os.path.join(IMG_FD, "metro.ico")
-
-TEST_MD = False
-PLC_NUM = 2
-
-PERIODIC = 300      # update the main in every 300ms
-MBTCP_PORT = 502
-
 # Init the log type parameters.
 DEBUG_FLG   = False
 LOG_INFO    = 0
@@ -56,24 +48,47 @@ LOG_WARN    = 1
 LOG_ERR     = 2
 LOG_EXCEPT  = 3
 
-gTrackConfig = OrderedDict()
+#-----------------------------------------------------------------------------
+# Init the configure file loader.
+import ConfigLoader
+gGonfigPath = os.path.join(dirpath, CONFIG_FILE_NAME)
+iConfigLoader = ConfigLoader.ConfigLoader(gGonfigPath, mode='r')
+if iConfigLoader is None:
+    print("Error: The config file %s is not exist.Program exit!" %str(gGonfigPath))
+    exit()
+CONFIG_DICT = iConfigLoader.getJson()
 
-gPlcInfo = OrderedDict()
-gPlcInfo['PLC-06'] = {'id': 'PLC-06', 'ipaddress': '127.0.0.1',
-                      'port': 504, 'hRegsInfo': (0, 10), 'coilsInfo': (0, 10)}
+#------<IMAGES PATH>-------------------------------------------------------------
+IMG_FD = os.path.join(dirpath, 'img')
+ICO_PATH = os.path.join(IMG_FD, "metro.ico")
 
-gPlcPnlInfo = OrderedDict()
-gPlcPnlInfo['PLC-06'] = {'id': 'PLC-06', 'label': 'PLC-05[Master:slot-0]', 'ipaddress': '127.0.0.1',
-                         'port': 504, 'tgt': 'PLC-06', 'hRegsInfo': (0, 8), 'coilsInfo': (0, 8)}
-
-gPlcPnlInfo['PLC-07'] = {'id': 'PLC-07', 'label': 'PLC-06[Slave:slot-1]', 'ipaddress': '127.0.0.1',
-                         'port': 504, 'tgt': 'PLC-06', 'hRegsInfo': (8, 10), 'coilsInfo': (8, 10)}
-
-gTranspPct = 70     # Windows transparent percentage.
-gUpdateRate = 2     # main frame update rate 1 sec.
+TEST_MD = CONFIG_DICT['TEST_MD']      # test mode flag, True: the simulator will operate with control logic itself. 
+PERIODIC = 300      # update the main in every 300ms
+PLC_ID = CONFIG_DICT['PLC_ID']
+PLC_IP = CONFIG_DICT['PLC_IP']
+PLC_PORT = int(CONFIG_DICT['PLC_PORT'])
 
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.
+
+gTrackConfig = OrderedDict()
+
+# The PLC data fetching and set information
+gPlcInfo = OrderedDict()
+gPlcInfo['PLC-06'] = {'id': PLC_ID, 'ipaddress': PLC_IP, 'port': PLC_PORT, 
+                      'hRegsInfo': (0, 10), 'coilsInfo': (0, 10)}
+
+# Init the plc display panel data fetching mapping information.
+gPlcPnlInfo = OrderedDict()
+gPlcPnlInfo['PLC-06'] = {'id': 'PLC-06', 'label': 'PLC-06[Master:slot-0]', 
+                         'ipaddress': PLC_IP, 'port': PLC_PORT, 'tgt': PLC_ID, 
+                         'hRegsInfo': (0, 8), 'coilsInfo': (0, 8)}
+
+gPlcPnlInfo['PLC-07'] = {'id': 'PLC-07', 'label': 'PLC-07[Slave:slot-1]', 
+                         'ipaddress': PLC_IP, 'port': PLC_PORT, 'tgt': PLC_ID, 
+                         'hRegsInfo': (8, 10), 'coilsInfo': (8, 10)}
+
+gUpdateRate = float(CONFIG_DICT['CLK_INT'])     # main frame update rate every 2 sec.
 
 def gDebugPrint(msg, prt=True, logType=None):
     if prt: print(msg)

@@ -60,7 +60,6 @@ PLC_NAME = CONFIG_DICT['PLC_NAME']
 ALLOW_R_L = CONFIG_DICT['ALLOW_R_L']
 ALLOW_W_L = CONFIG_DICT['ALLOW_W_L']
 
-
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.
 gRealWordIP = (CONFIG_DICT['RW_IP'], int(CONFIG_DICT['RW_PORT']))
