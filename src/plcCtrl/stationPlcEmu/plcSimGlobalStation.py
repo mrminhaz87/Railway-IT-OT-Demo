@@ -62,7 +62,6 @@ ALLOW_W_L = CONFIG_DICT['ALLOW_W_L']
 
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.
-gRealWordIP = ('127.0.0.1', 3001)
 gRealWordIP = (CONFIG_DICT['RW_IP'], int(CONFIG_DICT['RW_PORT']))
 gInterval = float(CONFIG_DICT['CLK_INT'])
 gModBusIP = (CONFIG_DICT['MD_BUS_IP'], int(CONFIG_DICT['MD_BUS_PORT']))

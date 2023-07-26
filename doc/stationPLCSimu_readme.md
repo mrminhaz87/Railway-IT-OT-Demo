@@ -40,10 +40,12 @@ Code base: https://github.com/LiuYuancheng/Metro_emulator/tree/main/src/plcCtrl/
 
 ------
 
+### Program Design 
+
 The program contents 3 main thread : 
 
 - Real-world communication thread to fetch junction sensors data and set signals state. 
-- Ladder logic execution state, once there is holding registers' state change, executed the related binding logic to change the coils state. 
+- Ladder logic execution thread, once there is holding registers' state change, executed the related binding logic to change the coils state. 
 - Modbus server thread to handling the Modbus TCP request from HMI.
 
 This is the program modules workflow diagram: 
@@ -160,7 +162,7 @@ or double click the file `runStationPlcCtrlEmu_win.bat`
 
 ------
 
-#### Problem and Solution
+### Problem and Solution
 
 Refer to `doc/ProblemAndSolution.md`
 

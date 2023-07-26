@@ -9,10 +9,10 @@
 #               
 # Author:      Yuancheng Liu
 #
-# Version:     v0.2
 # Created:     2023/05/29
-# Copyright:   
-# License:     
+# Version:     v0.1.2
+# Copyright:   Copyright (c) 2023 Singapore National Cybersecurity R&D Lab LiuYuancheng
+# License:     MIT License   
 #-----------------------------------------------------------------------------
 """ 
     Program design:

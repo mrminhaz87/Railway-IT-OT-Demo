@@ -5,20 +5,21 @@
 # Purpose:     A simple plc simulation module to connect and control the real-world 
 #              emulator via UDP (to simulate the eletrical signals change) and handle
 #              SCADA system Modbus TCP request.
-#              - This module will simulate 3 PLCs connected under master-slave mode
+#              - This module will simulate 2 PLCs connected under master-slave mode
+#              to sense the train speed and control the trains power
 #               
 # Author:      Yuancheng Liu
 #
-# Version:     v0.2
 # Created:     2023/05/29
-# Copyright:   
-# License:     
+# Version:     v0.1.2
+# Copyright:   Copyright (c) 2023 Singapore National Cybersecurity R&D Lab LiuYuancheng
+# License:     MIT License
 #-----------------------------------------------------------------------------
 """ 
     Program design:
         We want to create a PLC simulator which can simulate a PLC set (Master[slot-0], 
-        Slave[slot-1], Slave[slot-2]) with thress 16-in 8-out PLCs. The PLC sets will
-        take 22 input signal and provide 22 output signal to implement the railway station
+        Slave[slot-1]) with thress 16-in 8-out PLCs. The PLC sets will take 10 input 
+        speed sensor and provide 10 power output signal to implement the railway trains 
         control system.
 """
 
@@ -31,7 +32,8 @@ import plcSimulator
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class onlyCoilLadderLogic(modbusTcpCom.ladderLogic):
-    """ A Direct connection ladder logic diagram set
+    """ Indiviaul holder register and coil usage, no executable ladder logic 
+        between them.
     """
     def __init__(self, parent, ladderName) -> None:
         super().__init__(parent, ladderName=ladderName)
@@ -43,6 +45,10 @@ class onlyCoilLadderLogic(modbusTcpCom.ladderLogic):
         self.srcCoilsInfo['offset'] = None
         self.destCoilsInfo['address'] = 0
         self.destCoilsInfo['offset'] = 10
+        # For total 10 holding registers connected addresses
+        # address: 0 - 3: weline trains speed.
+        # address: 4 - 6: nsline trains speed.
+        # address: 7 - 9: ccline trains speed.
 
 #-----------------------------------------------------------------------------
     def runLadderLogic(self, regsList, coilList=None):
@@ -59,8 +65,9 @@ class trainPowerPlcSet(plcSimulator.plcSimuInterface):
             the output coils state based on the ladder logic. 
         - Send the signal setup request to the real world emulator to change the signal.
     """
-    def __init__(self, parent, plcID, addressInfoDict, ladderObj):
-        super().__init__(parent, plcID, addressInfoDict, ladderObj)
+    def __init__(self, parent, plcID, addressInfoDict, ladderObj, updateInt=0.6):
+        super().__init__(parent, plcID, addressInfoDict, ladderObj,
+                        updateInt=updateInt)
 
     def initInputState(self):
         self.regsAddrs = (0, 10)
@@ -92,7 +99,7 @@ def main():
     gv.gDebugPrint("Start Init the PLC: %s" %str(gv.PLC_NAME), logType=gv.LOG_INFO)
     gv.iLadderLogic = onlyCoilLadderLogic(None, ladderName='only_coil_control')
     addressInfoDict = {
-        'hostaddress': ('localhost', 504),
+        'hostaddress': gv.gModBusIP,
         'realworld':gv.gRealWordIP, 
         'allowread':gv.ALLOW_R_L,
         'allowwrite': gv.ALLOW_W_L
