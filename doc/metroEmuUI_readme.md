@@ -67,7 +67,7 @@ The program user interface design detail is shown below:
 | 3    | configFiles/TrainLocation/*.json |               | All the preset scenario config file.                         |
 | 4    | img/*.png, *.jpg, *.icon         |               | All the UI picture materials file.                           |
 | 5    | MetroEmuRun.py                   | python 3      | Main UI application program.                                 |
-| 6    | metroEmuGobal.py                 | python 3      | System needs global file, the system config file's contents will be saved in the global parameters. |
+| 6    | metroEmuGobal.py                 | python 3      | System global file, the system config file's contents will be saved in the global parameters. |
 | 7    | railwayAgent.py                  | python 3      | Components agents module to initialize all the different items shown on the map. |
 | 8    | railwayMgr.py                    | python 3      | UI data controller, System auto controller                   |
 | 9    | railwayPanel.py                  | python 3      | All the control panels                                       |

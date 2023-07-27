@@ -1,3 +1,3 @@
 @echo off
-python plcCtrl\trainCtrlUI\trainCtrlRun.py
+python trainCtrlUI\trainCtrlRun.py
 pause

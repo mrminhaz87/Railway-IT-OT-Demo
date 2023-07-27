@@ -157,6 +157,18 @@ class UIFrame(wx.Frame):
             self.plcPnls[key] = pnlFunction.PanelPLC(self, panelInfo['label'], ipaddr)
             hbox1.Add(self.plcPnls[key], flag=flagsL, border=2)
         vSizer.Add(hbox1, flag=flagsL, border=2)
+        # Added the data and time disyplay
+        vSizer.AddSpacer(10)
+        timelabel = wx.StaticText(self, label="Date & Time :")
+        timelabel.SetFont(font)
+        timelabel.SetForegroundColour(wx.Colour("WHITE"))
+        vSizer.Add(timelabel, flag=flagsL, border=2)
+        vSizer.AddSpacer(10)
+        self.timeInfo = wx.StaticText(self, label=time.strftime(' %Y - %m - %d %H : %M : %S ', 
+                                                                time.localtime(time.time())))
+        self.timeInfo.SetFont(wx.Font(16, wx.DECORATIVE, wx.BOLD, wx.BOLD))
+        self.timeInfo.SetBackgroundColour(wx.Colour("WHITE"))
+        vSizer.Add(self.timeInfo, flag=flagsL, border=2)
         return vSizer
 
 #--UIFrame---------------------------------------------------------------------
@@ -192,6 +204,9 @@ class UIFrame(wx.Frame):
                     
             if gv.iMapMgr:
                 gv.iInfoPanel.updateTrainInfoGrid()
+            # update time 
+            self.timeInfo.SetLabel(time.strftime(' %Y - %m - %d %H : %M : %S ',
+                                                 time.localtime(time.time())))
 
 #-----------------------------------------------------------------------------
     def onHelp(self, event):
