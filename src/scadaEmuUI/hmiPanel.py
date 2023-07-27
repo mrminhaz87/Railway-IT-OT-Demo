@@ -16,6 +16,9 @@ import scadaGobal as gv
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 class PanelPLC(wx.Panel):
     """ PLC panel UI to show PLC input feedback state and the relay connected 
         to the related output pin.
@@ -29,7 +32,7 @@ class PanelPLC(wx.Panel):
         self.ipAddr = ipAddr
         self.regsNum = 16
         self.coilsNum = 8
-        self.connected = {'0': 'Unconnected', '1': 'Connected'}
+        self.connectedFlg = False
         self.gpioInList = [0]*self.regsNum  # PLC GPIO input stuation list.
         self.gpioInLbList = []  # GPIO input device <id> label list.
         self.gpioOuList = [0]*self.coilsNum # PLC GPIO output situation list.
@@ -45,16 +48,14 @@ class PanelPLC(wx.Panel):
         flagsR = wx.LEFT
         mSizer.AddSpacer(5)
         # Row idx = 0 : set the basic PLC informaiton.
-        self.nameLb = wx.StaticText(
-            self, label=" PLC Name: ".ljust(15)+self.plcName)
+        self.nameLb = wx.StaticText(self, label=" PLC Name: ".ljust(15)+self.plcName)
         mSizer.Add(self.nameLb, flag=flagsR, border=5)
-        self.ipaddrLb = wx.StaticText(
-            self, label=" PLC IPaddr: ".ljust(15)+self.ipAddr)
+        self.ipaddrLb = wx.StaticText( self, label=" PLC IPaddr: ".ljust(15)+self.ipAddr)
         mSizer.Add(self.ipaddrLb, flag=flagsR, border=5)
         hbox0 = wx.BoxSizer(wx.HORIZONTAL)
-        hbox0.Add(wx.StaticText(self, label="Connection:".ljust(15)),
-                  flag=flagsR, border=5)
-        self.connLb = wx.StaticText(self, label=self.connected['0'])
+        hbox0.Add(wx.StaticText(self, label="Connection:".ljust(15)), flag=flagsR, border=5)
+        self.connLb = wx.StaticText(self, label=' Connected ' if self.connectedFlg else ' Unconnected ')
+        self.connLb.SetBackgroundColour( wx.Colour('GREEN') if self.connectedFlg else wx.Colour(120, 120, 120))
         hbox0.Add(self.connLb, flag=flagsR, border=5)
         mSizer.Add(hbox0, flag=flagsR, border=5)
         mSizer.AddSpacer(10)
@@ -65,7 +66,6 @@ class PanelPLC(wx.Panel):
         # - row line structure: Input indicator | output label | output button with current status.
         for i in range(self.regsNum):
             hsizer = wx.BoxSizer(wx.HORIZONTAL)
-            # M221 doc: IO 0:3 are regular input, IO 4:7 are fast input.
             # Col idx = 0: PLC input indicators.
             lbtext = " R_%H 0."+str(i)
             inputLb = wx.StaticText(self, label=lbtext.ljust(12))
@@ -80,7 +80,6 @@ class PanelPLC(wx.Panel):
                 # Col idx =2: PLC output ON/OFF contorl buttons.
                 hsizer.AddSpacer(5)
                 outputBt = wx.Button(self, label='OFF', size=(50, 17), name=self.plcName+':'+str(i))
-                #outputBt.Bind(wx.EVT_BUTTON, self.relayOn)
                 self.gpioOuLbList.append(outputBt)
                 hsizer.Add(outputBt, flag=flagsR, border=5)
             mSizer.Add(hsizer, flag=flagsR, border=5)
@@ -88,34 +87,19 @@ class PanelPLC(wx.Panel):
         return mSizer
 
 #--PanelPLC--------------------------------------------------------------------
-    def relayOn(self, event): 
-        """ Turn on the related ralay based on the user's action and update the 
-            button's display situation.
-        """
-        obj = event.GetEventObject()
-        print("PLC panel:   Button idx %s" % str(obj.GetName()))
-        plcIdx = int(obj.GetName().split('[')[0][-1])
-        outIdx = int(obj.GetName().split(':')[-1])
-        # toggle output state.
-        self.gpioOuList[outIdx] = 1 - self.gpioOuList[outIdx]
-        self.updateOutput(outIdx, self.gpioOuList[outIdx])
-        # Update the element on the map.
-        tag = str((plcIdx+1)*100+outIdx)
-        for element in gv.iPowCtrlPanel.powerLabel:
-            if tag in element:
-                gv.iMapMgr.setSignalPwr(element, self.gpioOuList[outIdx])
-                break
-
-#--PanelPLC--------------------------------------------------------------------
     def setConnection(self, state):
-        """ Update the connection state on the UI. 0 - disconnect 1- connected
-        """
-        self.connLb.SetLabel(self.connected[str(state)])
+        """ Update the connection state on the UI."""
+        self.connectedFlg = state
+        self.connLb.SetLabel(' Connected ' if self.connectedFlg else ' Unconnected ')
         self.connLb.SetBackgroundColour(
-            wx.Colour('GREEN') if state else wx.Colour(120, 120, 120))
+            wx.Colour('GREEN') if self.connectedFlg else wx.Colour(120, 120, 120))
         self.Refresh(False)
 
+#--PanelPLC--------------------------------------------------------------------
     def updateHoldingRegs(self, regList):
+        """ Update the holding register's data and UI indicator's state if there 
+            is new register chagne.
+        """
         if regList is None or self.gpioInList == regList: return # no new update
         for idx in range(min(self.regsNum, len(regList))):
             status = regList[idx]
@@ -123,9 +107,12 @@ class PanelPLC(wx.Panel):
                 self.gpioInList[idx] = status
                 self.gpioInLbList[idx].SetBackgroundColour(
                     wx.Colour('GREEN') if status else wx.Colour(120, 120, 120))
-        #self.Refresh(False)
 
+#--PanelPLC--------------------------------------------------------------------
     def updateCoils(self, coilsList):
+        """ Update the coils data and UI indicator's state if there is new coils
+            state chagne.
+        """
         if coilsList is None or self.gpioOuList == coilsList: return  
         for idx in range(min(self.coilsNum, len(coilsList))):
             status = coilsList[idx]
@@ -134,8 +121,8 @@ class PanelPLC(wx.Panel):
                 self.gpioOuLbList[idx].SetLabel('ON' if status else 'OFF')
                 self.gpioOuLbList[idx].SetBackgroundColour(
                     wx.Colour('GREEN') if status else wx.Colour(253, 253, 253))
-        #self.Refresh(False)
 
+#--PanelPLC--------------------------------------------------------------------
     def updataPLCdata(self):
         if gv.idataMgr:
             plcdata =  gv.idataMgr.getPLCInfo(self.plcName)
@@ -143,42 +130,13 @@ class PanelPLC(wx.Panel):
                 self.updateHoldingRegs(plcdata[0])
                 self.updateCoils(plcdata[1])
 
-    
+#--PanelPLC--------------------------------------------------------------------
     def updateDisplay(self, updateFlag=None):
         """ Set/Update the display: if called as updateDisplay() the function will 
             update the panel, if called as updateDisplay(updateFlag=?) the function
             will set the self update flag.
         """
         self.Refresh(False)
-
-#--PanelPLC--------------------------------------------------------------------
-    def updateInput(self, idx, status): 
-        """ Update the input state for each PLC input indicator."""
-        if idx >= 8 or not status in [0,1]: 
-            print("PLC panel:   the input parameter is not valid") 
-            return
-        elif self.gpioInList[idx] != status:
-            self.gpioInList[idx] = status
-            # Change the indicator status.
-            self.gpioInLbList[idx].SetBackgroundColour(
-                wx.Colour('GREEN') if status else wx.Colour(120, 120, 120))
-            self.Refresh(False) # needed after the status update.
-
-#--PanelPLC--------------------------------------------------------------------
-    def updateOutput(self, idx, status):
-        """ Update the output state for each PLC output button."""
-        if idx >= 8 or not status in [0,1]: 
-            print("PLC panel:   the output parameter is not valid") 
-            return
-        elif self.gpioOuList[idx] != status:
-            self.gpioOuList[idx] = status
-            [lbtext, color] = ['ON', wx.Colour('Green')] if status else [
-            'OFF', wx.Colour(200, 200, 200)]
-            self.gpioOuLbList[idx].SetLabel(lbtext)
-            self.gpioOuLbList[idx].SetBackgroundColour(color)
-            self.Refresh(False) # needed after the status update.
-
-
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

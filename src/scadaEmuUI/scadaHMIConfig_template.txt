@@ -1,0 +1,21 @@
+# This is the config file template for the module <monitorApp.py>
+# Setup the paramter with below format (every line follow <key>:<val> format, the
+# key can not be changed):
+
+# Test mode:
+# True: use the real word internal logic to simulator the control logic. 
+# False: connect to PLC let plc control the signals 
+TEST_MD:False
+
+# Init the sensor-signal PLC set information
+SEN_PLC_ID:PLC-00
+SEN_PLC_IP:127.0.0.1
+SEN_PLC_PORT:502
+
+# Init the station PLC set information
+STN_PLC_ID:PLC-03
+STN_PLC_IP:127.0.0.1
+STN_PLC_PORT:503
+
+# Define update clock interval
+CLK_INT:2
