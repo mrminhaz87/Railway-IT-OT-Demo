@@ -1,24 +1,27 @@
 #!/usr/bin/python
 #-----------------------------------------------------------------------------
-# Name:        uiRun.py
+# Name:        TrainCtrlRun.py
 #
-# Purpose:     This module is used as a sample to create the main wx frame.
+# Purpose:     This module is the main wx-frame for the metro trains controller
+#              sysetm HMI.
 #
 # Author:      Yuancheng Liu
 #
-# Created:     2019/01/10
-# Copyright:   YC @ Singtel Cyber Security Research & Development Laboratory
-# License:     YC
+# Version:     v0.1.2
+# Created:     2023/07/12
+# Copyright:   Copyright (c) 2023 Singapore National Cybersecurity R&D Lab LiuYuancheng
+# License:     MIT License 
 #-----------------------------------------------------------------------------
 
 import os
 import time
+
 import wx
+
 import trainCtrlGlobal as gv
 import trainCtrlPanel as pnlFunction
 import trainDataMgr as dataMgr
 
-PERIODIC = 500      # update in every 500ms
 FRAME_SIZE = (1200, 650)
 
 #-----------------------------------------------------------------------------
@@ -26,36 +29,29 @@ FRAME_SIZE = (1200, 650)
 class UIFrame(wx.Frame):
     """ Main UI frame window."""
     def __init__(self, parent, id, title):
-        """ Init the UI and parameters """
+        """ Init the UI and parameters, No boader frame."""
         wx.Frame.__init__(self, parent, id, title, size=FRAME_SIZE)
-        # No boader frame:
         self.SetBackgroundColour(wx.Colour(39, 40, 62))
         self.SetIcon(wx.Icon(gv.ICO_PATH))
         #self.SetTransparent(gv.gTranspPct*255//100)
         self._initGlobals()
-        
         # Build UI sizer
         self._buildMenuBar()
         self.SetSizer(self._buidUISizer())
-        self.updateLock = False
-        if not gv.TEST_MD:
-            gv.idataMgr = dataMgr.DataManager(self, gv.gPlcInfo)
-
         self.statusbar = self.CreateStatusBar(1)
         self.statusbar.SetStatusText('Test mode: %s' %str(gv.TEST_MD))
+        # Init the local parameters:
+        self.updateLock = False
+        # Turn on all the trains power during init.
+        self.turnOnallTrainsPwr()
+        # update the plc connection indicator
+        self.updatePlcConIndicator()
         # Set the periodic call back
         self.lastPeriodicTime = time.time()
         self.timer = wx.Timer(self)
         self.updateLock = False
         self.Bind(wx.EVT_TIMER, self.periodic)
-        self.timer.Start(PERIODIC)  # every 500 ms
-        
-        self.trainPwrState = [True]*10
-        TrainTgtPlcID = 'PLC-06'
-        csIdx, ceIdx = (0, 10)
-        if gv.idataMgr:
-            for idx in range(csIdx, ceIdx):
-                gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, self.trainPwrState[idx])
+        self.timer.Start(gv.PERIODIC)  # every 500 ms
 
 #--UIFrame---------------------------------------------------------------------
     def _initGlobals(self):
@@ -74,25 +70,22 @@ class UIFrame(wx.Frame):
                                      'trainHregIdx': (7,10),
                                      'trainCoilIdx': (7,10),
                                      'color': wx.Colour(255, 136, 0), 'icon': 'cclabel.png'}
-        # Init all the global instance
-        # if gv.gCollsionTestFlg: gv.gTestMD = False # disable the test mode flag to fetch the signal from PLC
-        # Init all the train list
+        # Init all the display manager and the data manager.
         gv.iMapMgr = dataMgr.MapManager(self)
+        if not gv.TEST_MD: gv.idataMgr = dataMgr.DataManager(self, gv.gPlcInfo)
 
 #--UIFrame---------------------------------------------------------------------
     def _buildMenuBar(self):
         menubar = wx.MenuBar()  # Creat the function menu bar.
         # Add the config menu
-        
+
         # Add the about menu.
         helpMenu = wx.Menu()
-        aboutItem = wx.MenuItem(helpMenu, 200,text = "Help",kind = wx.ITEM_NORMAL)
+        aboutItem = wx.MenuItem(helpMenu, 120, text="Help", kind=wx.ITEM_NORMAL)
         helpMenu.Append(aboutItem)
         self.Bind(wx.EVT_MENU, self.onHelp, aboutItem)
         menubar.Append(helpMenu, '&About')
-
         self.SetMenuBar(menubar)
-
 
 #--UIFrame---------------------------------------------------------------------
     def _buidUISizer(self):
@@ -110,9 +103,9 @@ class UIFrame(wx.Frame):
         mSizer.AddSpacer(15)
         mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(-1, 560),
                             style=wx.LI_VERTICAL), flag=flagsL, border=2)
-        
+        # Init all the plc display panel.
         self.plcPnls = {}
-        plcSZ = self._buildPlcPnlsSizer("PLC Monitor Panels [Train]", 
+        plcSZ = self._buildPlcPnlsSizer("PLC Monitor Panels [Trains]", 
                                 ('PLC-06', 'PLC-07'))
         mSizer.Add(plcSZ, flag=flagsL, border=2)
         return mSizer
@@ -136,7 +129,6 @@ class UIFrame(wx.Frame):
             sublabel = wx.StaticBitmap(self, -1, png, (10, 5), (png.GetWidth(), png.GetHeight()))
             hbox = wx.BoxSizer(wx.HORIZONTAL)
             hbox.Add(sublabel, flag=flagsL, border=2)
-            
             for i in range(panelCfg['num']):
                 trainPanel = pnlFunction.PanelTainCtrl(self, panelCfg['id'], i, bgColor=color)
                 hbox.Add(trainPanel, flag=flagsL, border=2)
@@ -144,7 +136,6 @@ class UIFrame(wx.Frame):
             vbox0.Add(hbox, flag=flagsL, border=2)
             vbox0.AddSpacer(5)
         return vbox0
-
 
 #--UIFrame---------------------------------------------------------------------
     def _buildPlcPnlsSizer(self, PanelTitle, panelKeySeq):
@@ -165,7 +156,6 @@ class UIFrame(wx.Frame):
             ipaddr = panelInfo['ipaddress'] + ' : ' + str(panelInfo['port'])
             self.plcPnls[key] = pnlFunction.PanelPLC(self, panelInfo['label'], ipaddr)
             hbox1.Add(self.plcPnls[key], flag=flagsL, border=2)
-        
         vSizer.Add(hbox1, flag=flagsL, border=2)
         return vSizer
 
@@ -183,11 +173,11 @@ class UIFrame(wx.Frame):
                     tgtPlcID = gv.gPlcPnlInfo[key]['tgt']
                     rsIdx, reIdx = gv.gPlcPnlInfo[key]['hRegsInfo']
                     registList = gv.idataMgr.getPlcHRegsData(tgtPlcID, rsIdx, reIdx)
-                    print(registList)
+                    #print(registList)
                     self.plcPnls[key].updateHoldingRegs(registList)
                     csIdx, ceIdx = gv.gPlcPnlInfo[key]['coilsInfo']
                     coilsList = gv.idataMgr.getPlcCoilsData(tgtPlcID, csIdx, ceIdx)
-                    print(coilsList)
+                    #print(coilsList)
                     self.plcPnls[key].updateCoils(coilsList)
                     self.plcPnls[key].updateDisplay()
                 # update the display Info
@@ -212,6 +202,22 @@ class UIFrame(wx.Frame):
                         Created:     2023/07/20 \n \
                         GitHub Link: https://github.com/LiuYuancheng/Metro_emulator \n', 
                     'Help', wx.OK)
+        
+#-----------------------------------------------------------------------------
+    def turnOnallTrainsPwr(self):
+        gv.gDebugPrint('Power on all the trains', logType=gv.LOG_INFO)
+        self.trainPwrState = [True]*10
+        TrainTgtPlcID = gv.PLC_ID
+        csIdx, ceIdx = (0, 10)
+        if gv.idataMgr:
+            for idx in range(csIdx, ceIdx):
+                gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, self.trainPwrState[idx])
+
+#-----------------------------------------------------------------------------
+    def updatePlcConIndicator(self):
+        if gv.idataMgr:
+            for val in self.plcPnls.values():
+                val.setConnection(gv.idataMgr.getConntionState(gv.PLC_ID))
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

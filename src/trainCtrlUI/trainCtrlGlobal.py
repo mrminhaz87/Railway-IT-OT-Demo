@@ -63,7 +63,7 @@ IMG_FD = os.path.join(dirpath, 'img')
 ICO_PATH = os.path.join(IMG_FD, "metro.ico")
 
 TEST_MD = CONFIG_DICT['TEST_MD']      # test mode flag, True: the simulator will operate with control logic itself. 
-PERIODIC = 300      # update the main in every 300ms
+PERIODIC = 500      # update the main in every 300ms
 PLC_ID = CONFIG_DICT['PLC_ID']
 PLC_IP = CONFIG_DICT['PLC_IP']
 PLC_PORT = int(CONFIG_DICT['PLC_PORT'])

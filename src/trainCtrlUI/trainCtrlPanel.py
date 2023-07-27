@@ -176,7 +176,11 @@ class PanelPLC(wx.Panel):
                 self.gpioInLbList[idx].SetBackgroundColour(
                     wx.Colour('GREEN') if status else wx.Colour(120, 120, 120))
 
+#--PanelPLC--------------------------------------------------------------------
     def updateCoils(self, coilsList):
+        """ Update the coils data and UI indicator's state if there is new coils
+            state chagne.
+        """
         if coilsList is None or self.gpioOuList == coilsList: return  
         for idx in range(min(self.coilsNum, len(coilsList))):
             status = coilsList[idx]
@@ -186,6 +190,7 @@ class PanelPLC(wx.Panel):
                 self.gpioOuLbList[idx].SetBackgroundColour(
                     wx.Colour('GREEN') if status else wx.Colour(253, 253, 253))
 
+#--PanelPLC--------------------------------------------------------------------
     def updataPLCdata(self):
         if gv.idataMgr:
             plcdata =  gv.idataMgr.getPLCInfo(self.plcName)
@@ -193,7 +198,7 @@ class PanelPLC(wx.Panel):
                 self.updateHoldingRegs(plcdata[0])
                 self.updateCoils(plcdata[1])
 
-    
+#--PanelPLC--------------------------------------------------------------------
     def updateDisplay(self, updateFlag=None):
         """ Set/Update the display: if called as updateDisplay() the function will 
             update the panel, if called as updateDisplay(updateFlag=?) the function
@@ -201,37 +206,10 @@ class PanelPLC(wx.Panel):
         """
         self.Refresh(False)
 
-#--PanelPLC--------------------------------------------------------------------
-    def updateInput(self, idx, status): 
-        """ Update the input state for each PLC input indicator."""
-        if idx >= 8 or not status in [0,1]: 
-            print("PLC panel:   the input parameter is not valid") 
-            return
-        elif self.gpioInList[idx] != status:
-            self.gpioInList[idx] = status
-            # Change the indicator status.
-            self.gpioInLbList[idx].SetBackgroundColour(
-                wx.Colour('GREEN') if status else wx.Colour(120, 120, 120))
-            self.Refresh(False) # needed after the status update.
-
-#--PanelPLC--------------------------------------------------------------------
-    def updateOutput(self, idx, status):
-        """ Update the output state for each PLC output button."""
-        if idx >= 8 or not status in [0,1]: 
-            print("PLC panel:   the output parameter is not valid") 
-            return
-        elif self.gpioOuList[idx] != status:
-            self.gpioOuList[idx] = status
-            [lbtext, color] = ['ON', wx.Colour('Green')] if status else [
-            'OFF', wx.Colour(200, 200, 200)]
-            self.gpioOuLbList[idx].SetLabel(lbtext)
-            self.gpioOuLbList[idx].SetBackgroundColour(color)
-            self.Refresh(False) # needed after the status update.
-
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class PanelTainCtrl(wx.Panel):
-    """ Train control Panel control panel."""
+    """ Train power on/oof control panel."""
 
     def __init__(self, parent, trackID, trainID, bgColor=wx.Colour(200, 210, 200)):
         wx.Panel.__init__(self, parent)
@@ -248,6 +226,7 @@ class PanelTainCtrl(wx.Panel):
         stoptBmp = wx.Bitmap(os.path.join(gv.IMG_FD, 'emgStop32.png'), wx.BITMAP_TYPE_ANY)
         font = wx.Font(11, wx.DECORATIVE, wx.BOLD, wx.BOLD)
         vbox = wx.BoxSizer(wx.VERTICAL)
+        # Row 0 : add the panel label: trains ID.
         label = wx.StaticText(self, label=" %s - %s" %(self.trackID, str(self.trainID)))
         label.SetFont(font)
         label.SetForegroundColour(wx.WHITE)
@@ -278,7 +257,11 @@ class PanelTainCtrl(wx.Panel):
             TrainTgtPlcID = 'PLC-06'
             startIdx = gv.gTrackConfig[self.trackID]['trainCoilIdx'][0]
             idx = startIdx + int(self.trainID)
-            gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, True)
+            # pop up a power change confirm message box
+            dlg = wx.MessageDialog(None, "Confirm Power on %s" %'-'.join((self.trackID, str(self.trainID))),
+                                   'Train Pwr Change',wx.YES_NO | wx.ICON_WARNING)
+            result = dlg.ShowModal()
+            if result == wx.ID_YES: gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, True)
 
     #-----------------------------------------------------------------------------
     def turnOffTrain(self, event):
@@ -287,31 +270,11 @@ class PanelTainCtrl(wx.Panel):
             TrainTgtPlcID = 'PLC-06'
             startIdx = gv.gTrackConfig[self.trackID]['trainCoilIdx'][0]
             idx = startIdx + int(self.trainID)
-            gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, False)
-
-#-----------------------------------------------------------------------------
-#-----------------------------------------------------------------------------
-class PanelCtrl(wx.Panel):
-    """ Function control panel."""
-
-    def __init__(self, parent):
-        wx.Panel.__init__(self, parent)
-        self.SetBackgroundColour(wx.Colour(200, 210, 200))
-        self.gpsPos = None
-        self.SetSizer(self._buidUISizer())
-
-#--PanelCtrl-------------------------------------------------------------------
-    def _buidUISizer(self):
-        """ build the control panel sizer. """
-        flagsR = wx.CENTER
-        ctSizer = wx.BoxSizer(wx.VERTICAL)
-        hbox0 = wx.BoxSizer(wx.HORIZONTAL)
-        ctSizer.AddSpacer(5)
-        # Row idx 0: show the search key and map zoom in level.
-        hbox0.Add(wx.StaticText(self, label="Control panel".ljust(15)),
-                  flag=flagsR, border=2)
-        ctSizer.Add(hbox0, flag=flagsR, border=2)
-        return ctSizer
+            # pop up a power change confirm message box
+            dlg = wx.MessageDialog(None, "Confirm Power on %s" %'-'.join((self.trackID, str(self.trainID))),
+                                   'Train Pwr Change',wx.YES_NO | wx.ICON_WARNING)
+            result = dlg.ShowModal()
+            if result == wx.ID_YES: gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, False)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
