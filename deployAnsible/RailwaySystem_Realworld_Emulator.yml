@@ -48,3 +48,18 @@
      - name: Copy the file from master to mwiapp02
        copy: src=buffer/app01-to-app02.jar dest=/tmp/
        when: "{{ inventory_hostname == 'mwiapp02' }}"
+
+
+
+
+- name: Copy config file from ansible host to VM
+  hosts: '{{ target-vm-name }}'
+  tasks:
+    - name: Copying the config file
+      become: true 
+      copy:
+        src: '{{host-config-file-path}}'
+        dest: '{{git-cloned-file-path}}'
+        owner: XS23-RAIL
+        group: XS23-RAIL        
+
