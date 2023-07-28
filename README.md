@@ -1,6 +1,6 @@
-# Railway[Metro] IT/OT System security test platform
+# Railway[Metro] IT/OT System Security Test Platform
 
-**Project Design :** We want to create a digital twin type Railway emulation platform  to simulate multiple trains running on different tracks with different sensor-signal control for cyber security researchers to demo/test different kind of IT attack's affect on OT system. The system contents 6 main components (programs): 
+**Project Design :** We want to create a digital twin type Railway system emulation platform to simulate multiple trains running on different tracks with different sensor-signal control for cyber security researchers to demo/test different kind of IT attack's affect on OT system. The system contents 6 main components (programs): 
 
 - 2D Railway[Metro] System Real-world Emulator
 - Railway System SCADA HMI
