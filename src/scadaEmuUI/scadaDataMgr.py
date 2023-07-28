@@ -8,11 +8,12 @@
 # Author:      Yuancheng Liu
 #
 # Created:     2023/06/13
-# Version:     v_0.1
-# Copyright:   n.a
-# License:     n.a
+# Version:     v0.1.2
+# Copyright:   Copyright (c) 2023 Singapore National Cybersecurity R&D Lab LiuYuancheng
+# License:     MIT License
 #-----------------------------------------------------------------------------
 
+import time
 from collections import OrderedDict
 
 import scadaGobal as gv
@@ -22,8 +23,7 @@ import modbusTcpCom
 #-----------------------------------------------------------------------------
 class DataManager(object):
     """ The data manager is a module running parallel with the main thread to 
-        handle the data-IO with dataBase and the monitor hub's data fetching/
-        changing request.
+        connect to PLCs to do the data communication with modbus TCP.
     """
     def __init__(self, parent, plcInfo) -> None:
         self.parent = parent
@@ -41,7 +41,7 @@ class DataManager(object):
                 gv.gDebugPrint('DataManager: Fail to connect to PLC', logType=gv.LOG_INFO)
             self.regsDict[key] = []
             self.coilsDict[key] = []
-        gv.gDebugPrint('ScadaMgr inited', logType=gv.LOG_INFO)
+        gv.gDebugPrint('Scada dataMgr inited', logType=gv.LOG_INFO)
 
     #--UIFrame---------------------------------------------------------------------
     def periodic(self, now):
@@ -53,12 +53,22 @@ class DataManager(object):
             coilsAddr, coilsNum = self.plcInfo[key]['coilsInfo']
             self.coilsDict[key] = self.plcClients[key].getCoilsBits(coilsAddr, coilsNum)
 
+    #-----------------------------------------------------------------------------
     def getPlcHRegsData(self, plcid, startIdx, endIdx):
         if plcid in self.regsDict.keys():
-            return self.regsDict[plcid][startIdx:endIdx]
+            if not self.regsDict[plcid] is None:
+                return self.regsDict[plcid][startIdx:endIdx]
         return None
 
-    def getPlcCoilsData(self, plcid, startIdx, endIdx):
-        if plcid in self.coilsDict.keys():
-            return self.coilsDict[plcid][startIdx:endIdx]
-        return None
+    #-----------------------------------------------------------------------------
+    def getConntionState(self, plcID):
+        if plcID in self.plcClients.keys():
+            return self.plcClients[plcID].checkConn()
+        return False
+    
+    #-----------------------------------------------------------------------------
+    def setPlcCoilsData(self, plcid, idx, val):
+        if plcid in self.plcClients.keys():
+            gv.gDebugPrint('DataManager: set PLC coil:%s' %str((plcid, idx, val)), logType=gv.LOG_INFO)
+            self.plcClients[plcid].setCoilsBit(idx, val)
+            time.sleep(0.1)

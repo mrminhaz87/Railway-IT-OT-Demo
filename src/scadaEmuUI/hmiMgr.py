@@ -220,7 +220,6 @@ class MapMgr(object):
                 signal.addTFoffPos(sPosList[idx])
             self.signals[key].append(signal)
 
-
     def _initStations(self):
         y = 100
         trackStation_we = [{'id': 'Tuas_Link', 'pos': (80+100*0+60, y), 'layout': gv.LAY_D},
@@ -288,7 +287,6 @@ class MapMgr(object):
                 self.signals[trackID][i].setState(state)
 
     def setStationsSensors(self, trackID, stateList):
-        
         if trackID in self.stations.keys() and len(stateList) <= len(self.stations[trackID]):
             for i, state in enumerate(stateList):
                 self.stations[trackID][i].setSensorState(state)

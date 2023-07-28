@@ -3,19 +3,49 @@
 # Name:        uiPanel.py
 #
 # Purpose:     This module is used to create different function panels.
+#
 # Author:      Yuancheng Liu
 #
-# Created:     2020/01/10
-# Copyright:   YC @ Singtel Cyber Security Research & Development Laboratory
-# License:     YC
+# Version:     v0.1.2
+# Created:     2023/07/12
+# Copyright:   Copyright (c) 2023 Singapore National Cybersecurity R&D Lab LiuYuancheng
+# License:     MIT License 
 #-----------------------------------------------------------------------------
-import wx
 
-from datetime import datetime
+import wx
+import os
+
 import scadaGobal as gv
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
+class PanelSensorLabels(wx.Panel):
+
+    def __init__(self, parent, labelInfoList):
+        """ Init the panel."""
+        wx.Panel.__init__(self, parent)
+        img = os.path.join(gv.IMG_FD, 'plcLS.png')
+        self.lbBmap = wx.Image(img, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+         
+        self.labelInfoList = labelInfoList
+        self.SetSizer(self.buidUISizer())
+
+#-----------------------------------------------------------------------------
+    def buidUISizer(self):
+        mSizer = wx.BoxSizer(wx.VERTICAL) # main sizer
+        flagsR = wx.LEFT
+        btnSample = wx.StaticBitmap(self, -1, self.lbBmap, (0, 0), (self.lbBmap.GetWidth(), self.lbBmap.GetHeight()))
+        mSizer.Add(btnSample, flag=flagsR, border=5)
+        for labelInfo in self.labelInfoList:
+            prefix = labelInfo['prefix']
+            idRange = labelInfo['range']
+            color = labelInfo['color']
+            for i in range(idRange[0], idRange[1]):
+                lbtext = prefix+str(i)+' - '
+                inputLb = wx.StaticText(self, label=lbtext.ljust(10))
+                inputLb.SetForegroundColour(color)
+                mSizer.Add(inputLb, flag=flagsR, border=5)
+        return mSizer
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -23,7 +53,7 @@ class PanelPLC(wx.Panel):
     """ PLC panel UI to show PLC input feedback state and the relay connected 
         to the related output pin.
     """
-    def __init__(self, parent, name, ipAddr):
+    def __init__(self, parent, name, ipAddr, icon=None, dInInfoList=None, dOutInfoList=None):
         """ Init the panel."""
         wx.Panel.__init__(self, parent)
         self.SetBackgroundColour(wx.Colour(200, 200, 200))
@@ -37,7 +67,12 @@ class PanelPLC(wx.Panel):
         self.gpioInLbList = []  # GPIO input device <id> label list.
         self.gpioOuList = [0]*self.coilsNum # PLC GPIO output situation list.
         self.gpioOuLbList = []  # GPIO output device <id> label list.
+        self.dInInfoList = dInInfoList
+        self.dOutInfoList = dOutInfoList
+
         # Init the UI.
+        img = os.path.join(gv.IMG_FD, 'plcIcon.png')
+        self.lbBmap = wx.Image(img, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         self.SetSizer(self.buidUISizer())
         #self.Layout() # must call the layout if the panel size is set to fix.
 
@@ -48,24 +83,27 @@ class PanelPLC(wx.Panel):
         flagsR = wx.LEFT
         mSizer.AddSpacer(5)
         # Row idx = 0 : set the basic PLC informaiton.
-        self.nameLb = wx.StaticText(self, label=" PLC Name: ".ljust(15)+self.plcName)
-        mSizer.Add(self.nameLb, flag=flagsR, border=5)
-        self.ipaddrLb = wx.StaticText( self, label=" PLC IPaddr: ".ljust(15)+self.ipAddr)
-        mSizer.Add(self.ipaddrLb, flag=flagsR, border=5)
-        hbox0 = wx.BoxSizer(wx.HORIZONTAL)
-        hbox0.Add(wx.StaticText(self, label="Connection:".ljust(15)), flag=flagsR, border=5)
-        self.connLb = wx.StaticText(self, label=' Connected ' if self.connectedFlg else ' Unconnected ')
-        self.connLb.SetBackgroundColour( wx.Colour('GREEN') if self.connectedFlg else wx.Colour(120, 120, 120))
-        hbox0.Add(self.connLb, flag=flagsR, border=5)
-        mSizer.Add(hbox0, flag=flagsR, border=5)
+        titleSZ = self._buildTitleSizer()
+        mSizer.Add(titleSZ, flag=flagsR, border=5)
         mSizer.AddSpacer(10)
         # Row idx = 1: set the GPIO and feed back of the PLC. 
-        mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(220, -1),
+        mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(270, -1),
                                  style=wx.LI_HORIZONTAL), flag=flagsR, border=5)
         mSizer.AddSpacer(10)
         # - row line structure: Input indicator | output label | output button with current status.
         for i in range(self.regsNum):
             hsizer = wx.BoxSizer(wx.HORIZONTAL)
+            # Col idx = 0: PLC digital in 
+            if self.dInInfoList and i < len(self.dInInfoList):
+                cfg = self.dInInfoList[i]
+                lbtext = cfg['item']
+                inputLb = wx.StaticText(self, label=lbtext.ljust(10))
+                inputLb.SetBackgroundColour(cfg['color'])
+                hsizer.Add(inputLb, flag=flagsR, border=5)
+            else:
+                inputLb = wx.StaticText(self, label='----'.ljust(10))
+                inputLb.SetBackgroundColour(wx.Colour('BLACK'))
+                hsizer.Add(inputLb, flag=flagsR, border=5)
             # Col idx = 0: PLC input indicators.
             lbtext = " R_%H 0."+str(i)
             inputLb = wx.StaticText(self, label=lbtext.ljust(12))
@@ -73,18 +111,52 @@ class PanelPLC(wx.Panel):
             hsizer.Add(inputLb, flag=flagsR, border=5)
             self.gpioInLbList.append(inputLb)
             # Col idx =1: PLC output labels.
-            hsizer.AddSpacer(15)
+            hsizer.AddSpacer(5)
             if i < self.coilsNum:
+                # Added the coils output info.
                 hsizer.Add(wx.StaticText(self, label=str(
                     " %Q 0."+str(i)+':').ljust(12)), flag=flagsR, border=5)
                 # Col idx =2: PLC output ON/OFF contorl buttons.
-                hsizer.AddSpacer(5)
+                #hsizer.AddSpacer(5)
                 outputBt = wx.Button(self, label='OFF', size=(50, 17), name=self.plcName+':'+str(i))
                 self.gpioOuLbList.append(outputBt)
                 hsizer.Add(outputBt, flag=flagsR, border=5)
+                # Add the digital output 
+                if self.dOutInfoList and i < len(self.dOutInfoList):
+                    cfg = self.dOutInfoList[i]
+                    lbtext = cfg['item']
+                    outputLb = wx.StaticText(self, label=lbtext.ljust(10))
+                    outputLb.SetBackgroundColour(cfg['color'])
+                    hsizer.Add(outputLb, flag=flagsR, border=5)
+                else:
+                    outputLb = wx.StaticText(self, label='----'.ljust(10))
+                    outputLb.SetBackgroundColour(wx.Colour('BLACK'))
+                    hsizer.Add(outputLb, flag=flagsR, border=5)
             mSizer.Add(hsizer, flag=flagsR, border=5)
             mSizer.AddSpacer(3)
         return mSizer
+
+#--PanelPLC--------------------------------------------------------------------
+    def _buildTitleSizer(self):
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
+        flagsR = wx.LEFT
+        btnSample = wx.StaticBitmap(self, -1, self.lbBmap, (0, 0), (self.lbBmap.GetWidth(), self.lbBmap.GetHeight()))
+        hsizer.Add(btnSample, flag=flagsR, border=5)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
+        self.nameLb = wx.StaticText(self, label=" PLC Name: ".ljust(15)+self.plcName)
+        vsizer.Add(self.nameLb, flag=flagsR, border=5)
+        self.ipaddrLb = wx.StaticText( self, label=" PLC IPaddr: ".ljust(15)+self.ipAddr)
+        vsizer.Add(self.ipaddrLb, flag=flagsR, border=5)
+        hbox0 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox0.Add(wx.StaticText(self, label="Connection:".ljust(15)), flag=flagsR, border=5)
+        self.connLb = wx.StaticText(self, label=' Connected ' if self.connectedFlg else ' Unconnected ')
+        self.connLb.SetBackgroundColour( wx.Colour('GREEN') if self.connectedFlg else wx.Colour(120, 120, 120))
+        hbox0.Add(self.connLb, flag=flagsR, border=5)
+        vsizer.Add(hbox0, flag=flagsR, border=5)
+        hsizer.Add(vsizer, flag=flagsR, border=5)
+        return hsizer
+
+
 
 #--PanelPLC--------------------------------------------------------------------
     def setConnection(self, state):

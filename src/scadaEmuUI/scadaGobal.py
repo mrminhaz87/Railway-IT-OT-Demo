@@ -87,7 +87,6 @@ LAY_V = 6   # vertical layout
 
 gTrackConfig = OrderedDict()
 
-
 # PLC connection info
 gPlcInfo = OrderedDict()
 

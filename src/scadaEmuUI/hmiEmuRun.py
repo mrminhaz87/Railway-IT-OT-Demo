@@ -55,6 +55,8 @@ class UIFrame(wx.Frame):
         self.Bind(wx.EVT_TIMER, self.periodic)
         self.timer.Start(PERIODIC)  # every 500 ms
 
+
+#-----------------------------------------------------------------------------
     def _initGlobals(self):
         # Init the global parameters used only by this module
         gv.gTrackConfig['weline'] = {'id': 'weline',
@@ -134,9 +136,9 @@ class UIFrame(wx.Frame):
         hbox1.Add(wx.StaticLine(self, wx.ID_ANY, size=(-1, 400),
                         style=wx.LI_VERTICAL), flag=flagsL, border=5)
         hbox1.AddSpacer(10)
-        label2 = wx.StaticText(self, label="Maintenance-Track Place Holder")
-        label2.SetFont(font)
-        hbox1.Add(label2, flag=flagsL, border=2)
+        #label2 = wx.StaticText(self, label="Maintenance-Track Place Holder")
+        #label2.SetFont(font)
+        #hbox1.Add(label2, flag=flagsL, border=2)
 
         # for key, val in gv.gPlcPnlInfo.items():
         #     hbox1.AddSpacer(10)
@@ -157,7 +159,6 @@ class UIFrame(wx.Frame):
         vSizer.Add(label, flag=flagsL, border=2)
         vSizer.AddSpacer(5)
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
-        #panelSeq = ('PLC-00', 'PLC-01', 'PLC-02')
         for key in panelKeySeq:
             hbox1.AddSpacer(10)
             panelInfo = gv.gPlcPnlInfo[key]
