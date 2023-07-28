@@ -61,6 +61,13 @@ class DataManager(object):
         return None
 
     #-----------------------------------------------------------------------------
+    def getPlcCoilsData(self, plcid, startIdx, endIdx):
+        if plcid in self.coilsDict.keys():
+            if not self.coilsDict[plcid] is None:
+                return self.coilsDict[plcid][startIdx:endIdx]
+        return None
+
+    #-----------------------------------------------------------------------------
     def getConntionState(self, plcID):
         if plcID in self.plcClients.keys():
             return self.plcClients[plcID].checkConn()

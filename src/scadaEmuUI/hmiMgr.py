@@ -37,6 +37,7 @@ class AgentSensors(object):
             self.sensorsStateList[idx] = state
 
     def updateSensorsState(self, statList):
+        if statList is None: return
         print("update sensor: %s, in: %s, %s " % (str( self.id), str(self.sensorsCount), str(len(statList)) ))
         if len(statList) == self.sensorsCount:
             self.sensorsStateList = statList
@@ -282,16 +283,19 @@ class MapMgr(object):
         self.sensors[trackID].updateSensorsState(stateList)
 
     def setSingals(self, trackID, stateList):
+        if trackID is None or stateList is None: return
         if len(stateList) <= len(self.signals[trackID]):
             for i, state in enumerate(stateList):
                 self.signals[trackID][i].setState(state)
 
     def setStationsSensors(self, trackID, stateList):
+        if trackID is None or stateList is None: return
         if trackID in self.stations.keys() and len(stateList) <= len(self.stations[trackID]):
             for i, state in enumerate(stateList):
                 self.stations[trackID][i].setSensorState(state)
 
     def setStationsSignals(self, trackID, stateList):
+        if trackID is None or stateList is None: return
         if trackID in self.stations.keys() and len(stateList) <= len(self.stations[trackID]):
             for i, state in enumerate(stateList):
                 self.stations[trackID][i].setSignalState(state)

@@ -17,35 +17,6 @@ import os
 
 import scadaGobal as gv
 
-#-----------------------------------------------------------------------------
-#-----------------------------------------------------------------------------
-class PanelSensorLabels(wx.Panel):
-
-    def __init__(self, parent, labelInfoList):
-        """ Init the panel."""
-        wx.Panel.__init__(self, parent)
-        img = os.path.join(gv.IMG_FD, 'plcLS.png')
-        self.lbBmap = wx.Image(img, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-         
-        self.labelInfoList = labelInfoList
-        self.SetSizer(self.buidUISizer())
-
-#-----------------------------------------------------------------------------
-    def buidUISizer(self):
-        mSizer = wx.BoxSizer(wx.VERTICAL) # main sizer
-        flagsR = wx.LEFT
-        btnSample = wx.StaticBitmap(self, -1, self.lbBmap, (0, 0), (self.lbBmap.GetWidth(), self.lbBmap.GetHeight()))
-        mSizer.Add(btnSample, flag=flagsR, border=5)
-        for labelInfo in self.labelInfoList:
-            prefix = labelInfo['prefix']
-            idRange = labelInfo['range']
-            color = labelInfo['color']
-            for i in range(idRange[0], idRange[1]):
-                lbtext = prefix+str(i)+' - '
-                inputLb = wx.StaticText(self, label=lbtext.ljust(10))
-                inputLb.SetForegroundColour(color)
-                mSizer.Add(inputLb, flag=flagsR, border=5)
-        return mSizer
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -97,11 +68,11 @@ class PanelPLC(wx.Panel):
             if self.dInInfoList and i < len(self.dInInfoList):
                 cfg = self.dInInfoList[i]
                 lbtext = cfg['item']
-                inputLb = wx.StaticText(self, label=lbtext.ljust(10))
+                inputLb = wx.StaticText(self, label=lbtext.ljust(6))
                 inputLb.SetBackgroundColour(cfg['color'])
                 hsizer.Add(inputLb, flag=flagsR, border=5)
             else:
-                inputLb = wx.StaticText(self, label='----'.ljust(10))
+                inputLb = wx.StaticText(self, label='----'.ljust(6))
                 inputLb.SetBackgroundColour(wx.Colour('BLACK'))
                 hsizer.Add(inputLb, flag=flagsR, border=5)
             # Col idx = 0: PLC input indicators.
@@ -125,11 +96,11 @@ class PanelPLC(wx.Panel):
                 if self.dOutInfoList and i < len(self.dOutInfoList):
                     cfg = self.dOutInfoList[i]
                     lbtext = cfg['item']
-                    outputLb = wx.StaticText(self, label=lbtext.ljust(10))
+                    outputLb = wx.StaticText(self, label=lbtext.ljust(6))
                     outputLb.SetBackgroundColour(cfg['color'])
                     hsizer.Add(outputLb, flag=flagsR, border=5)
                 else:
-                    outputLb = wx.StaticText(self, label='----'.ljust(10))
+                    outputLb = wx.StaticText(self, label='----'.ljust(6))
                     outputLb.SetBackgroundColour(wx.Colour('BLACK'))
                     hsizer.Add(outputLb, flag=flagsR, border=5)
             mSizer.Add(hsizer, flag=flagsR, border=5)
@@ -148,15 +119,13 @@ class PanelPLC(wx.Panel):
         self.ipaddrLb = wx.StaticText( self, label=" PLC IPaddr: ".ljust(15)+self.ipAddr)
         vsizer.Add(self.ipaddrLb, flag=flagsR, border=5)
         hbox0 = wx.BoxSizer(wx.HORIZONTAL)
-        hbox0.Add(wx.StaticText(self, label="Connection:".ljust(15)), flag=flagsR, border=5)
+        hbox0.Add(wx.StaticText(self, label=" Connection:".ljust(15)), flag=flagsR)
         self.connLb = wx.StaticText(self, label=' Connected ' if self.connectedFlg else ' Unconnected ')
         self.connLb.SetBackgroundColour( wx.Colour('GREEN') if self.connectedFlg else wx.Colour(120, 120, 120))
         hbox0.Add(self.connLb, flag=flagsR, border=5)
         vsizer.Add(hbox0, flag=flagsR, border=5)
         hsizer.Add(vsizer, flag=flagsR, border=5)
         return hsizer
-
-
 
 #--PanelPLC--------------------------------------------------------------------
     def setConnection(self, state):

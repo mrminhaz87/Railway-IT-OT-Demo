@@ -154,8 +154,7 @@ class MapManager(object):
 #-----------------------------------------------------------------------------
 class DataManager(object):
     """ The data manager is a module running parallel with the main thread to 
-        handle the data-IO with dataBase and the monitor hub's data fetching/
-        changing request.
+        connect to PLCs to do the data communication with modbus TCP
     """
     def __init__(self, parent, plcInfo) -> None:
         self.parent = parent
@@ -173,7 +172,7 @@ class DataManager(object):
                 gv.gDebugPrint('DataManager: Fail to connect to PLC', logType=gv.LOG_INFO)
             self.regsDict[key] = []
             self.coilsDict[key] = []
-        gv.gDebugPrint('ScadaMgr inited', logType=gv.LOG_INFO)
+        gv.gDebugPrint('Trains dataMgr inited', logType=gv.LOG_INFO)
 
     #-----------------------------------------------------------------------------
     def periodic(self, now):

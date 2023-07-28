@@ -41,6 +41,10 @@ class UIFrame(wx.Frame):
         self._initGlobals()
         self._buildMenuBar()
         # Build UI sizer
+        self.digitalInLBList= None
+        self.digitalOutLBList = None
+        self._initDigitalLbs()
+
         self.SetSizer(self._buidUISizer())
 
         self.statusbar = self.CreateStatusBar(1)
@@ -50,6 +54,7 @@ class UIFrame(wx.Frame):
         if not gv.TEST_MD:
             gv.idataMgr = dataMgr.DataManager(self, gv.gPlcInfo)
         # Set the periodic call back
+        self.updatePlcConIndicator()
         self.lastPeriodicTime = time.time()
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.periodic)
@@ -82,6 +87,92 @@ class UIFrame(wx.Frame):
         # Init all the global instance
         gv.iMapMgr = mapMgr.MapMgr(self)
 
+#--UIFrame---------------------------------------------------------------------
+    def _initDigitalLbs(self):
+        self.digitalInLBList= {}
+        self.digitalOutLBList ={}
+        # init the PLC-00
+        self.digitalInLBList['PLC-00'] = []
+        for i in range(0, 15):
+            data = {'item': 'wes'+str(i).zfill(2), 'color':wx.Colour(52, 169, 129)}
+            self.digitalInLBList['PLC-00'].append(data)
+        
+        self.digitalOutLBList['PLC-00'] = []
+        for i in range(0, 7):
+            data = {'item': 'Swe'+str(i).zfill(2), 'color':wx.Colour(52, 169, 129)}
+            self.digitalOutLBList['PLC-00'].append(data)
+       
+        # init the PLC-01
+        self.digitalInLBList['PLC-01'] = []
+        for i in range(0, 2):
+            data = {'item': 'wes'+str(i+14).zfill(2), 'color':wx.Colour(52, 169, 129)}
+            self.digitalInLBList['PLC-01'].append(data)
+        for i in range(0, 8):
+            data = {'item': 'nss'+str(i).zfill(2), 'color':wx.Colour(233, 0, 97)}
+            self.digitalInLBList['PLC-01'].append(data)
+        for i in range(0, 5):
+            data = {'item': 'ccs'+str(i).zfill(2), 'color':wx.Colour(255, 136, 0)}
+            self.digitalInLBList['PLC-01'].append(data)
+        
+        self.digitalOutLBList['PLC-01'] = []
+        for i in range(0, 4):
+            data = {'item': 'Sns'+str(i).zfill(2), 'color':wx.Colour(233, 0, 97)}
+            self.digitalOutLBList['PLC-01'].append(data)
+        for i in range(0, 3):
+            data = {'item': 'Scc'+str(i).zfill(2), 'color':wx.Colour(255, 136, 0)}
+            self.digitalOutLBList['PLC-01'].append(data)
+    
+        # init the PLC-02
+        self.digitalInLBList['PLC-02'] = []
+        for i in range(4, 13):
+            data = {'item': 'Scc'+str(i).zfill(2), 'color':wx.Colour(255, 136, 0)}
+            self.digitalInLBList['PLC-02'].append(data)
+
+        self.digitalOutLBList['PLC-02'] = []
+        for i in range(3, 7):
+            data = {'item': 'Scc'+str(i).zfill(2), 'color':wx.Colour(255, 136, 0)}
+            self.digitalOutLBList['PLC-02'].append(data)
+
+
+      # init the PLC-03
+        self.digitalInLBList['PLC-03'] = []
+        for i in range(0, 8):
+            data = {'item': 'west'+str(i).zfill(2), 'color':wx.Colour(52, 169, 129)}
+            self.digitalInLBList['PLC-03'].append(data)
+
+        self.digitalOutLBList['PLC-03'] = []
+        for i in range(0, 8):
+            data = {'item': 'STwe'+str(i).zfill(2), 'color':wx.Colour(52, 169, 129)}
+            self.digitalOutLBList['PLC-03'].append(data)
+
+
+      # init the PLC-04
+        self.digitalInLBList['PLC-04'] = []
+        for i in range(8, 10):
+            data = {'item': 'west'+str(i).zfill(2), 'color':wx.Colour(52, 169, 129)}
+            self.digitalInLBList['PLC-04'].append(data)
+        for i in range(0, 6):
+            data = {'item': 'nsst'+str(i).zfill(2), 'color':wx.Colour(233, 0, 97)}
+            self.digitalInLBList['PLC-04'].append(data)
+
+        self.digitalOutLBList['PLC-04'] = []
+        for i in range(8, 10):
+            data = {'item': 'STwe'+str(i).zfill(2), 'color':wx.Colour(52, 169, 129)}
+            self.digitalOutLBList['PLC-04'].append(data)
+        for i in range(0, 6):
+            data = {'item': 'STns'+str(i).zfill(2), 'color':wx.Colour(233, 0, 97)}
+            self.digitalOutLBList['PLC-04'].append(data)
+
+    # Init the PLC-05
+        self.digitalInLBList['PLC-05'] = []
+        for i in range(0, 6):
+            data = {'item': 'ccst'+str(i).zfill(2), 'color':wx.Colour(255, 136, 0)}
+            self.digitalInLBList['PLC-05'].append(data)
+
+        self.digitalOutLBList['PLC-05'] = []
+        for i in range(0, 6):
+            data = {'item': 'STcc'+str(i).zfill(2), 'color':wx.Colour(255, 136, 0)}
+            self.digitalOutLBList['PLC-05'].append(data)
 
 #--UIFrame---------------------------------------------------------------------
     def _buildMenuBar(self):
@@ -163,7 +254,13 @@ class UIFrame(wx.Frame):
             hbox1.AddSpacer(10)
             panelInfo = gv.gPlcPnlInfo[key]
             ipaddr = panelInfo['ipaddress'] + ' : ' + str(panelInfo['port'])
-            self.plcPnls[key] = pnlFunction.PanelPLC(self, panelInfo['label'], ipaddr)
+
+
+            dInInfoList =  self.digitalInLBList[key] if key in self.digitalInLBList.keys() else None
+            dOutInfoList = self.digitalOutLBList[key] if key in self.digitalOutLBList.keys() else None
+            self.plcPnls[key] = pnlFunction.PanelPLC(self, panelInfo['label'], ipaddr, 
+                                                     dInInfoList=dInInfoList,
+                                                     dOutInfoList=dOutInfoList)
             hbox1.Add(self.plcPnls[key], flag=flagsL, border=2)
         
         vSizer.Add(hbox1, flag=flagsL, border=2)
@@ -225,6 +322,14 @@ class UIFrame(wx.Frame):
                         Created:     2023/05/02 \n \
                         GitHub Link: https://github.com/LiuYuancheng/Metro_emulator \n', 
                     'Help', wx.OK)
+
+#-----------------------------------------------------------------------------
+    def updatePlcConIndicator(self):
+        if gv.idataMgr:
+            for key in self.plcPnls.keys():
+                plcID = gv.gPlcPnlInfo[key]['tgt']
+                self.plcPnls[key].setConnection(gv.idataMgr.getConntionState(plcID))
+
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
