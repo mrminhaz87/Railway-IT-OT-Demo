@@ -91,87 +91,92 @@ class UIFrame(wx.Frame):
     def _initDigitalLbs(self):
         self.digitalInLBList= {}
         self.digitalOutLBList ={}
+        welineColor = gv.gTrackConfig['weline']['color']
+        nslineColor = gv.gTrackConfig['nsline']['color']
+        cclineColor = gv.gTrackConfig['ccline']['color']
         # init the PLC-00
         self.digitalInLBList['PLC-00'] = []
         for i in range(0, 15):
-            data = {'item': 'wes'+str(i).zfill(2), 'color':wx.Colour(52, 169, 129)}
+            data = {'item': 'wes'+str(i).zfill(2), 'color':welineColor}
             self.digitalInLBList['PLC-00'].append(data)
         
         self.digitalOutLBList['PLC-00'] = []
         for i in range(0, 7):
-            data = {'item': 'Swe'+str(i).zfill(2), 'color':wx.Colour(52, 169, 129)}
+            data = {'item': 'Swe'+str(i).zfill(2), 'color':welineColor}
             self.digitalOutLBList['PLC-00'].append(data)
        
         # init the PLC-01
         self.digitalInLBList['PLC-01'] = []
         for i in range(0, 2):
-            data = {'item': 'wes'+str(i+14).zfill(2), 'color':wx.Colour(52, 169, 129)}
+            data = {'item': 'wes'+str(i+14).zfill(2), 'color':welineColor}
             self.digitalInLBList['PLC-01'].append(data)
         for i in range(0, 8):
-            data = {'item': 'nss'+str(i).zfill(2), 'color':wx.Colour(233, 0, 97)}
+            data = {'item': 'nss'+str(i).zfill(2), 'color':nslineColor}
             self.digitalInLBList['PLC-01'].append(data)
         for i in range(0, 5):
-            data = {'item': 'ccs'+str(i).zfill(2), 'color':wx.Colour(255, 136, 0)}
+            data = {'item': 'ccs'+str(i).zfill(2), 'color':cclineColor}
             self.digitalInLBList['PLC-01'].append(data)
         
         self.digitalOutLBList['PLC-01'] = []
+             
+        data = {'item': 'Swe'+str(7).zfill(2), 'color':welineColor}
+        self.digitalOutLBList['PLC-01'].append(data)
         for i in range(0, 4):
-            data = {'item': 'Sns'+str(i).zfill(2), 'color':wx.Colour(233, 0, 97)}
+            data = {'item': 'Sns'+str(i).zfill(2), 'color':nslineColor}
             self.digitalOutLBList['PLC-01'].append(data)
-        for i in range(0, 3):
-            data = {'item': 'Scc'+str(i).zfill(2), 'color':wx.Colour(255, 136, 0)}
+        for i in range(0, 2):
+            data = {'item': 'Scc'+str(i).zfill(2), 'color':cclineColor}
             self.digitalOutLBList['PLC-01'].append(data)
     
         # init the PLC-02
         self.digitalInLBList['PLC-02'] = []
         for i in range(4, 13):
-            data = {'item': 'Scc'+str(i).zfill(2), 'color':wx.Colour(255, 136, 0)}
+            data = {'item': 'Scc'+str(i).zfill(2), 'color':cclineColor}
             self.digitalInLBList['PLC-02'].append(data)
 
         self.digitalOutLBList['PLC-02'] = []
-        for i in range(3, 7):
-            data = {'item': 'Scc'+str(i).zfill(2), 'color':wx.Colour(255, 136, 0)}
+        for i in range(2, 7):
+            data = {'item': 'Scc'+str(i).zfill(2), 'color':cclineColor}
             self.digitalOutLBList['PLC-02'].append(data)
-
 
       # init the PLC-03
         self.digitalInLBList['PLC-03'] = []
         for i in range(0, 8):
-            data = {'item': 'west'+str(i).zfill(2), 'color':wx.Colour(52, 169, 129)}
+            data = {'item': 'west'+str(i).zfill(2), 'color':welineColor}
             self.digitalInLBList['PLC-03'].append(data)
 
         self.digitalOutLBList['PLC-03'] = []
         for i in range(0, 8):
-            data = {'item': 'STwe'+str(i).zfill(2), 'color':wx.Colour(52, 169, 129)}
+            data = {'item': 'STwe'+str(i).zfill(2), 'color':welineColor}
             self.digitalOutLBList['PLC-03'].append(data)
 
 
       # init the PLC-04
         self.digitalInLBList['PLC-04'] = []
         for i in range(8, 10):
-            data = {'item': 'west'+str(i).zfill(2), 'color':wx.Colour(52, 169, 129)}
+            data = {'item': 'west'+str(i).zfill(2), 'color':welineColor}
             self.digitalInLBList['PLC-04'].append(data)
         for i in range(0, 6):
-            data = {'item': 'nsst'+str(i).zfill(2), 'color':wx.Colour(233, 0, 97)}
+            data = {'item': 'nsst'+str(i).zfill(2), 'color':nslineColor}
             self.digitalInLBList['PLC-04'].append(data)
 
         self.digitalOutLBList['PLC-04'] = []
         for i in range(8, 10):
-            data = {'item': 'STwe'+str(i).zfill(2), 'color':wx.Colour(52, 169, 129)}
+            data = {'item': 'STwe'+str(i).zfill(2), 'color':welineColor}
             self.digitalOutLBList['PLC-04'].append(data)
         for i in range(0, 6):
-            data = {'item': 'STns'+str(i).zfill(2), 'color':wx.Colour(233, 0, 97)}
+            data = {'item': 'STns'+str(i).zfill(2), 'color':nslineColor}
             self.digitalOutLBList['PLC-04'].append(data)
 
     # Init the PLC-05
         self.digitalInLBList['PLC-05'] = []
         for i in range(0, 6):
-            data = {'item': 'ccst'+str(i).zfill(2), 'color':wx.Colour(255, 136, 0)}
+            data = {'item': 'ccst'+str(i).zfill(2), 'color':cclineColor}
             self.digitalInLBList['PLC-05'].append(data)
 
         self.digitalOutLBList['PLC-05'] = []
         for i in range(0, 6):
-            data = {'item': 'STcc'+str(i).zfill(2), 'color':wx.Colour(255, 136, 0)}
+            data = {'item': 'STcc'+str(i).zfill(2), 'color':cclineColor}
             self.digitalOutLBList['PLC-05'].append(data)
 
 #--UIFrame---------------------------------------------------------------------

@@ -64,18 +64,99 @@ The program user interface design detail is shown below:
 
 | Idx  | Program File       | Execution Env | Description                                                  |
 | ---- | ------------------ | ------------- | ------------------------------------------------------------ |
-| 1    | trainHMIConfig.txt |               | system config file.                                          |
-| 2    | trainCtrlGlobal.py | python 3      | System global file, the system config file's contents will be saved in the global parameters. |
-| 3    | trainCtrlPanel.py  | python 3      | All the UI function panels module.                           |
-| 4    | trainDataMgr.py    | python 3      | This module provides map manger to generate the display panel ,  data manger to process the PLC data, PLC connector to communicate with PLC. |
-| 5    | trainCtrlRun.py    | python        | Main HMI user interface.                                     |
+| 1    | scadaHMIConfig.txt |               | system config file.                                          |
+| 2    | scadaGobal.py      | python 3      | System global file, the system config file's contents will be saved in the global parameters. |
+| 3    | hmiPanel.py        | python 3      | All the UI function panels (PLC) module.                     |
+| 4    | scadaDataMgr.py    | python 3      | This module provides map manger to generate the display panel ,  data manger to process the PLC data, PLC connector to communicate with PLC. |
+| 5    | hmiPanelMap.py     | python 3      | The main display panel                                       |
+| 6    | hmiMgr.py          | python 3      | Display information manager module.                          |
+| 7    | hmiEmuRun.py       | python 3      | Main HMI user interface.                                     |
 |      |                    |               |                                                              |
 
+Libraries  required code base: https://github.com/LiuYuancheng/Metro_emulator/tree/main/src/lib
+
+
+
+------
+
+###### Development Environment : python 3.7.4
+
+###### Additional Lib/Software Need
+
+1. **wxPython** : https://docs.wxpython.org/index.html
+
+   ```
+   Install: pip install wxPython
+   ```
+
+
+###### Hardware Needed : None
+
+###### Execution environment 
+
+```
+OS : Microsoft windows 10/11 home
+Display mode:
+- Display output: Yes
+- Display resolution: 1920 x 1080
+- Display orientation: Landscape
+Network interface requirement:
+- NIC number: 1
+- RDP: enable
+- NIC 1: IP address: 10.0.10.100, gateway: 10.0.10.1
+```
 
 
 
 
 
+------
+
+### Program Usage
+
+##### Edit Configuration File 
+
+Open config file `scadaHMIConfig.txt`,  if you want to run this program individually, set the test mode flag `TEST_MD` to True. If you want to connect to other modules such as the PLCs, please set the flag to False.
 
 
+
+##### Program Execution 
+
+After follow the instruction in the file `trainHMIConfig.txt` to setup all the parameters, you can run the program: 
+
+```
+python hmiEmuRun.py
+```
+
+or double click the file `runTrainsCtrlHMI.bat`
+
+
+
+##### Interface Usage
+
+Please to refer to the [Railway System SCADA HMI User Manual]() to check the detail usage for all the functions. Below are some of the usage functions: 
+
+##### Train docking situation 
+
+The station docking senor will be triggered and station signal will change to block state with below steps when a train is trying to dock in station:
+
+![](img/scadaHMI/stationSignal.png)
+
+##### Junction clock and release situation 
+
+![](img/scadaHMI/junctionSignal.png)
+
+
+
+------
+
+#### Problem and Solution
+
+Refer to `doc/ProblemAndSolution.md`
+
+
+
+------
+
+> last edit by LiuYuancheng (liu_yuan_cheng@hotmail.com) by 28/07/2023 if you have any problem, please send me a message. 
 

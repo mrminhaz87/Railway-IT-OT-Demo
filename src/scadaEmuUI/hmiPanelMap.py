@@ -15,7 +15,7 @@
 
 import os
 import wx
-import math
+import time
 
 import scadaGobal as gv
 
@@ -42,15 +42,17 @@ class PanelMap(wx.Panel):
         self.labelDict = {
             'weline': [None, (70, 25)],
             'ccline': [None, (70, 175)],
-            'nsline': [None, (1550, 335)]
+            'nsline': [None, (1550, 335)],
         }
-
         for key in gv.gTrackConfig.keys():
             imgName = gv.gTrackConfig[key]['icon']
             imgPath = os.path.join(gv.IMG_FD, imgName)
             if os.path.exists(imgPath):
                 self.labelDict[key][0]  = wx.Bitmap(imgPath)
-
+                # Draw the current date and time
+        imgPath = os.path.join(gv.IMG_FD, 'time.png')
+        self.labelDict['timelb'] = [wx.Bitmap(imgPath), (1450, 15)]
+    
 #-----------------------------------------------------------------------------
     def _drawRailWay(self, dc):
         """ Draw the background and the railway."""
@@ -72,6 +74,11 @@ class PanelMap(wx.Panel):
         for val in self.labelDict.values():
             bitmap, pos = val
             dc.DrawBitmap(bitmap, pos[0], pos[1])
+
+        # draw the time label
+        dc.SetFont(wx.Font(14, wx.DEFAULT, wx.NORMAL, wx.BOLD))
+        dc.SetTextForeground(wx.Colour('GREEN'))
+        dc.DrawText(time.strftime("%b %d %Y %H:%M:%S", time.localtime(time.time())), 1500, 15)
 
 #-----------------------------------------------------------------------------
     def _drawSensors(self, dc):
@@ -160,8 +167,6 @@ class PanelMap(wx.Panel):
                 dc.SetPen(wx.Pen(color, width=2, style=wx.PENSTYLE_SOLID))
                 dc.SetBrush(wx.Brush(color, wx.TRANSPARENT))
                 dc.DrawRectangle(pos[0]-10, pos[1]-10, 20, 20)
-
-
 
     #--PanelMap--------------------------------------------------------------------
     def onPaint(self, event):

@@ -72,7 +72,7 @@ class PanelPLC(wx.Panel):
                 inputLb.SetBackgroundColour(cfg['color'])
                 hsizer.Add(inputLb, flag=flagsR, border=5)
             else:
-                inputLb = wx.StaticText(self, label='----'.ljust(6))
+                inputLb = wx.StaticText(self, label='NoIO'.ljust(6))
                 inputLb.SetBackgroundColour(wx.Colour('BLACK'))
                 hsizer.Add(inputLb, flag=flagsR, border=5)
             # Col idx = 0: PLC input indicators.
@@ -100,7 +100,7 @@ class PanelPLC(wx.Panel):
                     outputLb.SetBackgroundColour(cfg['color'])
                     hsizer.Add(outputLb, flag=flagsR, border=5)
                 else:
-                    outputLb = wx.StaticText(self, label='----'.ljust(6))
+                    outputLb = wx.StaticText(self, label='NoIO'.ljust(6))
                     outputLb.SetBackgroundColour(wx.Colour('BLACK'))
                     hsizer.Add(outputLb, flag=flagsR, border=5)
             mSizer.Add(hsizer, flag=flagsR, border=5)
