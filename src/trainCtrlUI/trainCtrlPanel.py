@@ -14,8 +14,11 @@
 #-----------------------------------------------------------------------------
 
 import os
+from math import pi
+
 import wx
 import wx.grid
+import wx.lib.agw.speedmeter as SM
 
 import trainCtrlGlobal as gv
 
@@ -276,6 +279,69 @@ class PanelTainCtrl(wx.Panel):
             result = dlg.ShowModal()
             if result == wx.ID_YES: gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, False)
 
+class SpeedAguagePanel(wx.Panel):
+
+    def __init__(self, parent, size=(200, 200), speedRange=(0, 140)):
+        wx.Panel.__init__(self, parent, size=size)
+        
+        self.speedVal = 0
+        self.pnlSize = size
+        self.speedRange = speedRange
+        #self.SetBackgroundColour(wx.Colour(39, 40, 62))
+        self.SetSizer(self._buidUISizer())
+
+    def _buidUISizer(self):
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        flagsL = wx.LEFT
+
+        sizer.AddSpacer(30)
+
+        self.speedGauge = SM.SpeedMeter(self, size=(self.pnlSize[0]-30, self.pnlSize[1]-30) ,
+                                        agwStyle=SM.SM_DRAW_HAND|SM.SM_DRAW_SECTORS|SM.SM_DRAW_MIDDLE_TEXT|SM.SM_DRAW_SECONDARY_TICKS)
+        self.speedGauge.SetAngleRange(-pi/6, 7*pi/6)
+        intervals = range(int(self.speedRange[0]), int(self.speedRange[1])+1, 20)
+        self.speedGauge.SetIntervals(intervals)
+        lightGreen = wx.Colour(183, 253, 172)
+        lightYellow = wx.Colour(253, 253, 172)
+        lightBlue = wx.Colour(140, 170, 220)
+        lightRed = wx.Colour(255, 130, 130)
+        colours = [lightBlue ,lightGreen, lightGreen, lightYellow, lightYellow, lightRed, lightRed ]
+        self.speedGauge.SetIntervalColours(colours)
+
+        # Set the ticks.
+        ticks = [str(interval) for interval in intervals]
+        self.speedGauge.SetTicks(ticks)
+        self.speedGauge.SetTicksColour(wx.BLACK)
+        self.speedGauge.SetNumberOfSecondaryTicks(5)
+        self.speedGauge.SetTicksFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
+
+        # Set The Text In The Center Of SpeedMeter
+        self.speedGauge.SetMiddleText("Km / h")
+        self.speedGauge.SetMiddleTextColour(wx.BLACK)
+        self.speedGauge.SetMiddleTextFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD))
+
+        # Set The Colour For The Hand Indicator
+        self.speedGauge.SetHandColour(wx.Colour(255, 50, 0))
+        self.speedGauge.DrawExternalArc(False)
+        self.speedGauge.SetSpeedValue(self.speedVal)
+
+        sizer.Add(self.speedGauge, flag=flagsL, border=2)
+
+        sizer.AddSpacer(10)
+        font = wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        self.speedLabel = wx.StaticText(self, label=" Speed : %s Km/h" %str(self.speedVal))
+        self.speedLabel.SetFont(font)
+        sizer.Add(self.speedLabel, flag=flagsL, border=2)
+        return sizer
+
+    def setSpeedValue(self, speedVal):
+        self.speedVal = speedVal
+        gaugeVal = min(speedVal, self.speedRange[1])
+        self.speedGauge.SetSpeedValue(gaugeVal)
+
+
+
+
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 def main():
@@ -294,7 +360,7 @@ def main():
     if testPanelIdx == 0:
         testPanel = PanelImge(mainFrame)
     elif testPanelIdx == 1:
-        testPanel = PanelTrain(mainFrame)
+        testPanel = SpeedAguagePanel(mainFrame)
     mainFrame.Show()
     app.MainLoop()
 

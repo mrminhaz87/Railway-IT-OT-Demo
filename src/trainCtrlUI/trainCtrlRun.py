@@ -159,16 +159,20 @@ class UIFrame(wx.Frame):
         vSizer.Add(hbox1, flag=flagsL, border=2)
         # Added the data and time disyplay
         vSizer.AddSpacer(10)
-        timelabel = wx.StaticText(self, label="Date & Time :")
-        timelabel.SetFont(font)
-        timelabel.SetForegroundColour(wx.Colour("WHITE"))
-        vSizer.Add(timelabel, flag=flagsL, border=2)
-        vSizer.AddSpacer(10)
-        self.timeInfo = wx.StaticText(self, label=time.strftime(' %Y - %m - %d %H : %M : %S ', 
-                                                                time.localtime(time.time())))
-        self.timeInfo.SetFont(wx.Font(16, wx.DECORATIVE, wx.BOLD, wx.BOLD))
-        self.timeInfo.SetBackgroundColour(wx.Colour("WHITE"))
+        #timelabel = wx.StaticText(self, label="Date & Time :")
+        #timelabel.SetFont(font)
+        #timelabel.SetForegroundColour(wx.Colour("WHITE"))
+        #vSizer.Add(timelabel, flag=flagsL, border=2)
+        timeStr = 'Date and time : ' + time.strftime(' %Y - %m - %d %H : %M : %S ',time.localtime(time.time()))
+        self.timeInfo = wx.StaticText(self, label=timeStr)
+        self.timeInfo.SetFont(font)
+        #self.timeInfo.SetBackgroundColour(wx.Colour("WHITE"))
+        self.timeInfo.SetForegroundColour(wx.Colour("WHITE"))
         vSizer.Add(self.timeInfo, flag=flagsL, border=2)
+        # Add the train collision auto avoidance 
+        vSizer.AddSpacer(10)
+        #hbox2 = wx.BoxSizer(wx.HORIZONTAL)
+        #collAvoidlabel = wx.StaticText(self, label="Trains collision Auto-avoidance")
         return vSizer
 
 #--UIFrame---------------------------------------------------------------------
@@ -201,12 +205,11 @@ class UIFrame(wx.Frame):
                         gv.iMapMgr.updateTrainsSpeed(key, regdataList[rsIdx:reIdx])
                         csIdx, ceIdx = gv.gTrackConfig[key]['trainCoilIdx']
                         gv.iMapMgr.updateTrainsPwr(key, coildataList[csIdx:ceIdx] )
-                    
-            if gv.iMapMgr:
-                gv.iInfoPanel.updateTrainInfoGrid()
-            # update time 
-            self.timeInfo.SetLabel(time.strftime(' %Y - %m - %d %H : %M : %S ',
-                                                 time.localtime(time.time())))
+            # Update the train inforation grid.
+            if gv.iMapMgr: gv.iInfoPanel.updateTrainInfoGrid()
+            # update time
+            timeStr = 'Date and time : ' + time.strftime(' %Y - %m - %d %H : %M : %S ',time.localtime(time.time()))
+            self.timeInfo.SetLabel(timeStr)
 
 #-----------------------------------------------------------------------------
     def onHelp(self, event):
