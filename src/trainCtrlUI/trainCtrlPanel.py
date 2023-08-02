@@ -212,7 +212,7 @@ class PanelPLC(wx.Panel):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class PanelTainCtrl(wx.Panel):
-    """ Train power on/oof control panel."""
+    """ Train power on/off control panel."""
 
     def __init__(self, parent, trackID, trainID, bgColor=wx.Colour(200, 210, 200)):
         wx.Panel.__init__(self, parent)
@@ -279,24 +279,23 @@ class PanelTainCtrl(wx.Panel):
             result = dlg.ShowModal()
             if result == wx.ID_YES: gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, False)
 
-class SpeedAguagePanel(wx.Panel):
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+class SpeedGuagePanel(wx.Panel):
 
-    def __init__(self, parent, size=(200, 200), speedRange=(0, 140)):
+    def __init__(self, parent, size=(200, 230), speedRange=(0, 140)):
         wx.Panel.__init__(self, parent, size=size)
         
         self.speedVal = 0
         self.pnlSize = size
         self.speedRange = speedRange
-        #self.SetBackgroundColour(wx.Colour(39, 40, 62))
+        self.SetBackgroundColour(wx.Colour(200, 210, 200))
         self.SetSizer(self._buidUISizer())
 
     def _buidUISizer(self):
         sizer = wx.BoxSizer(wx.VERTICAL)
         flagsL = wx.LEFT
-
-        sizer.AddSpacer(30)
-
-        self.speedGauge = SM.SpeedMeter(self, size=(self.pnlSize[0]-30, self.pnlSize[1]-30) ,
+        self.speedGauge = SM.SpeedMeter(self, size=(self.pnlSize[0], self.pnlSize[1]-30) ,
                                         agwStyle=SM.SM_DRAW_HAND|SM.SM_DRAW_SECTORS|SM.SM_DRAW_MIDDLE_TEXT|SM.SM_DRAW_SECONDARY_TICKS)
         self.speedGauge.SetAngleRange(-pi/6, 7*pi/6)
         intervals = range(int(self.speedRange[0]), int(self.speedRange[1])+1, 20)
@@ -331,7 +330,7 @@ class SpeedAguagePanel(wx.Panel):
         font = wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
         self.speedLabel = wx.StaticText(self, label=" Speed : %s Km/h" %str(self.speedVal))
         self.speedLabel.SetFont(font)
-        sizer.Add(self.speedLabel, flag=flagsL, border=2)
+        sizer.Add(self.speedLabel, flag=wx.CENTER, border=2)
         return sizer
 
     def setSpeedValue(self, speedVal):
@@ -360,7 +359,7 @@ def main():
     if testPanelIdx == 0:
         testPanel = PanelImge(mainFrame)
     elif testPanelIdx == 1:
-        testPanel = SpeedAguagePanel(mainFrame)
+        testPanel = SpeedGuagePanel(mainFrame)
     mainFrame.Show()
     app.MainLoop()
 

@@ -43,7 +43,7 @@ class DataManager(object):
             self.coilsDict[key] = []
         gv.gDebugPrint('Scada dataMgr inited', logType=gv.LOG_INFO)
 
-    #--UIFrame---------------------------------------------------------------------
+    #-----------------------------------------------------------------------------
     def periodic(self, now):
         """ Call back every periodic time."""
         gv.gDebugPrint('DataManager: get PLC information', logType=gv.LOG_INFO)
@@ -52,6 +52,12 @@ class DataManager(object):
             self.regsDict[key] = self.plcClients[key].getHoldingRegs(hRegsAddr, hRegsNum)
             coilsAddr, coilsNum = self.plcInfo[key]['coilsInfo']
             self.coilsDict[key] = self.plcClients[key].getCoilsBits(coilsAddr, coilsNum)
+
+    #-----------------------------------------------------------------------------
+    def getConntionState(self, plcID):
+        if plcID in self.plcClients.keys():
+            return self.plcClients[plcID].checkConn()
+        return False
 
     #-----------------------------------------------------------------------------
     def getPlcHRegsData(self, plcid, startIdx, endIdx):
@@ -67,12 +73,6 @@ class DataManager(object):
                 return self.coilsDict[plcid][startIdx:endIdx]
         return None
 
-    #-----------------------------------------------------------------------------
-    def getConntionState(self, plcID):
-        if plcID in self.plcClients.keys():
-            return self.plcClients[plcID].checkConn()
-        return False
-    
     #-----------------------------------------------------------------------------
     def setPlcCoilsData(self, plcid, idx, val):
         if plcid in self.plcClients.keys():

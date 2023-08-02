@@ -22,7 +22,7 @@ import trainCtrlGlobal as gv
 import trainCtrlPanel as pnlFunction
 import trainDataMgr as dataMgr
 
-FRAME_SIZE = (1200, 650)
+FRAME_SIZE = (1200, 1000)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -115,6 +115,9 @@ class UIFrame(wx.Frame):
         flagsL = wx.LEFT
         vbox0 = wx.BoxSizer(wx.VERTICAL)
         vbox0.AddSpacer(5)
+        self.speedPanel = pnlFunction.SpeedGuagePanel(self)
+        vbox0.Add(self.speedPanel, flag=flagsL, border=2)
+
         font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
         label = wx.StaticText(self, label="Trains Power Control")
         label.SetFont(font)
@@ -210,6 +213,8 @@ class UIFrame(wx.Frame):
             # update time
             timeStr = 'Date and time : ' + time.strftime(' %Y - %m - %d %H : %M : %S ',time.localtime(time.time()))
             self.timeInfo.SetLabel(timeStr)
+
+            self.speedPanel.setSpeedValue(20)
 
 #-----------------------------------------------------------------------------
     def onHelp(self, event):
