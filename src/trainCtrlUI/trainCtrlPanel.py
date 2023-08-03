@@ -340,6 +340,7 @@ class SpeedGuagePanel(wx.Panel):
         self.speedVal = speedVal
         gaugeVal = min(speedVal, self.speedRange[1])
         self.speedGauge.SetSpeedValue(gaugeVal)
+        self.speedLabel.SetLabel(" Speed : %s Km/h" %str(self.speedVal))
 
 
 #-----------------------------------------------------------------------------
@@ -349,7 +350,7 @@ class PanelTrain(wx.Panel):
     def __init__(self, parent, trackId, trainId, size=(300, 280), bgColor=None, fontColor=None):
         wx.Panel.__init__(self, parent, size=size)
         self.trainId = trainId
-        self.trackID = trackId
+        self.trackId = trackId
         self.bgColor = wx.Colour(200, 210, 200) if bgColor is None else bgColor
         self.fontColur = wx.Colour('BLACK') if fontColor is None else fontColor
         self.powerState = False
@@ -363,7 +364,7 @@ class PanelTrain(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         flagsL = wx.LEFT
         sizer.AddSpacer(5)
-        titleLabel = wx.StaticText(self, label=" Train: %s - %s" %(self.trackID, str(self.trainId)))
+        titleLabel = wx.StaticText(self, label=" Train: %s - %s" %(self.trackId, str(self.trainId)))
         font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
         titleLabel.SetFont(font)
         titleLabel.SetForegroundColour(self.fontColur)
@@ -435,29 +436,49 @@ class PanelTrain(wx.Panel):
         sizer.Add(hbox, flag=flagsL, border=2)
         return sizer 
 
+   #-----------------------------------------------------------------------------
+    def updateState(self, stateDict):
+        if self.speedVal != stateDict['speed']:
+            self.speedVal = stateDict['speed']
+            self.speedGauge.setSpeedValue(self.speedVal)
+
+        if self.powerState != stateDict['power']:
+            self.powerState = stateDict['power']
+            color = wx.Colour('GREEN') if self.powerState else wx.Colour('RED')
+            labelStr = ' Power:ON' if self.powerState else ' Power:OFF'
+            self.powerLabel.SetLabel(labelStr)
+            self.powerLabel.SetBackgroundColour(color)
+        
+        if self.currentVal != stateDict['current']:
+            self.currentVal = stateDict['current']
+            self.currentLed.SetValue(str(self.currentVal))
+
+        if self.voltageVal != stateDict['voltage']:
+            self.voltageVal = stateDict['voltage']
+            self.voltageLed.SetValue(str(self.voltageVal))
 
     #-----------------------------------------------------------------------------
     def turnOnTrainPwr(self, event):
-        gv.gDebugPrint(' Turn on train power: %s on track: %s' %(str(self.trainID), self.trackID))
+        gv.gDebugPrint(' Turn on train power: %s on track: %s' %(str(self.trainId), self.trackId))
         if gv.idataMgr:
             TrainTgtPlcID = 'PLC-06'
-            startIdx = gv.gTrackConfig[self.trackID]['trainCoilIdx'][0]
-            idx = startIdx + int(self.trainID)
+            startIdx = gv.gTrackConfig[self.trackId]['trainCoilIdx'][0]
+            idx = startIdx + int(self.trainId)
             # pop up a power change confirm message box
-            dlg = wx.MessageDialog(None, "Confirm Power on %s" %'-'.join((self.trackID, str(self.trainID))),
+            dlg = wx.MessageDialog(None, "Confirm Power on %s" %'-'.join((self.trackId, str(self.trainId))),
                                    'Train Pwr Change',wx.YES_NO | wx.ICON_WARNING)
             result = dlg.ShowModal()
             if result == wx.ID_YES: gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, True)
 
     #-----------------------------------------------------------------------------
     def turnOffTrain(self, event):
-        gv.gDebugPrint(' Turn off train power: %s on track: %s' %(str(self.trainID), self.trackID))
+        gv.gDebugPrint(' Turn off train power: %s on track: %s' %(str(self.trainId), self.trackId))
         if gv.idataMgr:
             TrainTgtPlcID = 'PLC-06'
-            startIdx = gv.gTrackConfig[self.trackID]['trainCoilIdx'][0]
-            idx = startIdx + int(self.trainID)
+            startIdx = gv.gTrackConfig[self.trackId]['trainCoilIdx'][0]
+            idx = startIdx + int(self.trainId)
             # pop up a power change confirm message box
-            dlg = wx.MessageDialog(None, "Confirm Power on %s" %'-'.join((self.trackID, str(self.trainID))),
+            dlg = wx.MessageDialog(None, "Confirm Power on %s" %'-'.join((self.trackId, str(self.trainId))),
                                    'Train Pwr Change',wx.YES_NO | wx.ICON_WARNING)
             result = dlg.ShowModal()
             if result == wx.ID_YES: gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, False)

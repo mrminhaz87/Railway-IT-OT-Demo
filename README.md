@@ -47,7 +47,7 @@ Railway System SCADA HMI detailed software design document: [link](doc/scadaHMI_
 
 Railway System Trains Controller HMI UI
 
-![](doc/video/trainsHmi.gif)
+![](doc/video/trainHmihalf.gif)
 
 Railway System Trains Controller HMI detailed software design document: [link](doc/trainsCtrlHMI.md)
 
