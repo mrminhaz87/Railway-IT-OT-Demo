@@ -22,7 +22,7 @@ import trainCtrlGlobal as gv
 import trainCtrlPanel as pnlFunction
 import trainDataMgr as dataMgr
 
-FRAME_SIZE = (1200, 1000)
+FRAME_SIZE = (1900, 1000)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -93,22 +93,60 @@ class UIFrame(wx.Frame):
         flagsL = wx.LEFT
         mSizer = wx.BoxSizer(wx.HORIZONTAL)
         mSizer.AddSpacer(5)
+        
+        trainPanelSizer = self._buildTrainStateSizer()
+        mSizer.Add(trainPanelSizer, flag=flagsL, border=2)
+        mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(-1, 560),
+                    style=wx.LI_VERTICAL), flag=flagsL, border=2)
+
+
         vbox0 = wx.BoxSizer(wx.VERTICAL)
         vbox0.AddSpacer(5)
         gv.iInfoPanel = pnlFunction.PanelTrainInfo(self)
         vbox0.Add(gv.iInfoPanel, flag=flagsL, border=2)
-        tPwrSZ = self._buildTrainCtrlSizer()
-        vbox0.Add(tPwrSZ, flag=flagsL, border=2)
-        mSizer.Add(vbox0, flag=flagsL, border=2)
-        mSizer.AddSpacer(15)
-        mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(-1, 560),
-                            style=wx.LI_VERTICAL), flag=flagsL, border=2)
-        # Init all the plc display panel.
+        #tPwrSZ = self._buildTrainCtrlSizer()
+        #vbox0.Add(tPwrSZ, flag=flagsL, border=2)
         self.plcPnls = {}
         plcSZ = self._buildPlcPnlsSizer("PLC Monitor Panels [Trains]", 
                                 ('PLC-06', 'PLC-07'))
-        mSizer.Add(plcSZ, flag=flagsL, border=2)
+        vbox0.Add(plcSZ, flag=flagsL, border=2)
+        mSizer.Add(vbox0, flag=flagsL, border=2)
+        mSizer.AddSpacer(15)
         return mSizer
+
+    def _buildTrainStateSizer(self):
+        flagsL = wx.LEFT
+        vbox0 = wx.BoxSizer(wx.VERTICAL)
+        vbox0.AddSpacer(5)
+        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        label = wx.StaticText(self, label="Trains State")
+        label.SetFont(font)
+        label.SetForegroundColour(wx.Colour("WHITE"))
+        vbox0.Add(label, flag=flagsL, border=2)
+        vbox0.AddSpacer(5)
+        self.trainPnlDict = {}
+        for key, panelCfg in gv.gTrackConfig.items():
+            self.trainPnlDict[key] = []
+            hbox = wx.BoxSizer(wx.HORIZONTAL)
+            for i in range(4):
+                if i < panelCfg['num']:
+                    color = panelCfg['color']
+                    trainPanel = pnlFunction.PanelTrain(self, panelCfg['id'], i, 
+                                                        bgColor=color,
+                                                        fontColor=wx.Colour('WHITE')
+                                                        )
+                    self.trainPnlDict[key].append(trainPanel)
+                    hbox.Add(trainPanel, flag=flagsL, border=2)
+                else:
+                    img = os.path.join(gv.IMG_FD, 'placeHolder.png')
+                    png = wx.Image(img, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+                    placeholder = wx.StaticBitmap(self, -1, png, (0, 0), (png.GetWidth(), png.GetHeight()))
+                    hbox.Add(placeholder, flag=flagsL, border=2)
+                hbox.AddSpacer(5)
+            vbox0.Add(hbox, flag=flagsL, border=2)
+            vbox0.AddSpacer(5)
+        return vbox0
+
 
 #--UIFrame---------------------------------------------------------------------
     def _buildTrainCtrlSizer(self):
@@ -124,6 +162,7 @@ class UIFrame(wx.Frame):
         label.SetForegroundColour(wx.Colour("WHITE"))
         vbox0.Add(label, flag=flagsL, border=2)
         vbox0.AddSpacer(5)
+        
         for key, panelCfg in gv.gTrackConfig.items():
             img, color = panelCfg['icon'], panelCfg['color']
             if img is None: continue
@@ -214,7 +253,7 @@ class UIFrame(wx.Frame):
             timeStr = 'Date and time : ' + time.strftime(' %Y - %m - %d %H : %M : %S ',time.localtime(time.time()))
             self.timeInfo.SetLabel(timeStr)
 
-            self.speedPanel.setSpeedValue(20)
+            #self.speedPanel.setSpeedValue(20)
 
 #-----------------------------------------------------------------------------
     def onHelp(self, event):
