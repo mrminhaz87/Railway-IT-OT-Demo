@@ -19,12 +19,13 @@ from math import pi
 import wx
 import wx.grid
 import wx.lib.agw.speedmeter as SM
+import wx.gizmos as gizmos
 
 import trainCtrlGlobal as gv
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
-class PanelTrain(wx.Panel):
+class PanelTrainInfo(wx.Panel):
     """ Mutli-information display panel used to show all the trains' name, speed 
         current voltage and power state.
     """
@@ -289,7 +290,8 @@ class SpeedGuagePanel(wx.Panel):
         self.speedVal = 0
         self.pnlSize = size
         self.speedRange = speedRange
-        self.SetBackgroundColour(wx.Colour(200, 210, 200))
+        self.bgColor = wx.Colour(200, 210, 200)
+        self.SetBackgroundColour(self.bgColor)
         self.SetSizer(self._buidUISizer())
 
     def _buidUISizer(self):
@@ -297,6 +299,7 @@ class SpeedGuagePanel(wx.Panel):
         flagsL = wx.LEFT
         self.speedGauge = SM.SpeedMeter(self, size=(self.pnlSize[0], self.pnlSize[1]-30) ,
                                         agwStyle=SM.SM_DRAW_HAND|SM.SM_DRAW_SECTORS|SM.SM_DRAW_MIDDLE_TEXT|SM.SM_DRAW_SECONDARY_TICKS)
+        self.speedGauge.SetBackgroundColour(self.bgColor)
         self.speedGauge.SetAngleRange(-pi/6, 7*pi/6)
         intervals = range(int(self.speedRange[0]), int(self.speedRange[1])+1, 20)
         self.speedGauge.SetIntervals(intervals)
@@ -339,6 +342,126 @@ class SpeedGuagePanel(wx.Panel):
         self.speedGauge.SetSpeedValue(gaugeVal)
 
 
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+class PanelTrain(wx.Panel):
+
+    def __init__(self, parent, trackId, trainId, size=(200, 230), bgColor=None, fontColor=None):
+        wx.Panel.__init__(self, parent, size=size)
+        self.trainId = trainId
+        self.trackID = trackId
+        self.bgColor = wx.Colour(200, 210, 200) if bgColor is None else bgColor
+        self.fontColur = wx.Colour('BLACK') if fontColor is None else fontColor
+        self.powerState = False
+        self.currentVal = 0
+        self.voltageVal = 750
+        self.speedVal = 0 
+        self.SetBackgroundColour(self.bgColor)
+        self.SetSizer(self._buidUISizer())
+
+    def _buidUISizer(self):
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        flagsL = wx.LEFT
+        sizer.AddSpacer(5)
+        titleLabel = wx.StaticText(self, label=" %s - %s" %(self.trackID, str(self.trainId)))
+        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        titleLabel.SetFont(font)
+        titleLabel.SetForegroundColour(self.fontColur)
+        sizer.Add(titleLabel, flag=flagsL, border=2)
+        sizer.AddSpacer(5)
+        sizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(300, -1),
+                            style=wx.LI_HORIZONTAL), flag=flagsL, border=2)
+        sizer.AddSpacer(5)
+
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
+        self.speedGauge = SpeedGuagePanel(self)
+        hbox.Add(self.speedGauge, flag=flagsL, border=2)
+
+        vbox = wx.BoxSizer(wx.VERTICAL)
+        vbox.AddSpacer(10)
+        font = wx.Font(10, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        # Add the power display
+        color = wx.Colour('GREEN') if self.powerState else wx.Colour('RED')
+        labelStr = ' Power:ON' if self.powerState else ' Power:OFF'
+        self.powerLabel = wx.StaticText(self, label=labelStr)
+        self.powerLabel.SetFont(font)
+        self.powerLabel.SetBackgroundColour(color)
+        vbox.Add(self.powerLabel, flag=flagsL, border=2)
+        
+        # Added the current display
+        vbox.AddSpacer(10)
+        crtlabel = wx.StaticText(self, label=' Current [A] :')
+        crtlabel.SetFont(font)
+        crtlabel.SetForegroundColour(self.fontColur)
+        vbox.Add(crtlabel, flag=flagsL, border=2)
+        vbox.AddSpacer(5)
+        self.currentLed = gizmos.LEDNumberCtrl(self, -1, size=(80, 35), style=gizmos.LED_ALIGN_CENTER)
+        self.currentLed.SetValue(str(self.currentVal))
+        vbox.Add(self.currentLed, flag=flagsL, border=2)
+        # Add the voltage display
+        vbox.AddSpacer(10)
+        voltagelabel = wx.StaticText(self, label=' Voltage [V]:')
+        voltagelabel.SetFont(font)
+        voltagelabel.SetForegroundColour(self.fontColur)
+        vbox.Add(voltagelabel, flag=flagsL, border=2)
+        vbox.AddSpacer(5)
+        self.voltageLed = gizmos.LEDNumberCtrl(self, -1, size=(80, 35), style=gizmos.LED_ALIGN_CENTER)
+        self.voltageLed.SetValue(str(750))
+        vbox.Add(self.voltageLed, flag=flagsL, border=2)
+        # Add the power contorl
+        vbox.AddSpacer(10)
+        pwrCtrllabel = wx.StaticText(self, label=' Pwr Control')
+        pwrCtrllabel.SetFont(font)
+        pwrCtrllabel.SetForegroundColour(self.fontColur)
+        vbox.Add(pwrCtrllabel, flag=flagsL, border=2)
+
+        startBmp = wx.Bitmap(os.path.join(gv.IMG_FD, 'reset32.png'), wx.BITMAP_TYPE_ANY)
+        stoptBmp = wx.Bitmap(os.path.join(gv.IMG_FD, 'emgStop32.png'), wx.BITMAP_TYPE_ANY)
+        hbox0 =  wx.BoxSizer(wx.HORIZONTAL)
+        # Add the start button.
+        self.recbtn1 = wx.BitmapButton(self, bitmap=startBmp,
+                                       size=(startBmp.GetWidth()+10, startBmp.GetHeight()+10))
+        self.recbtn1.Bind(wx.EVT_BUTTON, self.turnOnTrainPwr)
+        hbox0.Add(self.recbtn1, flag=flagsL, border=1)
+        # Add the emergency stop button.
+        self.recbtn2 = wx.BitmapButton(self, bitmap=stoptBmp,
+                                       size=(stoptBmp.GetWidth()+10, stoptBmp.GetHeight()+10))
+        self.recbtn2.Bind(wx.EVT_BUTTON, self.turnOffTrain)
+        hbox0.Add(self.recbtn2, flag=flagsL, border=1)
+        vbox.Add(hbox0, flag=flagsL, border=0)
+
+        hbox.Add(vbox, flag=flagsL, border=2)
+
+        sizer.Add(hbox, flag=flagsL, border=2)
+        return sizer 
+
+
+    #-----------------------------------------------------------------------------
+    def turnOnTrainPwr(self, event):
+        gv.gDebugPrint(' Turn on train power: %s on track: %s' %(str(self.trainID), self.trackID))
+        if gv.idataMgr:
+            TrainTgtPlcID = 'PLC-06'
+            startIdx = gv.gTrackConfig[self.trackID]['trainCoilIdx'][0]
+            idx = startIdx + int(self.trainID)
+            # pop up a power change confirm message box
+            dlg = wx.MessageDialog(None, "Confirm Power on %s" %'-'.join((self.trackID, str(self.trainID))),
+                                   'Train Pwr Change',wx.YES_NO | wx.ICON_WARNING)
+            result = dlg.ShowModal()
+            if result == wx.ID_YES: gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, True)
+
+    #-----------------------------------------------------------------------------
+    def turnOffTrain(self, event):
+        gv.gDebugPrint(' Turn off train power: %s on track: %s' %(str(self.trainID), self.trackID))
+        if gv.idataMgr:
+            TrainTgtPlcID = 'PLC-06'
+            startIdx = gv.gTrackConfig[self.trackID]['trainCoilIdx'][0]
+            idx = startIdx + int(self.trainID)
+            # pop up a power change confirm message box
+            dlg = wx.MessageDialog(None, "Confirm Power on %s" %'-'.join((self.trackID, str(self.trainID))),
+                                   'Train Pwr Change',wx.YES_NO | wx.ICON_WARNING)
+            result = dlg.ShowModal()
+            if result == wx.ID_YES: gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, False)
+
 
 
 #-----------------------------------------------------------------------------
@@ -357,9 +480,9 @@ def main():
     mainFrame = wx.Frame(gv.iMainFrame, -1, 'Debug Panel',
                          pos=(300, 300), size=(640, 480), style=wx.DEFAULT_FRAME_STYLE)
     if testPanelIdx == 0:
-        testPanel = PanelImge(mainFrame)
+        testPanel = PanelTrain(mainFrame)
     elif testPanelIdx == 1:
-        testPanel = SpeedGuagePanel(mainFrame)
+        testPanel = PanelTrain(mainFrame, 'weline', '01')
     mainFrame.Show()
     app.MainLoop()
 

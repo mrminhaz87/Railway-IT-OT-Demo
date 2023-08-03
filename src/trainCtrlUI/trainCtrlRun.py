@@ -95,7 +95,7 @@ class UIFrame(wx.Frame):
         mSizer.AddSpacer(5)
         vbox0 = wx.BoxSizer(wx.VERTICAL)
         vbox0.AddSpacer(5)
-        gv.iInfoPanel = pnlFunction.PanelTrain(self)
+        gv.iInfoPanel = pnlFunction.PanelTrainInfo(self)
         vbox0.Add(gv.iInfoPanel, flag=flagsL, border=2)
         tPwrSZ = self._buildTrainCtrlSizer()
         vbox0.Add(tPwrSZ, flag=flagsL, border=2)
