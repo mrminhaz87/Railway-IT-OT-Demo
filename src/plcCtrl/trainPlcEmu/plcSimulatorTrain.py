@@ -44,7 +44,7 @@ class onlyCoilLadderLogic(modbusTcpCom.ladderLogic):
         self.srcCoilsInfo['address'] = None
         self.srcCoilsInfo['offset'] = None
         self.destCoilsInfo['address'] = 0
-        self.destCoilsInfo['offset'] = 10
+        self.destCoilsInfo['offset'] = 11
         # For total 10 holding registers connected addresses
         # address: 0 - 3: weline trains speed.
         # address: 4 - 6: nsline trains speed.
@@ -82,16 +82,18 @@ class trainPowerPlcSet(plcSimulator.plcSimuInterface):
         self.regsStateRW['ccline'] = [0]*3
 
     def initCoilState(self):
-        self.coilsAddrs = (0, 10)
+        self.coilsAddrs = (0, 11)
         self.coilsRWSetKey = 'trains'
         self.coils2RWMap = OrderedDict()
         self.coils2RWMap['weline'] = (0, 4)
         self.coils2RWMap['nsline'] = (4, 7)
         self.coils2RWMap['ccline'] = (7, 10)
+        self.coils2RWMap['config'] = (10, 11)
         self.coilStateRW = OrderedDict()
         self.coilStateRW['weline']  = [False]*4
         self.coilStateRW['nsline']  = [False]*3 
-        self.coilStateRW['ccline']  = [False]*3 
+        self.coilStateRW['ccline']  = [False]*3
+        self.coilStateRW['config']  = [True]
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

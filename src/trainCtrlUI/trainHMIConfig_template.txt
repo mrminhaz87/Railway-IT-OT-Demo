@@ -30,3 +30,4 @@ CLK_INT:2
 # Define 10 trains power in a list true: init power on, false init power off
 # sequence: weline 0 - 4, nsline 0 - 3, ccline 0 - 3  
 TRAINS_PWR:[true, true, true, true, true, true, true, true, true, true]
+

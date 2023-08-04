@@ -23,7 +23,7 @@ import trainCtrlGlobal as gv
 import trainCtrlPanel as pnlFunction
 import trainDataMgr as dataMgr
 
-FRAME_SIZE = (1880, 1000)
+FRAME_SIZE = (1860, 1000)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -44,6 +44,8 @@ class UIFrame(wx.Frame):
         self.updateLock = False
         # Turn on all the trains power during init.
         self.loadTrainsPwrConfig()
+        # Load the auto collision config setting 
+        self.loadAutoCAConfig()
         # update the plc connection indicator
         self.updatePlcConIndicator()
         # Set the periodic call back
@@ -123,6 +125,11 @@ class UIFrame(wx.Frame):
             data = {'item': 'ccP'+str(i).zfill(2), 'color': cclineColor}
             self.digitalOutLBList['PLC-07'].append(data)
 
+        # Append the collision avidance control
+        data = {'item': 'ca_on', 'color': wx.Colour(140, 170, 220)}
+        self.digitalOutLBList['PLC-07'].append(data)
+
+
 #-----------------------------------------------------------------------------
     def _buildMenuBar(self):
         menubar = wx.MenuBar()  # Creat the function menu bar.
@@ -144,7 +151,7 @@ class UIFrame(wx.Frame):
         mSizer.AddSpacer(10)
         # column 0: panel to display all the trains information gauage 
         mSizer.Add(self._buildTrainGaugeSizer(), flag=flagsL, border=2)
-        mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(-1, 890),
+        mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(-1, 900),
                     style=wx.LI_VERTICAL), flag=flagsL, border=2)
         # column 1: information panel, plc panel and config change panel.
         vbox0 = wx.BoxSizer(wx.VERTICAL)
@@ -294,6 +301,16 @@ class UIFrame(wx.Frame):
         return True
 
 #-----------------------------------------------------------------------------
+    def loadAutoCAConfig(self):
+        """ Load the pre-configured collision avoidance control state to the PLC."""   
+        self.caCombo.SetSelection(0 if gv.gAutoCA else 1)
+        if gv.idataMgr is None: return False
+        gv.gDebugPrint('Chage the collision avoidance config', logType=gv.LOG_INFO)
+        idx = 10
+        gv.idataMgr.setPlcCoilsData(gv.PLC_ID, idx, gv.gAutoCA)
+        return True
+
+#-----------------------------------------------------------------------------
     def periodic(self, event):
         """ Call back every periodic time."""
         now = time.time()
@@ -374,14 +391,15 @@ class UIFrame(wx.Frame):
     def onChangeCA(self, event):
         """ Change the collision avoidance setting.
         """
-        state = 'Enable' if self.caCombo.GetSelection() == 0 else 'Disable'
-        dlg = wx.MessageDialog(None, "Confirm Change Trains Collision Auto-Avoidance",
-                                        ' %s Trains Collision Auto-Avoidance' %str(state),wx.YES_NO | wx.ICON_WARNING)
-        result = dlg.ShowModal()
-        if result == wx.ID_YES:
-            pass
-            #gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, True)
-        print('---')
+        if gv.idataMgr:
+            state = 'Enable' if self.caCombo.GetSelection() == 0 else 'Disable'
+            dlg = wx.MessageDialog(None, "Confirm Change Trains Collision Auto-Avoidance",
+                                            ' %s Trains Collision Auto-Avoidance' %str(state),wx.YES_NO | wx.ICON_WARNING)
+            result = dlg.ShowModal()
+            if result == wx.ID_YES:
+                val = self.caCombo.GetSelection() == 0
+                TrainTgtPlcID = 'PLC-06'
+                gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, 10, val)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

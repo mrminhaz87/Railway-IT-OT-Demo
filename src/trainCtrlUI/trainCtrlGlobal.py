@@ -97,10 +97,11 @@ gPlcPnlInfo['PLC-06'] = {'id': 'PLC-06', 'label': 'PLC-06[Master:slot-0]',
 
 gPlcPnlInfo['PLC-07'] = {'id': 'PLC-07', 'label': 'PLC-07[Slave:slot-1]', 
                          'ipaddress': PLC_IP, 'port': PLC_PORT, 'tgt': PLC_ID, 
-                         'hRegsInfo': (8, 10), 'coilsInfo': (8, 10)}
+                         'hRegsInfo': (8, 10), 'coilsInfo': (8, 11)}
 # main frame update rate every 2 sec.
 gUpdateRate = float(CONFIG_DICT['CLK_INT'])
 gTrainsPwrList = json.loads(CONFIG_DICT['TRAINS_PWR'])
+gAutoCA = CONFIG_DICT['AUTO_CA']
 
 #-------<GLOBAL PARAMTERS>-----------------------------------------------------
 iMainFrame = None   # UI MainFrame.

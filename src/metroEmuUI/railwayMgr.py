@@ -440,6 +440,13 @@ class MapMgr(object):
                 if i < len(powerStateList):
                     stopflg = not powerStateList[i]
                     train.setEmgStop(stopflg)
+        # change the trains avoidance config if need
+        if trackID == 'config':
+            gv.gDebugPrint('--> change the CA state: %s' %str(powerStateList[0]), 
+                           logType=gv.LOG_INFO)
+            data = powerStateList[0]
+            gv.gCollAvoid = data
+            gv.iMainFrame.changeCAcheckboxState(gv.gCollAvoid)
 
 #-----------------------------------------------------------------------------
     def updateSignalState(self, key):

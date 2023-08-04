@@ -22,7 +22,7 @@ For the DC trains power system (600V-DC, 750V-DC, 1500V-DC, 3kV-DC) detail opera
 
 **Railway System Trains Controller HMI User Interface :**
 
-![](video/trainsHmi.gif)
+![](video/trainHmihalf.gif)
 
 The HMI contents below components and function:
 

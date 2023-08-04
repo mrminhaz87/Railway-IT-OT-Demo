@@ -174,6 +174,9 @@ class UIFrame(wx.Frame):
         gv.gCollAvoid = self.collisionCB.IsChecked()
         gv.gDebugPrint("Trains automated collision avoidance enable: %s" %str(gv.gCollAvoid), logType=gv.LOG_INFO)
 
+    def changeCAcheckboxState(self, state):
+        self.collisionCB.SetValue(state)
+
 #-----------------------------------------------------------------------------
     def onLoadScenario(self, event):
         self.scenarioDialog = wx.SingleChoiceDialog(self,
