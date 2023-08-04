@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------
-# Name:        scadaGlobal.py
+# Name:        trainCtrlGlobal.py
 #
 # Purpose:     This module is used as a local config file to set constants, 
 #              global parameters which will be used in the other modules.
@@ -19,6 +19,7 @@ For good coding practice, follow the following naming convention:
 """
 
 import os, sys
+import json
 from collections import OrderedDict
 
 print("Current working directory is : %s" % os.getcwd())
@@ -47,6 +48,17 @@ LOG_INFO    = 0
 LOG_WARN    = 1
 LOG_ERR     = 2
 LOG_EXCEPT  = 3
+# init the log print module.
+def gDebugPrint(msg, prt=True, logType=None):
+    if prt: print(msg)
+    if logType == LOG_WARN:
+        Log.warning(msg)
+    elif logType == LOG_ERR:
+        Log.error(msg)
+    elif logType == LOG_EXCEPT:
+        Log.exception(msg)
+    elif logType == LOG_INFO or DEBUG_FLG:
+        Log.info(msg)
 
 #-----------------------------------------------------------------------------
 # Init the configure file loader.
@@ -61,19 +73,18 @@ CONFIG_DICT = iConfigLoader.getJson()
 #------<IMAGES PATH>-------------------------------------------------------------
 IMG_FD = os.path.join(dirpath, 'img')
 ICO_PATH = os.path.join(IMG_FD, "metro.ico")
-
-TEST_MD = CONFIG_DICT['TEST_MD']      # test mode flag, True: the simulator will operate with control logic itself. 
+TEST_MD = CONFIG_DICT['TEST_MD']    # test mode flag, True: the simulator will operate with control logic itself. 
 PERIODIC = 500      # update the main in every 300ms
 PLC_ID = CONFIG_DICT['PLC_ID']
 PLC_IP = CONFIG_DICT['PLC_IP']
 PLC_PORT = int(CONFIG_DICT['PLC_PORT'])
+UI_TITLE = CONFIG_DICT['UI_TITLE']
 
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.
-
 gTrackConfig = OrderedDict()
 
-# The PLC data fetching and set information
+# The PLC module's information
 gPlcInfo = OrderedDict()
 gPlcInfo['PLC-06'] = {'id': PLC_ID, 'ipaddress': PLC_IP, 'port': PLC_PORT, 
                       'hRegsInfo': (0, 10), 'coilsInfo': (0, 10)}
@@ -87,24 +98,13 @@ gPlcPnlInfo['PLC-06'] = {'id': 'PLC-06', 'label': 'PLC-06[Master:slot-0]',
 gPlcPnlInfo['PLC-07'] = {'id': 'PLC-07', 'label': 'PLC-07[Slave:slot-1]', 
                          'ipaddress': PLC_IP, 'port': PLC_PORT, 'tgt': PLC_ID, 
                          'hRegsInfo': (8, 10), 'coilsInfo': (8, 10)}
-
-gUpdateRate = float(CONFIG_DICT['CLK_INT'])     # main frame update rate every 2 sec.
-
-def gDebugPrint(msg, prt=True, logType=None):
-    if prt: print(msg)
-    if logType == LOG_WARN:
-        Log.warning(msg)
-    elif logType == LOG_ERR:
-        Log.error(msg)
-    elif logType == LOG_EXCEPT:
-        Log.exception(msg)
-    elif logType == LOG_INFO or DEBUG_FLG:
-        Log.info(msg)
+# main frame update rate every 2 sec.
+gUpdateRate = float(CONFIG_DICT['CLK_INT'])
+gTrainsPwrList = json.loads(CONFIG_DICT['TRAINS_PWR'])
 
 #-------<GLOBAL PARAMTERS>-----------------------------------------------------
 iMainFrame = None   # UI MainFrame.
-iCtrlPanel = None   # UI function control panel.
 iInfoPanel = None   # UI map display panel
-iMapMgr = None
+iMapMgr = None      # manager module to control all the compontents displayed on UI
 iPlcClient = None   # modbus client to connect to the PLC
-idataMgr = None
+idataMgr = None     # manager module to process all the data.

@@ -2,19 +2,31 @@
 # Setup the paramter with below format (every line follow <key>:<val> format, the
 # key can not be changed):
 
+#-----------------------------------------------------------------------------
 # Test mode:
 # True: use the real word internal logic to simulator the control logic. 
 # False: connect to PLC let plc control the signals 
-TEST_MD:False
+TEST_MD:True
 
+#-----------------------------------------------------------------------------
 # Init the PLC information need to connect
 PLC_ID:PLC-06
 
 # Target PLC IP address 
 PLC_IP:127.0.0.1
 
-# Target PLC port
+# Target PLC modbus TCP port (defualt 502)
 PLC_PORT:504
 
-# Define update clock interval
+#-----------------------------------------------------------------------------
+# Define all the UI config paramters
+
+# define UI title name 
+UI_TITLE:Railway System Trains Controller HMI
+
+# Define UI update clock interval (seconds)
 CLK_INT:2
+
+# Define 10 trains power in a list true: init power on, false init power off
+# sequence: weline 0 - 4, nsline 0 - 3, ccline 0 - 3  
+TRAINS_PWR:[true, true, true, true, true, true, true, true, true, true]
