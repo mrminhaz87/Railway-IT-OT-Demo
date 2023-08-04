@@ -27,11 +27,11 @@ import trainCtrlGlobal as gv
 #------------------------------------------------------------------------------
 class PanelTrainInfo(wx.Panel):
     """ Mutli-information display panel used to show all the trains' name, speed 
-        current voltage and power state.
+        track-id, current, voltage and power state.
     """
-    def __init__(self, parent):
+    def __init__(self, parent, panelSize=(600, 300)):
         """ Init the panel."""
-        wx.Panel.__init__(self, parent, size=(600, 300))
+        wx.Panel.__init__(self, parent, size=panelSize)
         self.SetBackgroundColour(wx.Colour(39, 40, 62))
         self.SetSizer(self._buidUISizer())
 
@@ -51,9 +51,8 @@ class PanelTrainInfo(wx.Panel):
         # Row 1: set the information display grid
         self.grid = wx.grid.Grid(self, -1)
         self.grid.CreateGrid(12, 6)
-        # Set the Grid size.
         self.grid.SetRowLabelSize(40)
-        # Set the Grid's labels.
+        # Set the Grid's column labels.
         self.grid.SetColLabelValue(0, 'Train-ID')
         self.grid.SetColLabelValue(1, 'Railway-ID')
         self.grid.SetColLabelValue(2, 'Speed[km/h]')
@@ -69,8 +68,7 @@ class PanelTrainInfo(wx.Panel):
 
 #------------------------------------------------------------------------------
     def updateTrainInfoGrid(self):
-        """ update the trains information grid.
-        """
+        """ Update the trains information grid."""
         lineIdx = 0
         for key in gv.gTrackConfig.keys():
             trainsInfo = gv.iMapMgr.getTrainsInfo(key)
@@ -91,268 +89,88 @@ class PanelTrainInfo(wx.Panel):
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
-class PanelPLC_old(wx.Panel):
-    """ PLC panel UI to show PLC input feedback state and the relay connected 
-        to the related output pin.
-    """
-    def __init__(self, parent, name, ipAddr):
-        """ Init the panel."""
-        wx.Panel.__init__(self, parent)
-        self.SetBackgroundColour(wx.Colour(200, 200, 200))
-        # Init self paremeters
-        self.plcName = name
-        self.ipAddr = ipAddr
-        self.regsNum = 16
-        self.coilsNum = 8
-        self.connectedFlg = False
-        self.gpioInList = [0]*self.regsNum  # PLC GPIO input stuation list.
-        self.gpioInLbList = []  # GPIO input device <id> label list.
-        self.gpioOuList = [0]*self.coilsNum # PLC GPIO output situation list.
-        self.gpioOuLbList = []  # GPIO output device <id> label list.
-        # Init the UI.
-        self.SetSizer(self.buidUISizer())
-        #self.Layout() # must call the layout if the panel size is set to fix.
+class SpeedGaugePanel(wx.Panel):
+    """ Train speed gauge panel."""
 
-#--PanelPLC--------------------------------------------------------------------
-    def buidUISizer(self):
-        """ Build the UI and the return the wx.sizer. """
-        mSizer = wx.BoxSizer(wx.VERTICAL) # main sizer
-        flagsR = wx.LEFT
-        mSizer.AddSpacer(5)
-        # Row idx = 0 : set the basic PLC informaiton.
-        self.nameLb = wx.StaticText(self, label=" PLC Name: ".ljust(15)+self.plcName)
-        mSizer.Add(self.nameLb, flag=flagsR, border=5)
-        self.ipaddrLb = wx.StaticText( self, label=" PLC IPaddr: ".ljust(15)+self.ipAddr)
-        mSizer.Add(self.ipaddrLb, flag=flagsR, border=5)
-        hbox0 = wx.BoxSizer(wx.HORIZONTAL)
-        hbox0.Add(wx.StaticText(self, label="Connection:".ljust(15)), flag=flagsR, border=5)
-        self.connLb = wx.StaticText(self, label='Connected' if self.connectedFlg else 'Unconnected')
-        self.connLb.SetBackgroundColour( wx.Colour('GREEN') if self.connectedFlg else wx.Colour(120, 120, 120))
-        hbox0.Add(self.connLb, flag=flagsR, border=5)
-        mSizer.Add(hbox0, flag=flagsR, border=5)
-        mSizer.AddSpacer(10)
-        # Row idx = 1: set the GPIO and feed back of the PLC. 
-        mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(220, -1),
-                                 style=wx.LI_HORIZONTAL), flag=flagsR, border=5)
-        mSizer.AddSpacer(10)
-        # - row line structure: Input indicator | output label | output button with current status.
-        for i in range(self.regsNum):
-            hsizer = wx.BoxSizer(wx.HORIZONTAL)
-            # Col idx = 0: PLC input indicators.
-            lbtext = " R_%H 0."+str(i)
-            inputLb = wx.StaticText(self, label=lbtext.ljust(12))
-            inputLb.SetBackgroundColour(wx.Colour(120, 120, 120))
-            hsizer.Add(inputLb, flag=flagsR, border=5)
-            self.gpioInLbList.append(inputLb)
-            # Col idx =1: PLC output labels.
-            hsizer.AddSpacer(15)
-            if i < self.coilsNum:
-                hsizer.Add(wx.StaticText(self, label=str(
-                    " %Q 0."+str(i)+':').ljust(12)), flag=flagsR, border=5)
-                # Col idx =2: PLC output ON/OFF contorl buttons.
-                hsizer.AddSpacer(5)
-                outputBt = wx.Button(self, label='OFF', size=(50, 17), name=self.plcName+':'+str(i))
-                self.gpioOuLbList.append(outputBt)
-                hsizer.Add(outputBt, flag=flagsR, border=5)
-            mSizer.Add(hsizer, flag=flagsR, border=5)
-            mSizer.AddSpacer(3)
-        return mSizer
-
-#--PanelPLC--------------------------------------------------------------------
-    def setConnection(self, state):
-        """ Update the connection state on the UI."""
-        self.connectedFlg = state
-        self.connLb.SetLabel('Connected' if self.connectedFlg else 'Unconnected')
-        self.connLb.SetBackgroundColour(
-            wx.Colour('GREEN') if self.connectedFlg else wx.Colour(120, 120, 120))
-        self.Refresh(False)
-
-#--PanelPLC--------------------------------------------------------------------
-    def updateHoldingRegs(self, regList):
-        """ Update the holding register's data and UI indicator's state if there 
-            is new register chagne.
-        """
-        if regList is None or self.gpioInList == regList: return # no new update
-        for idx in range(min(self.regsNum, len(regList))):
-            status = regList[idx]
-            if self.gpioInList[idx] != status:
-                self.gpioInList[idx] = status
-                self.gpioInLbList[idx].SetBackgroundColour(
-                    wx.Colour('GREEN') if status else wx.Colour(120, 120, 120))
-
-#--PanelPLC--------------------------------------------------------------------
-    def updateCoils(self, coilsList):
-        """ Update the coils data and UI indicator's state if there is new coils
-            state chagne.
-        """
-        if coilsList is None or self.gpioOuList == coilsList: return  
-        for idx in range(min(self.coilsNum, len(coilsList))):
-            status = coilsList[idx]
-            if self.gpioOuList[idx] != status:
-                self.gpioOuList[idx] = status
-                self.gpioOuLbList[idx].SetLabel('ON' if status else 'OFF')
-                self.gpioOuLbList[idx].SetBackgroundColour(
-                    wx.Colour('GREEN') if status else wx.Colour(253, 253, 253))
-
-#--PanelPLC--------------------------------------------------------------------
-    def updataPLCdata(self):
-        if gv.idataMgr:
-            plcdata =  gv.idataMgr.getPLCInfo(self.plcName)
-            if plcdata:
-                self.updateHoldingRegs(plcdata[0])
-                self.updateCoils(plcdata[1])
-
-#--PanelPLC--------------------------------------------------------------------
-    def updateDisplay(self, updateFlag=None):
-        """ Set/Update the display: if called as updateDisplay() the function will 
-            update the panel, if called as updateDisplay(updateFlag=?) the function
-            will set the self update flag.
-        """
-        self.Refresh(False)
-
-#-----------------------------------------------------------------------------
-#-----------------------------------------------------------------------------
-class PanelTainCtrl(wx.Panel):
-    """ Train power on/off control panel."""
-
-    def __init__(self, parent, trackID, trainID, bgColor=wx.Colour(200, 210, 200)):
-        wx.Panel.__init__(self, parent)
-        self.SetBackgroundColour(bgColor)
-        self.trackID = trackID
-        self.trainID = trainID
-        self.SetSizer(self._buidUISizer())
-
-#-----------------------------------------------------------------------------
-    def _buidUISizer(self):
-        """ build the control panel sizer. """
-        flagsL = wx.LEFT
-        startBmp = wx.Bitmap(os.path.join(gv.IMG_FD, 'reset32.png'), wx.BITMAP_TYPE_ANY)
-        stoptBmp = wx.Bitmap(os.path.join(gv.IMG_FD, 'emgStop32.png'), wx.BITMAP_TYPE_ANY)
-        font = wx.Font(11, wx.DECORATIVE, wx.BOLD, wx.BOLD)
-        vbox = wx.BoxSizer(wx.VERTICAL)
-        # Row 0 : add the panel label: trains ID.
-        label = wx.StaticText(self, label=" %s - %s" %(self.trackID, str(self.trainID)))
-        label.SetFont(font)
-        label.SetForegroundColour(wx.WHITE)
-        vbox.Add(label, flag=flagsL, border=2)
-
-        vbox.Add(wx.StaticLine(self, wx.ID_ANY, size=(90, -1),
-                                 style=wx.LI_HORIZONTAL), flag=flagsL, border=2)
-        vbox.AddSpacer(2)
-        hbox0 =  wx.BoxSizer(wx.HORIZONTAL)
-        # Add the start button.
-        self.recbtn1 = wx.BitmapButton(self, bitmap=startBmp,
-                                       size=(startBmp.GetWidth()+10, startBmp.GetHeight()+10))
-        self.recbtn1.Bind(wx.EVT_BUTTON, self.turnOnTrainPwr)
-        hbox0.Add(self.recbtn1, flag=flagsL, border=2)
-        # Add the emergency stop button.
-        self.recbtn2 = wx.BitmapButton(self, bitmap=stoptBmp,
-                                       size=(stoptBmp.GetWidth()+10, stoptBmp.GetHeight()+10))
-        self.recbtn2.Bind(wx.EVT_BUTTON, self.turnOffTrain)
-        hbox0.Add(self.recbtn2, flag=flagsL, border=2)
-        hbox0.AddSpacer(5)
-        vbox.Add(hbox0, flag=flagsL, border=2)
-        return vbox
-    
-    #-----------------------------------------------------------------------------
-    def turnOnTrainPwr(self, event):
-        gv.gDebugPrint(' Turn on train power: %s on track: %s' %(str(self.trainID), self.trackID))
-        if gv.idataMgr:
-            TrainTgtPlcID = 'PLC-06'
-            startIdx = gv.gTrackConfig[self.trackID]['trainCoilIdx'][0]
-            idx = startIdx + int(self.trainID)
-            # pop up a power change confirm message box
-            dlg = wx.MessageDialog(None, "Confirm Power on %s" %'-'.join((self.trackID, str(self.trainID))),
-                                   'Train Pwr Change',wx.YES_NO | wx.ICON_WARNING)
-            result = dlg.ShowModal()
-            if result == wx.ID_YES: gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, True)
-
-    #-----------------------------------------------------------------------------
-    def turnOffTrain(self, event):
-        gv.gDebugPrint(' Turn off train power: %s on track: %s' %(str(self.trainID), self.trackID))
-        if gv.idataMgr:
-            TrainTgtPlcID = 'PLC-06'
-            startIdx = gv.gTrackConfig[self.trackID]['trainCoilIdx'][0]
-            idx = startIdx + int(self.trainID)
-            # pop up a power change confirm message box
-            dlg = wx.MessageDialog(None, "Confirm Power on %s" %'-'.join((self.trackID, str(self.trainID))),
-                                   'Train Pwr Change',wx.YES_NO | wx.ICON_WARNING)
-            result = dlg.ShowModal()
-            if result == wx.ID_YES: gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, False)
-
-#-----------------------------------------------------------------------------
-#-----------------------------------------------------------------------------
-class SpeedGuagePanel(wx.Panel):
-
-    def __init__(self, parent, size=(200, 230), speedRange=(0, 140)):
-        wx.Panel.__init__(self, parent, size=size)
-        
-        self.speedVal = 0
-        self.pnlSize = size
+    def __init__(self, parent, panelSize=(200, 230), speedRange=(0, 140)):
+        wx.Panel.__init__(self, parent, size=panelSize)
+        self.pnlSize = panelSize
         self.speedRange = speedRange
+        self.speedVal = 0
         self.bgColor = wx.Colour(200, 210, 200)
         self.SetBackgroundColour(self.bgColor)
         self.SetSizer(self._buidUISizer())
-
+    
+#-----------------------------------------------------------------------------
     def _buidUISizer(self):
-        sizer = wx.BoxSizer(wx.VERTICAL)
+        # init the local function local constants
         flagsL = wx.LEFT
+        lightGreen = wx.Colour(183, 253, 172)
+        lightYellow = wx.Colour(253, 253, 172)
+        lightBlue = wx.Colour(140, 170, 220)
+        lightRed = wx.Colour(255, 130, 130)
+        font = wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        # Init the sizer
+        sizer = wx.BoxSizer(wx.VERTICAL)
         self.speedGauge = SM.SpeedMeter(self, size=(self.pnlSize[0], self.pnlSize[1]-30) ,
                                         agwStyle=SM.SM_DRAW_HAND|SM.SM_DRAW_SECTORS|SM.SM_DRAW_MIDDLE_TEXT|SM.SM_DRAW_SECONDARY_TICKS)
         self.speedGauge.SetBackgroundColour(self.bgColor)
         self.speedGauge.SetAngleRange(-pi/6, 7*pi/6)
         intervals = range(int(self.speedRange[0]), int(self.speedRange[1])+1, 20)
         self.speedGauge.SetIntervals(intervals)
-        lightGreen = wx.Colour(183, 253, 172)
-        lightYellow = wx.Colour(253, 253, 172)
-        lightBlue = wx.Colour(140, 170, 220)
-        lightRed = wx.Colour(255, 130, 130)
-        colours = [lightBlue ,lightGreen, lightGreen, lightYellow, lightYellow, lightRed, lightRed ]
+        colours = [lightBlue, lightGreen, lightGreen,
+                   lightYellow, lightYellow, lightRed, lightRed]
         self.speedGauge.SetIntervalColours(colours)
-
         # Set the ticks.
         ticks = [str(interval) for interval in intervals]
         self.speedGauge.SetTicks(ticks)
         self.speedGauge.SetTicksColour(wx.BLACK)
         self.speedGauge.SetNumberOfSecondaryTicks(5)
         self.speedGauge.SetTicksFont(wx.Font(10, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
-
         # Set The Text In The Center Of SpeedMeter
         self.speedGauge.SetMiddleText("Km / h")
         self.speedGauge.SetMiddleTextColour(wx.BLACK)
         self.speedGauge.SetMiddleTextFont(wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD))
-
         # Set The Colour For The Hand Indicator
         self.speedGauge.SetHandColour(wx.Colour(255, 50, 0))
         self.speedGauge.DrawExternalArc(False)
         self.speedGauge.SetSpeedValue(self.speedVal)
-
         sizer.Add(self.speedGauge, flag=flagsL, border=2)
-
         sizer.AddSpacer(10)
-        font = wx.Font(12, wx.FONTFAMILY_SWISS, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        # Add the speed display label.
         self.speedLabel = wx.StaticText(self, label=" Speed : %s Km/h" %str(self.speedVal))
         self.speedLabel.SetFont(font)
         sizer.Add(self.speedLabel, flag=wx.CENTER, border=2)
         return sizer
 
+#-----------------------------------------------------------------------------
     def setSpeedValue(self, speedVal):
         self.speedVal = speedVal
         gaugeVal = min(speedVal, self.speedRange[1])
         self.speedGauge.SetSpeedValue(gaugeVal)
         self.speedLabel.SetLabel(" Speed : %s Km/h" %str(self.speedVal))
 
-
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class PanelTrain(wx.Panel):
-
-    def __init__(self, parent, trackId, trainId, size=(300, 280), bgColor=None, fontColor=None):
-        wx.Panel.__init__(self, parent, size=size)
+    """ Trains information display and control panel. """
+    def __init__(self, parent, trackId, trainId, panelSize=(300, 280), bgColour=None, fontColour=None):
+        """ init example panel = PanelTrain(None, 'weline', 1, panelSize=(300, 280), 
+                                            bgColor = wx.Colour('WHITE'),
+                                            fontColor = wx.Colour('BLACK'))
+        Args:
+            parent (_type_): _description_
+            trackId (str): _description_
+            trainId (str/int): _description_
+            panelSize (tuple, optional): Panel size. Defaults to (300, 280).
+            bgColor (wx.Colour, optional): Panel background color. Defaults to wx.Colour(200, 210, 200).
+            fontColor (_type_, optional): Panel font color. Defaults to wx.Colour('BLACK').
+        """
+        wx.Panel.__init__(self, parent, size=panelSize)
         self.trainId = trainId
         self.trackId = trackId
-        self.bgColor = wx.Colour(200, 210, 200) if bgColor is None else bgColor
-        self.fontColur = wx.Colour('BLACK') if fontColor is None else fontColor
+        self.bgColor = wx.Colour(200, 210, 200) if bgColour is None else bgColour
+        self.fontColur = wx.Colour('BLACK') if fontColour is None else fontColour
         self.powerState = False
         self.currentVal = 0
         self.voltageVal = 750
@@ -360,12 +178,16 @@ class PanelTrain(wx.Panel):
         self.SetBackgroundColour(self.bgColor)
         self.SetSizer(self._buidUISizer())
 
+#-----------------------------------------------------------------------------
     def _buidUISizer(self):
-        sizer = wx.BoxSizer(wx.VERTICAL)
         flagsL = wx.LEFT
-        sizer.AddSpacer(5)
-        titleLabel = wx.StaticText(self, label=" Train: %s - %s" %(self.trackId, str(self.trainId)))
         font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        # Init the sizer
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.AddSpacer(5)
+        # r0: add title
+        titleLabel = wx.StaticText(
+            self, label=" Train: %s - %s" % (self.trackId, str(self.trainId)))
         titleLabel.SetFont(font)
         titleLabel.SetForegroundColour(self.fontColur)
         sizer.Add(titleLabel, flag=flagsL, border=2)
@@ -373,11 +195,10 @@ class PanelTrain(wx.Panel):
         sizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(295, -1),
                             style=wx.LI_HORIZONTAL), flag=flagsL, border=2)
         sizer.AddSpacer(5)
-
+        # r1: Add the gaugae
         hbox = wx.BoxSizer(wx.HORIZONTAL)
-        self.speedGauge = SpeedGuagePanel(self)
+        self.speedGauge = SpeedGaugePanel(self)
         hbox.Add(self.speedGauge, flag=flagsL, border=2)
-
         vbox = wx.BoxSizer(wx.VERTICAL)
         vbox.AddSpacer(10)
         font = wx.Font(10, wx.DECORATIVE, wx.BOLD, wx.BOLD)
@@ -388,7 +209,6 @@ class PanelTrain(wx.Panel):
         self.powerLabel.SetFont(font)
         self.powerLabel.SetBackgroundColour(color)
         vbox.Add(self.powerLabel, flag=flagsL, border=2)
-        
         # Added the current display
         vbox.AddSpacer(10)
         crtlabel = wx.StaticText(self, label=' Current [A] :')
@@ -409,13 +229,12 @@ class PanelTrain(wx.Panel):
         self.voltageLed = gizmos.LEDNumberCtrl(self, -1, size=(80, 35), style=gizmos.LED_ALIGN_CENTER)
         self.voltageLed.SetValue(str(750))
         vbox.Add(self.voltageLed, flag=flagsL, border=2)
-        # Add the power contorl
+        # Add the power control
         vbox.AddSpacer(10)
         pwrCtrllabel = wx.StaticText(self, label=' Pwr Control')
         pwrCtrllabel.SetFont(font)
         pwrCtrllabel.SetForegroundColour(self.fontColur)
         vbox.Add(pwrCtrllabel, flag=flagsL, border=2)
-
         startBmp = wx.Bitmap(os.path.join(gv.IMG_FD, 'reset32.png'), wx.BITMAP_TYPE_ANY)
         stoptBmp = wx.Bitmap(os.path.join(gv.IMG_FD, 'emgStop32.png'), wx.BITMAP_TYPE_ANY)
         hbox0 =  wx.BoxSizer(wx.HORIZONTAL)
@@ -430,29 +249,33 @@ class PanelTrain(wx.Panel):
         self.recbtn2.Bind(wx.EVT_BUTTON, self.turnOffTrain)
         hbox0.Add(self.recbtn2, flag=flagsL, border=1)
         vbox.Add(hbox0, flag=flagsL, border=0)
-
         hbox.Add(vbox, flag=flagsL, border=2)
-
         sizer.Add(hbox, flag=flagsL, border=2)
         return sizer 
 
    #-----------------------------------------------------------------------------
     def updateState(self, stateDict):
+        """ update all the state. 
+            stateDict example:{
+                'id': self.id,
+                'speed': 0,
+                'current': o,
+                'voltage': self.designVoltage + randint(0,50) if self.dataRanFlg else 0,
+                'power': self.powerFlag
+            }
+        """
         if self.speedVal != stateDict['speed']:
             self.speedVal = stateDict['speed']
             self.speedGauge.setSpeedValue(self.speedVal)
-
         if self.powerState != stateDict['power']:
             self.powerState = stateDict['power']
             color = wx.Colour('GREEN') if self.powerState else wx.Colour('RED')
             labelStr = ' Power:ON' if self.powerState else ' Power:OFF'
             self.powerLabel.SetLabel(labelStr)
             self.powerLabel.SetBackgroundColour(color)
-        
         if self.currentVal != stateDict['current']:
             self.currentVal = stateDict['current']
             self.currentLed.SetValue(str(self.currentVal))
-
         if self.voltageVal != stateDict['voltage']:
             self.voltageVal = stateDict['voltage']
             self.voltageLed.SetValue(str(self.voltageVal))
@@ -644,9 +467,6 @@ class PanelPLC(wx.Panel):
             will set the self update flag.
         """
         self.Refresh(False)
-
-
-
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

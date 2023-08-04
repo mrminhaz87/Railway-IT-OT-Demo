@@ -198,10 +198,10 @@ class UIFrame(wx.Frame):
             hbox = wx.BoxSizer(wx.HORIZONTAL)
             for i in range(rowMax):
                 if i < panelCfg['num']:
-                    color = panelCfg['color']
+                    bgcolor, ftcolor = panelCfg['color'], wx.Colour('WHITE')
                     trainPanel = pnlFunction.PanelTrain(self, panelCfg['id'], i, 
-                                                        bgColor=color,
-                                                        fontColor=wx.Colour('WHITE'))
+                                                        bgColour=bgcolor,
+                                                        fontColour=ftcolor)
                     self.trainPnlDict[key].append(trainPanel)
                     hbox.Add(trainPanel, flag=flagsL, border=2)
                 else:
