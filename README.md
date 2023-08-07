@@ -15,6 +15,17 @@
 
 ### Introduction 
 
+The Railway[Metro] IT/OT System Security Test Platform is mini railway IT/OT network emulation system for the ICS researcher or instructor to test their IT/OT-attack and defense solution or used for ICS security training and education purpose. The whole system contents 4 main part networks (as show in the below diagram): 
+
+![](doc/img/Components.png)
+
+1. **Cooperate network**: A subnet simulates a normal railway company cooperate IT network with different function/ERP servers (email, DMZ, staff management) and the production management workstation (production log archiving database, internal document server, operator manuals)
+2. **Supervision SCADA network**:  A subnet simulate the SCADA system network with different SCADA data/historian servers, different HMI computers for system operators and maintenance computers for ICS/OT-system engineers. 
+3. **Production network**:  A subnet contents different PLC simulators program. 
+4. **Physical real-world emulation network**: A subnet contents different real-word components emulator to show the physical effect of the real-work items.
+
+
+
 Railway[Metro] IT/OT System security test platform is build by 6 main components (introduced in the program design) under below structure: 
 
 ![](doc/img/networkCommDesign.png)
@@ -47,7 +58,7 @@ Railway System SCADA HMI detailed software design document: [link](doc/scadaHMI_
 
 Railway System Trains Controller HMI UI
 
-![](doc/video/trainHmihalf.gif)
+![](doc/video/trainHMIhalf.gif)
 
 Railway System Trains Controller HMI detailed software design document: [link](doc/trainsCtrlHMI.md)
 
