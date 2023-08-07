@@ -22,40 +22,44 @@ As shown the introduction and the attack road map, the hacker will do the attack
 
 ##### Attack Step1
 
-The attacker use one user/staff (Alice)'s laptop to send a phishing email (contents a fake IT support application form with a file download link)  to the IT management team. 
+The attacker uses one normal user/staff (Alice)'s laptop to send a phishing email (contents a fake IT support application form with a file download link)  to the IT management team.
 
 ##### Attack Step2
 
-A remiss support engineer Bob opened the phishing email, clicked the link and downloaded the backdoor trojan program. When the trojan is active, it change Bob's laptops remote login configuration, so the attacker is able to remotely check Bob's browser history,  cookies,  commands history and access some company's credentials document and internal system operating manuals. After analysis Bob's commands history, and all the accessable documents, the attacker figured out: 
+A remiss IT-service-support engineer Bob opened the phishing email, clicked the link and downloaded the backdoor trojan program. When the trojan is active, it changes Bob's laptop's remote login configuration, so the attacker is able to remotely check Bob's browser history,  cookies, commands history. After analyzed Bob's history and log, the attacking is able to access some company's credentials document and internal system operating manuals in the production management workstation. 
 
-- There is a computer in supervision network behind the firewall which Bob did use his laptop to SSH login before, he can use this to pass though the firewall. 
-- There are 2 SCADA servers in the supervision network. 
-- The maintenance laptop's login credential may be in one of the password record file in the management workstation. 
+After attacker analyzed all the accessible documents in the workstation and Bob's history log, he figured out below hints can be used for attacking:
+
+- There is a computer in supervision network behind the firewall and Bob did use his IT-Support laptop to SSH login it before, the attacker can use this to pass though the firewall.
+- There are 2 SCADA servers in the supervision network.
+- The maintenance laptop's login credential may be in one of the password record files in the management workstation.
+- Every PLC has a communication node IP whitelist, only the node in 'allow_read_whitelist' is allowed to fetch data from PLC and only the node in 'allow_write_whitelist' is allowed to change the PLC state, the maintenance laptop may be in the two lists.
 
 ##### Attack Step3
 
-After tried every username/password in the record file, the attacker ssh login the maintenance laptop successfully. He scanned the network to try to figure out the supervision network structure and the server's IP addresses, then he roughly understand the network topology of the SCADA network and found 2 servers may be the SCADA servers introduced in one of the user manual he found in step2. 
+After tried every username/password in the record file, the attacker ssh login the maintenance laptop (in the SCADA netowork) successfully. He scanned the network to try to figure out the supervision network structure and the server's IP addresses, then he roughly understands the network topology of the SCADA network and found 2 servers may be the SCADA servers introduced in one of the user manuals he found in step2.
 
 ##### Attack Step4
 
-The attack tried to capture the p-cap of the 2 servers which he though are SCADA servers, he find the Modbus communication traffic packages. Based on the incoming Modbus message package  length he figure out the trains controller SCADA server (server A) IP address. Based on the  outgoing Modbus package, he figured out the trains controller PLCs' IP address and some registers information (address and idx offset).
+The attack tried to capture the p-cap of the 2 servers which he thought are SCADA servers, he finds the Modbus communication traffic packages. Based on the incoming Modbus message package length he figures out the trains' controller SCADA server (server A) IP address. Based on the outgoing Modbus package, he figured out the train's controller PLCs' IP address and some registers information (address and idx offset).
 
 ##### Attack Step5
 
-The attacker created his own Modbus communication client program (malware) on the maintenance laptop, then he try to connect to the PLC and fetch some data. Based on the Fetched PLC data and the observation of the real-world emulator's trains state, the attack create his mapping file of: 
+The attacker created his own Modbus communication client (malware) program on the maintenance laptop, then he tries to connect to the PLC to run some PLC probing command to check whether this maintenance laptop is in the PLC's allow_read_whitelist. After he got successful fetching some data. Based on the fetched PLC data and the observation of the real-world emulator's trains state, the attacker created his mapping file of:
 
-- PLC holding registers -> PLC electrical signal in -> Real-world trains' speed sensors. 
-- PLC coils -> PLC electrical signal out -> Real-world trains' power control. 
+- PLC holding registers -> PLC electrical signal in -> Real-world trains' speed sensors.
 
-So he know how to monitor the trains state and roughly understand the control sequence of the trains.
+So the attacker knows how to monitor the trains' state, then he try to run some coils' state change command to check this maintenance laptop is in the PLC's allow_write_whitelist. Based on the previous tranis sate monitor map and the coils command he sent, the attacker roughly understand the control sequence of the trains and created his mapping file of:
+
+- PLC coils -> PLC electrical signal out -> Real-world trains' power control.
 
 ##### Attack Step6
 
-Based on the internal critical operator manuals the attacker found in step2, he also knows there is a PLC coil enable/disable to trains' collision auto-avoidance setting. He analyzed the Modbus traffic, his trains PLC controller map and use his malware to insert the harmful PLC coils turn off command to  overwrite the coils which he though may be used to disable the train collision auto-avoidance. 
+Based on the internal critical operator manuals the attacker found in step2, he also knows there is one PLC coil to enable/disable to trains' collision auto-avoidance setting. He analyzed the Modbus traffic, his trains PLC controller map and used his malware to insert the harmful PLC coils turn off command to overwrite the coils which he though may be used to disable the train collision auto-avoidance.
 
 ##### Attack Step7
 
-The attack observed the real-world emulator, choose the train he want to attack. Then he used his malware to insert train power off command to overwrite the PLC coils to active the targeted train's emergency stop .state As the collision auto-avoidance is disabled in step 6, then the train behind the attacked trains arrived the attacked train location, the train accident happens. 
+The attacker observed the real-world emulator, choose the train he wants to attack. Then he used his malware to insert train power off command to overwrite the PLC coils to active the targeted train's emergency stop. As the collision auto-avoidance is disabled in step 6, when the train behind the attacked trains arrived the attacked train location, the train accident happens.
 
 
 
