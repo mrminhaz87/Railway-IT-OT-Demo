@@ -3,7 +3,7 @@
 # Name:        scadaDataMgr.py
 #
 # Purpose:     Data manager module used to control all the other data processing 
-#              modules and store the interprocess/result data.
+#              modules and store the interprocess /result data.
 #
 # Author:      Yuancheng Liu
 #
@@ -41,7 +41,7 @@ class DataManager(object):
                 gv.gDebugPrint('DataManager: Fail to connect to PLC', logType=gv.LOG_INFO)
             self.regsDict[key] = []
             self.coilsDict[key] = []
-        gv.gDebugPrint('Scada dataMgr inited', logType=gv.LOG_INFO)
+        gv.gDebugPrint('ScadaHMI dataMgr inited', logType=gv.LOG_INFO)
 
     #-----------------------------------------------------------------------------
     def periodic(self, now):
@@ -54,6 +54,7 @@ class DataManager(object):
             self.coilsDict[key] = self.plcClients[key].getCoilsBits(coilsAddr, coilsNum)
 
     #-----------------------------------------------------------------------------
+    # define all the get() function here.
     def getConntionState(self, plcID):
         if plcID in self.plcClients.keys():
             return self.plcClients[plcID].checkConn()
@@ -75,7 +76,14 @@ class DataManager(object):
 
     #-----------------------------------------------------------------------------
     def setPlcCoilsData(self, plcid, idx, val):
+        """ Set the PLC coils state
+            Args:
+                plcid (str): PLC ID
+                idx (int): coils address index.
+                val (bool): coil on/off state.
+        """
         if plcid in self.plcClients.keys():
-            gv.gDebugPrint('DataManager: set PLC coil:%s' %str((plcid, idx, val)), logType=gv.LOG_INFO)
+            gv.gDebugPrint('DataManager: set PLC coil:%s' %str((plcid, idx, val)), 
+                           logType=gv.LOG_INFO)
             self.plcClients[plcid].setCoilsBit(idx, val)
             time.sleep(0.1)

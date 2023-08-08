@@ -47,6 +47,17 @@ LOG_INFO    = 0
 LOG_WARN    = 1
 LOG_ERR     = 2
 LOG_EXCEPT  = 3
+# init the log print module.
+def gDebugPrint(msg, prt=True, logType=None):
+    if prt: print(msg)
+    if logType == LOG_WARN:
+        Log.warning(msg)
+    elif logType == LOG_ERR:
+        Log.error(msg)
+    elif logType == LOG_EXCEPT:
+        Log.exception(msg)
+    elif logType == LOG_INFO or DEBUG_FLG:
+        Log.info(msg)
 
 #-----------------------------------------------------------------------------
 # Init the configure file loader.
@@ -61,7 +72,7 @@ CONFIG_DICT = iConfigLoader.getJson()
 #------<IMAGES PATH>-------------------------------------------------------------
 IMG_FD = os.path.join(dirpath, 'img')
 ICO_PATH = os.path.join(IMG_FD, "metro.ico")
-
+UI_TITLE = CONFIG_DICT['UI_TITLE']
 TEST_MD = CONFIG_DICT['TEST_MD']      # test mode flag, True: the simulator will operate with control logic itself. 
 PERIODIC = 500      # update the main in every 300ms
 
@@ -84,12 +95,9 @@ LAY_V = 6   # vertical layout
 
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.
-
 gTrackConfig = OrderedDict()
-
 # PLC connection info
 gPlcInfo = OrderedDict()
-
 # Init the PLC connection global information.
 gSensorPlcID = CONFIG_DICT['SEN_PLC_ID']
 gSensorPlcIP = CONFIG_DICT['SEN_PLC_IP']
@@ -107,40 +115,31 @@ gPlcInfo['PLC-03'] = {'id': gStationPlcID, 'ipaddress': gStationPlcIP,'port': gS
 gPlcPnlInfo = OrderedDict()
 
 # init junction Plcs
-gPlcPnlInfo['PLC-00'] = {'id': 'PLC-00', 'label': 'PLC-00[Master:slot-0]', 'ipaddress': gSensorPlcIP,
-                         'port': gSensorPlcPort, 'tgt': 'PLC-00', 'hRegsInfo': (0, 15), 'coilsInfo': (0, 7)}
-gPlcPnlInfo['PLC-01'] = {'id': 'PLC-01', 'label': 'PLC-01[Slave:slot-1]', 'ipaddress': gSensorPlcIP,
-                         'port': gSensorPlcPort, 'tgt': 'PLC-00', 'hRegsInfo': (15, 30), 'coilsInfo': (7, 14)}
-gPlcPnlInfo['PLC-02'] = {'id': 'PLC-02',  'label': 'PLC-02[Slave:slot-2]', 'ipaddress': gSensorPlcIP,
-                         'port': gSensorPlcPort, 'tgt': 'PLC-00', 'hRegsInfo': (30, 39), 'coilsInfo': (14, 19)}
+gPlcPnlInfo['PLC-00'] = {'id': 'PLC-00', 'label': 'PLC-00[Master:slot-0]',
+                         'ipaddress': gSensorPlcIP, 'port': gSensorPlcPort,
+                         'tgt': 'PLC-00', 'hRegsInfo': (0, 15), 'coilsInfo': (0, 7)}
+gPlcPnlInfo['PLC-01'] = {'id': 'PLC-01', 'label': 'PLC-01[Slave:slot-1]',
+                         'ipaddress': gSensorPlcIP, 'port': gSensorPlcPort,
+                         'tgt': 'PLC-00', 'hRegsInfo': (15, 30), 'coilsInfo': (7, 14)}
+gPlcPnlInfo['PLC-02'] = {'id': 'PLC-02',  'label': 'PLC-02[Slave:slot-2]',
+                         'ipaddress': gSensorPlcIP, 'port': gSensorPlcPort,
+                         'tgt': 'PLC-00', 'hRegsInfo': (30, 39), 'coilsInfo': (14, 19)}
 # init station Plcs
-gPlcPnlInfo['PLC-03'] = {'id': 'PLC-03', 'label': 'PLC-03[Master:slot-0]', 'ipaddress': gStationPlcIP,
-                         'port': gStationPlcPort, 'tgt': 'PLC-03', 'hRegsInfo': (0, 8), 'coilsInfo': (0, 8)}
-gPlcPnlInfo['PLC-04'] = {'id': 'PLC-04', 'label': 'PLC-04[Slave:slot-1]', 'ipaddress': gStationPlcIP,
-                         'port': gStationPlcPort, 'tgt': 'PLC-03', 'hRegsInfo': (8, 16), 'coilsInfo': (8, 16)}
-gPlcPnlInfo['PLC-05'] = {'id': 'PLC-05', 'label': 'PLC-05[Slave:slot-2]', 'ipaddress': gStationPlcIP,
-                         'port': gStationPlcPort, 'tgt': 'PLC-03', 'hRegsInfo': (16, 22), 'coilsInfo': (16, 22)}
+gPlcPnlInfo['PLC-03'] = {'id': 'PLC-03', 'label': 'PLC-03[Master:slot-0]',
+                         'ipaddress': gStationPlcIP, 'port': gStationPlcPort,
+                         'tgt': 'PLC-03', 'hRegsInfo': (0, 8), 'coilsInfo': (0, 8)}
+gPlcPnlInfo['PLC-04'] = {'id': 'PLC-04', 'label': 'PLC-04[Slave:slot-1]',
+                         'ipaddress': gStationPlcIP, 'port': gStationPlcPort,
+                         'tgt': 'PLC-03', 'hRegsInfo': (8, 16), 'coilsInfo': (8, 16)}
+gPlcPnlInfo['PLC-05'] = {'id': 'PLC-05', 'label': 'PLC-05[Slave:slot-2]',
+                         'ipaddress': gStationPlcIP, 'port': gStationPlcPort,
+                         'tgt': 'PLC-03', 'hRegsInfo': (16, 22), 'coilsInfo': (16, 22)}
 
 gUpdateRate = float(CONFIG_DICT['CLK_INT'])    # main frame update rate 1 sec.
-
-#-------<GLOBAL VARIABLES (start with "g")>------------------------------------
-# VARIABLES are the built in data type.
-
-def gDebugPrint(msg, prt=True, logType=None):
-    if prt: print(msg)
-    if logType == LOG_WARN:
-        Log.warning(msg)
-    elif logType == LOG_ERR:
-        Log.error(msg)
-    elif logType == LOG_EXCEPT:
-        Log.exception(msg)
-    elif logType == LOG_INFO or DEBUG_FLG:
-        Log.info(msg)
 
 #-------<GLOBAL PARAMTERS>-----------------------------------------------------
 iMainFrame = None   # UI MainFrame.
 iCtrlPanel = None   # UI function control panel.
 iMapPanel = None    # UI map display panel
 iMapMgr = None
-iPlcClient = None   # modbus client to connect to the PLC
 idataMgr = None

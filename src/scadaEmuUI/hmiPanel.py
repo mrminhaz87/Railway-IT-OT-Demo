@@ -1,12 +1,12 @@
 #!/usr/bin/python
 #-----------------------------------------------------------------------------
-# Name:        uiPanel.py
+# Name:        hmiPanel.py
 #
 # Purpose:     This module is used to create different function panels.
 #
 # Author:      Yuancheng Liu
 #
-# Version:     v0.1.2
+# Version:     v0.1.3
 # Created:     2023/07/12
 # Copyright:   Copyright (c) 2023 Singapore National Cybersecurity R&D Lab LiuYuancheng
 # License:     MIT License 
@@ -16,7 +16,6 @@ import wx
 import os
 
 import scadaGobal as gv
-
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

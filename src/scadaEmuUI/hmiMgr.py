@@ -1,16 +1,16 @@
 #!/usr/bin/python
 #-----------------------------------------------------------------------------
-# Name:        railwayMgr.py
+# Name:        hmiMgr.py
 #
 # Purpose:     The management module to control all the components on the map 
 #              and update the components state. 
 # 
 # Author:      Yuancheng Liu
 #
-# Version:     v0.1
+# Version:     v0.1.3
 # Created:     2023/05/29
-# Copyright:   
-# License:     
+# Copyright:   Copyright (c) 2023 LiuYuancheng
+# License:     MIT License
 #-----------------------------------------------------------------------------
 
 import scadaGobal as gv
@@ -18,6 +18,7 @@ from collections import OrderedDict
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
+
 class AgentSensors(object):
     """ The sensors set to show the sensors detection state."""
     def __init__(self, parent, id, posList=None):
@@ -25,7 +26,7 @@ class AgentSensors(object):
         self.id = id
         self.sensorsCount = 0 if posList is None else len(posList)
         self.sensorsPosList = [] if posList is None else posList
-        self.sensorsStateList = [0]*self.sensorsCount 
+        self.sensorsStateList = [0]*self.sensorsCount
 
     def addOneSensor(self, pos):
         self.sensorsPosList.append(pos)
@@ -38,10 +39,11 @@ class AgentSensors(object):
 
     def updateSensorsState(self, statList):
         if statList is None: return
-        print("update sensor: %s, in: %s, %s " % (str( self.id), str(self.sensorsCount), str(len(statList)) ))
+        print("update sensor: %s, in: %s, %s " %(str(self.id), str(self.sensorsCount), str(len(statList))))
         if len(statList) == self.sensorsCount:
             self.sensorsStateList = statList
-
+#-----------------------------------------------------------------------------
+# Init all the get() function here:
     def getID(self):
         return self.id
 
@@ -57,7 +59,7 @@ class AgentSensors(object):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class AgentSignal(object):
-
+    """ The signal agent."""
     def __init__(self, parent, id, pos) -> None:
         self.parent = parent
         self.id = id
@@ -72,6 +74,8 @@ class AgentSignal(object):
     def addTFoffPos(self, pos):
         self.triggerOffPosList.append(pos)
 
+#-----------------------------------------------------------------------------
+# Init all the get() function here:
     def getID(self):
         return self.id
     
@@ -93,7 +97,7 @@ class AgentSignal(object):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class AgentStation(object):
-
+    """ The station agent."""
     def __init__(self, parent, id, pos, labelLayout=gv.LAY_D) -> None:
         self.parent = parent
         self.id = id 
@@ -102,6 +106,8 @@ class AgentStation(object):
         self.signalState = False    # station singal state.
         self.labelLayout = labelLayout
 
+#-----------------------------------------------------------------------------
+# Init all the get() function here:
     def getID(self):
         return self.id
     
@@ -117,6 +123,8 @@ class AgentStation(object):
     def getlabelLayout(self):
         return self.labelLayout
 
+#-----------------------------------------------------------------------------
+# Init all the set() function here:
     def setSensorState(self, state):
         self.sensorState = state
 
@@ -138,50 +146,59 @@ class MapMgr(object):
         self._initSignals()
         self._initStations()
 
+#-----------------------------------------------------------------------------
     def _initSensors(self):
-        
+        """ Init all the sensors location on track."""
+        # weline (top)
         y = 100
-        sensorPos_we = [(80+100*i, y) for i in range(17) ]
+        sensorPos_we = [(80+100*i, y) for i in range(17)]
         self.sensors['weline'] = AgentSensors(self, 'we')
         for pos in sensorPos_we:
             self.sensors['weline'].addOneSensor(pos)
-
+        # ccline (mid)
         y += 160
         sensorPos_cc = [(80+120*i, y) for i in range(14)] 
         self.sensors['ccline'] = AgentSensors(self, 'cc')
         for pos in sensorPos_cc:
             self.sensors['ccline'].addOneSensor(pos)
-
+        # nsline (btm)
         y+= 160
-        sensorPos_ns = [(80+210*i, y) for i in range(8)] 
+        sensorPos_ns = [(80+210*i, y) for i in range(8)]
         self.sensors['nsline'] = AgentSensors(self, 'ns')
         for pos in sensorPos_ns:
             self.sensors['nsline'].addOneSensor(pos)
 
-    def _initSignals(self):
-        y = 100
-        trackSignalConfig_we = [
-            {'id': 'we-0', 'pos':(80+100*1+30, y), 'tiggerS': 'ccline', 'onIdx':(12,), 'offIdx':(13,) },
-            {'id': 'we-2', 'pos':(80+100*3+30, y),  'tiggerS': 'ccline', 'onIdx':(10,), 'offIdx':(11,) },
-            {'id': 'we-4', 'pos':(80+100*5+30, y),  'tiggerS': 'ccline', 'onIdx':(8,), 'offIdx':(9,) },
-            {'id': 'we-6', 'pos':(80+100*7+30, y),  'tiggerS': 'ccline', 'onIdx':(6,), 'offIdx':(7,) },
-            {'id': 'we-7', 'pos':(80+100*9+30, y),  'tiggerS': 'ccline', 'onIdx':(6,), 'offIdx':(7,) },
-            {'id': 'we-5', 'pos':(80+100*11+30, y),  'tiggerS': 'ccline', 'onIdx':(8,), 'offIdx':(9,) },
-            {'id': 'we-3', 'pos':(80+100*13+30, y),  'tiggerS': 'ccline', 'onIdx':(10,), 'offIdx':(11,) },
-            {'id': 'we-1', 'pos':(80+100*15+30, y),  'tiggerS': 'ccline', 'onIdx':(12,), 'offIdx':(13,) },            
-        ]
-        key = 'weline'
-        self.signals[key] = []
-        
-        for signalInfo in trackSignalConfig_we:
+#-----------------------------------------------------------------------------
+    def _builSignalList(self, configDict):
+        signals = []
+        for signalInfo in configDict:
             signal = AgentSignal(self, signalInfo['id'], signalInfo['pos'])
             sPosList = self.getSensors(trackID=signalInfo['tiggerS']).getSensorPos()
             for idx in signalInfo['onIdx']:
                 signal.addTGonPos(sPosList[idx])
             for idx in signalInfo['offIdx']:
                 signal.addTFoffPos(sPosList[idx])
-            self.signals[key].append(signal)
+            signals.append(signal)
+        return signals
 
+#-----------------------------------------------------------------------------
+    def _initSignals(self):
+        """ Init all the signals location on track."""
+        # weline (top)
+        y = 100
+        key = 'weline'
+        trackSignalConfig_we = [
+            {'id': 'we-0', 'pos':(80+100*1+30, y), 'tiggerS': 'ccline', 'onIdx':(12,), 'offIdx':(13,) },
+            {'id': 'we-2', 'pos':(80+100*3+30, y), 'tiggerS': 'ccline', 'onIdx':(10,), 'offIdx':(11,) },
+            {'id': 'we-4', 'pos':(80+100*5+30, y), 'tiggerS': 'ccline', 'onIdx':(8,), 'offIdx':(9,) },
+            {'id': 'we-6', 'pos':(80+100*7+30, y), 'tiggerS': 'ccline', 'onIdx':(6,), 'offIdx':(7,) },
+            {'id': 'we-7', 'pos':(80+100*9+30, y), 'tiggerS': 'ccline', 'onIdx':(6,), 'offIdx':(7,) },
+            {'id': 'we-5', 'pos':(80+100*11+30, y), 'tiggerS': 'ccline', 'onIdx':(8,), 'offIdx':(9,) },
+            {'id': 'we-3', 'pos':(80+100*13+30, y), 'tiggerS': 'ccline', 'onIdx':(10,), 'offIdx':(11,) },
+            {'id': 'we-1', 'pos':(80+100*15+30, y), 'tiggerS': 'ccline', 'onIdx':(12,), 'offIdx':(13,) },            
+        ]
+        self.signals[key] = self._builSignalList(trackSignalConfig_we)
+        # ccline (mid)
         y += 160
         trackSignalConfig_cc = [
             {'id': 'cc-0', 'pos':(80+120*0+40, y), 'tiggerS': 'nsline', 'onIdx':(0, 6), 'offIdx':(1, 7) },
@@ -193,16 +210,8 @@ class MapMgr(object):
             {'id': 'cc-6', 'pos':(80+120*12+40, y),  'tiggerS': 'weline', 'onIdx':(1, 15), 'offIdx':(2,16) },
         ]
         key = 'ccline'
-        self.signals[key] = []
-        for signalInfo in trackSignalConfig_cc:
-            signal = AgentSignal(self, signalInfo['id'], signalInfo['pos'])
-            sPosList = self.getSensors(trackID=signalInfo['tiggerS']).getSensorPos()
-            for idx in signalInfo['onIdx']:
-                signal.addTGonPos(sPosList[idx])
-            for idx in signalInfo['offIdx']:
-                signal.addTFoffPos(sPosList[idx])
-            self.signals[key].append(signal)
-
+        self.signals[key] = self._builSignalList(trackSignalConfig_cc)
+        # nsline (btm)
         y += 160
         trackSignalConfig_ns = [
             {'id': 'ns-0', 'pos':(80+210*0+70, y), 'tiggerS': 'ccline', 'onIdx':(0,), 'offIdx':(1,) },
@@ -211,18 +220,14 @@ class MapMgr(object):
             {'id': 'ns-3', 'pos':(80+210*6+70, y), 'tiggerS': 'ccline', 'onIdx':(4,), 'offIdx':(5,) },
         ]
         key = 'nsline'
-        self.signals[key] = []
-        for signalInfo in trackSignalConfig_ns:
-            signal = AgentSignal(self, signalInfo['id'], signalInfo['pos'])
-            sPosList = self.getSensors(trackID=signalInfo['tiggerS']).getSensorPos()
-            for idx in signalInfo['onIdx']:
-                signal.addTGonPos(sPosList[idx])
-            for idx in signalInfo['offIdx']:
-                signal.addTFoffPos(sPosList[idx])
-            self.signals[key].append(signal)
+        self.signals[key] = self._builSignalList(trackSignalConfig_ns)
 
+#-----------------------------------------------------------------------------
     def _initStations(self):
+        """ Init all the station location on track."""
+        # weline (top)
         y = 100
+        key = 'weline'
         trackStation_we = [{'id': 'Tuas_Link', 'pos': (80+100*0+60, y), 'layout': gv.LAY_D},
                     {'id': 'Jurong_East', 'pos': (80+100*2+60, y), 'layout': gv.LAY_U},
                     {'id': 'Outram_Park', 'pos': (80+100*4+60, y), 'layout': gv.LAY_U},
@@ -233,13 +238,13 @@ class MapMgr(object):
                     {'id': 'Raffles_Place', 'pos': (80+100*12+60, y), 'layout': gv.LAY_U},
                     {'id': 'Clementi', 'pos': (80+100*14+60, y), 'layout': gv.LAY_U},
                     {'id': 'Boon_Lay', 'pos': (80+100*15+60, y), 'layout': gv.LAY_D}]
-        key = 'weline'
         self.stations[key] = []
         for stationInfo in trackStation_we:
             station = AgentStation(self, stationInfo['id'], stationInfo['pos'], labelLayout=stationInfo['layout'])
             self.stations[key].append(station)
-
+        # ccline (mid)
         y += 160
+        key = 'ccline'
         trackStation_cc = [
                     {'id': 'Buona_Vista', 'pos': (80+120*11+40, y), 'layout': gv.LAY_D},
                     {'id': 'Farrer_Road', 'pos': (80+120*12+80, y), 'layout': gv.LAY_D},
@@ -247,26 +252,26 @@ class MapMgr(object):
                     {'id': 'Nicoll_Highway', 'pos': (80+120*7+40, y), 'layout': gv.LAY_U},
                     {'id': 'Bayfront', 'pos': (80+120*7+80, y),'layout': gv.LAY_D},
                     {'id': 'Harbourfront', 'pos': (80+120*9+80, y),'layout': gv.LAY_D}]
-        key = 'ccline'
         self.stations[key] = []
         for stationInfo in trackStation_cc:
             station = AgentStation(self, stationInfo['id'], stationInfo['pos'], labelLayout=stationInfo['layout'])
             self.stations[key].append(station)
-
+        # nsline (btm)
         y += 160
+        key = 'nsline'
         trackStation_ns = [{'id': 'Jurong_East', 'pos': (80+210*6+140, y), 'layout': gv.LAY_D},
                            {'id': 'Woodlands', 'pos': (80+210*1+70, y), 'layout': gv.LAY_U},
                            {'id': 'Yishun', 'pos': (80+210*1+140, y), 'layout': gv.LAY_D},
                            {'id': 'Orchard', 'pos': (80+210*3+70, y), 'layout': gv.LAY_U},
                            {'id': 'City_Hall', 'pos': (80+210*3+140, y), 'layout': gv.LAY_D},
                            {'id': 'Bishan', 'pos': (80+210*5+140, y), 'layout': gv.LAY_D}]
-        key = 'nsline'
         self.stations[key] = []
         for stationInfo in trackStation_ns:
             station = AgentStation(self, stationInfo['id'], stationInfo['pos'], labelLayout=stationInfo['layout'])
             self.stations[key].append(station)
 
-
+#-----------------------------------------------------------------------------
+# Init all the get() function here:
     def getSensors(self, trackID=None):
         if trackID and trackID in self.sensors.keys(): return self.sensors[trackID]
         return self.sensors
@@ -279,6 +284,8 @@ class MapMgr(object):
         if trackID and trackID in self.stations.keys(): return self.stations[trackID]
         return self.stations
 
+#-----------------------------------------------------------------------------
+# Init all the set() function here:
     def setSensors(self, trackID, stateList):
         self.sensors[trackID].updateSensorsState(stateList)
 

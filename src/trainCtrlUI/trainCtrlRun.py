@@ -57,7 +57,7 @@ class UIFrame(wx.Frame):
 
 #-----------------------------------------------------------------------------
     def _initGlobals(self):
-        # Init the global parameters used only by this module
+        """ Init the global parameters used only by this module."""
         gv.gTrackConfig['weline'] = {'id': 'weline', 'num': 4,
                                      'trainHregIdx': (0, 4),
                                      'trainCoilIdx': (0, 4),
@@ -75,13 +75,13 @@ class UIFrame(wx.Frame):
                                      'trainCoilIdx': (7, 10),
                                      'color': wx.Colour(255, 136, 0),
                                      'icon': 'cclabel.png'}
-        # Init all the display manager 
+        # Init the display manager 
         gv.iMapMgr = dataMgr.MapManager(self)
         # Init the data manager if we are under real mode.(need to connect to PLC module.)
         if not gv.TEST_MD: gv.idataMgr = dataMgr.DataManager(self, gv.gPlcInfo)
 
 #-----------------------------------------------------------------------------
-    def _initPlcDigitalLbs(self):
+    def _initElectricalLbs(self):
         """ Init the plc digital in and digital out labels."""
         self.digitalInLBList = {}
         self.digitalOutLBList = {}
@@ -134,7 +134,7 @@ class UIFrame(wx.Frame):
     def _buildMenuBar(self):
         menubar = wx.MenuBar()  # Creat the function menu bar.
         # Add the config menu
-
+        pass
         # Add the about menu.
         helpMenu = wx.Menu()
         aboutItem = wx.MenuItem(helpMenu, 120, text='Help', kind=wx.ITEM_NORMAL)
@@ -170,7 +170,7 @@ class UIFrame(wx.Frame):
         vbox0.AddSpacer(10)
         # c1, r2: Plca dispaly sizer
         self.plcPnls = {}
-        self._initPlcDigitalLbs()
+        self._initElectricalLbs()
         plcSZ = self._buildPlcPnlsSizer("PLC Monitor Panels [Trains]", 
                                     ('PLC-06', 'PLC-07'))
         vbox0.Add(plcSZ, flag=flagsL, border=2)

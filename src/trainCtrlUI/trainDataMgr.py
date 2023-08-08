@@ -175,7 +175,7 @@ class DataManager(object):
                 gv.gDebugPrint('DataManager: Failed to connect to PLC.', logType=gv.LOG_INFO)
             self.regsDict[key] = []
             self.coilsDict[key] = []
-        gv.gDebugPrint('Trains dataMgr inited', logType=gv.LOG_INFO)
+        gv.gDebugPrint('TrainsHMI dataMgr inited', logType=gv.LOG_INFO)
 
     #-----------------------------------------------------------------------------
     def periodic(self, now):

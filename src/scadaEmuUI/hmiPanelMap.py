@@ -3,14 +3,15 @@
 # Name:        hmiPanelMap.py
 #
 # Purpose:     This module is used to display the top view of the main railway 
-#              system current state.
+#              system junction sensor-signals controlling and station sensor-signals
+#              controlling real-time state.
 # 
 # Author:      Yuancheng Liu
 #
-# Version:     v0.1
+# Version:     v0.1.3
 # Created:     2023/06/13
-# Copyright:   
-# License:     
+# Copyright:   Copyright (c) 2023 LiuYuancheng
+# License:     MIT License 
 #-----------------------------------------------------------------------------
 
 import os
@@ -24,22 +25,22 @@ DEF_PNL_SIZE = (1750, 480)
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class PanelMap(wx.Panel):
-    """ RailWay top view map"""
+    """ RailWay junction and station view map. """
     def __init__(self, parent, panelSize=DEF_PNL_SIZE):
         wx.Panel.__init__(self, parent, size=panelSize)
         self.bgColor = wx.Colour(30, 40, 62)
         self.SetBackgroundColour(self.bgColor)
         self.panelSize = panelSize
-        #self.bitMaps = self._loadBitMaps()
         self.toggle = False
         self._loadLabelsImg()
         # Paint the map
         self.Bind(wx.EVT_PAINT, self.onPaint)
-        # self.Bind(wx.EVT_LEFT_DOWN, self.onLeftClick)
         self.SetDoubleBuffered(True)  # Set the panel double buffer to void the panel flash during update.
 
+#-----------------------------------------------------------------------------
     def _loadLabelsImg(self):
-        self.labelDict = {
+        """ Load the label image file and create the bitmap dict."""
+        self.labelDict = { # (bitmap, location)
             'weline': [None, (70, 25)],
             'ccline': [None, (70, 175)],
             'nsline': [None, (1550, 335)],
@@ -48,18 +49,19 @@ class PanelMap(wx.Panel):
             imgName = gv.gTrackConfig[key]['icon']
             imgPath = os.path.join(gv.IMG_FD, imgName)
             if os.path.exists(imgPath):
-                self.labelDict[key][0]  = wx.Bitmap(imgPath)
-                # Draw the current date and time
+                self.labelDict[key][0] = wx.Bitmap(imgPath)
+        # Draw the current date and time
         imgPath = os.path.join(gv.IMG_FD, 'time.png')
         self.labelDict['timelb'] = [wx.Bitmap(imgPath), (1450, 15)]
     
 #-----------------------------------------------------------------------------
     def _drawRailWay(self, dc):
-        """ Draw the background and the railway."""
+        """ Draw the background, railway tracks and different labels."""
         w, h = self.panelSize
+        trackSeq = ('weline', 'ccline', 'nsline')
         dc.SetBrush(wx.Brush(self.bgColor))
         dc.DrawRectangle(0, 0, w, h)
-        trackSeq = ('weline', 'ccline', 'nsline')
+        # draw the track lines.
         for i, trackName in enumerate(trackSeq):
             color = gv.gTrackConfig[trackName]['color']
             dc.SetPen(wx.Pen(color, width=4, style=wx.PENSTYLE_SOLID))
@@ -69,28 +71,26 @@ class PanelMap(wx.Panel):
             dc.DrawCircle(50, 100+160*i, 8)
             dc.DrawCircle(1700, 100+160*i, 8)
             dc.DrawCircle(1710, 100+160*i, 8)
-
         # draw three track's label
         for val in self.labelDict.values():
             bitmap, pos = val
             dc.DrawBitmap(bitmap, pos[0], pos[1])
-
-        # draw the time label
+        # draw the date and time label
         dc.SetFont(wx.Font(14, wx.DEFAULT, wx.NORMAL, wx.BOLD))
         dc.SetTextForeground(wx.Colour('GREEN'))
         dc.DrawText(time.strftime("%b %d %Y %H:%M:%S", time.localtime(time.time())), 1500, 15)
 
 #-----------------------------------------------------------------------------
     def _drawSensors(self, dc):
+        """ Draw the sensors with the state on track."""
         dc.SetPen(self.dcDefPen)
         dc.SetFont(wx.Font(7, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
         dc.SetBrush(wx.Brush('GRAY'))
-        for key, sensorAgent in gv.iMapMgr.getSensors().items():
+        for sensorAgent in gv.iMapMgr.getSensors().values():
             sensorId = sensorAgent.getID()
             sensorNum = sensorAgent.getSensorsCount()
             posList = sensorAgent.getSensorPos()
             stateList = sensorAgent.getSensorsState()
-
             dc.SetTextForeground(wx.Colour('White'))
             for i in range(sensorNum):
                 pos = posList[i]
@@ -100,43 +100,43 @@ class PanelMap(wx.Panel):
                     color = 'YELLOW' if self.toggle else 'BLUE'
                     dc.SetBrush(wx.Brush(color))
                     dc.DrawRectangle(pos[0]-6, pos[1]-6, 12, 12)
-                    dc.SetBrush(wx.Brush('GRAY'))
                 else:
+                    dc.SetBrush(wx.Brush('GRAY'))
                     dc.DrawRectangle(pos[0]-4, pos[1]-4, 8, 8)
 
 #-----------------------------------------------------------------------------
     def _drawSignals(self, dc):
+        """ Draw the signals with the State on track."""
         dc.SetPen(self.dcDefPen)
         dc.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
         dc.SetTextForeground(wx.Colour('White'))
         dc.SetBrush(wx.Brush('Green'))
-        for key, signals in gv.iMapMgr.getSignals().items():
+        for signals in gv.iMapMgr.getSignals().values():
             for signalAgent in signals:
                 id = signalAgent.getID()
                 pos = signalAgent.getPos()
                 state = signalAgent.getState()
-                # draw the trigger on sensors
-
-                tgOnlineStype =wx.PENSTYLE_SOLID if state else wx.PENSTYLE_LONG_DASH
+                # draw the trigger relation line to link the sensors
+                tgOnlineStype = wx.PENSTYLE_SOLID if state else wx.PENSTYLE_LONG_DASH
                 dc.SetPen(wx.Pen('RED', width=1, style=tgOnlineStype))
                 for sensorPos in signalAgent.getTGonPos():
                     dc.DrawLine(pos[0]-10, pos[1], sensorPos[0], sensorPos[1])
 
-                tgOfflineStype =wx.PENSTYLE_SOLID if not state else wx.PENSTYLE_LONG_DASH
+                tgOfflineStype = wx.PENSTYLE_SOLID if not state else wx.PENSTYLE_LONG_DASH
                 dc.SetPen(wx.Pen('GREEN', width=1, style=tgOfflineStype))
                 for sensorPos in signalAgent.getTGoffPos():
                     dc.DrawLine(pos[0]+10, pos[1], sensorPos[0], sensorPos[1])
-
-                color = 'RED' if state else 'GREEN'
-                #dc.SetPen(wx.Pen(color, width=2, style=wx.PENSTYLE_SOLID))
+                # draw the signal sample.
                 dc.SetPen(self.dcDefPen)
                 x, y = pos[0], pos[1]
                 dc.DrawText("S-"+str(id), x, y-25)
+                color = 'RED' if state else 'GREEN'
                 dc.SetBrush(wx.Brush(color))
                 dc.DrawRectangle(x-10, y-4, 20, 8)
 
 #-----------------------------------------------------------------------------
     def _drawStations(self, dc):
+        """ Draw the station sensor and signal state."""
         dc.SetPen(self.dcDefPen)
         dc.SetFont(wx.Font(11, wx.DEFAULT, wx.NORMAL, wx.BOLD))
         for key, stations in gv.iMapMgr.getStations().items():
@@ -150,8 +150,7 @@ class PanelMap(wx.Panel):
                 lboffset = 30 if station.getlabelLayout() == gv.LAY_D else -45
                 lioffest = 25 if station.getlabelLayout() == gv.LAY_D else -25
                 dc.DrawLine(pos[0], pos[1], pos[0], pos[1]+lioffest)
-                dc.DrawText("ST[%s]:%s" %(str(i), str(id)), pos[0]-30, pos[1]+lboffset)
-
+                dc.DrawText("ST[%s]:%s" % (str(i), str(id)), pos[0]-30, pos[1]+lboffset)
                 dc.SetPen(self.dcDefPen)
                 dc.SetBrush(wx.Brush('GRAY'))
                 # Draw the station sensor state
@@ -159,7 +158,6 @@ class PanelMap(wx.Panel):
                     color = 'YELLOW' if self.toggle else 'BLUE'
                     dc.SetBrush(wx.Brush(color))
                     dc.DrawRectangle(pos[0]-5, pos[1]-5, 10, 10)
-                    
                 else:
                     dc.DrawRectangle(pos[0]-5, pos[1]-5, 10, 10)
                 # Draw the station signal state
@@ -168,7 +166,7 @@ class PanelMap(wx.Panel):
                 dc.SetBrush(wx.Brush(color, wx.TRANSPARENT))
                 dc.DrawRectangle(pos[0]-10, pos[1]-10, 20, 20)
 
-    #--PanelMap--------------------------------------------------------------------
+#-----------------------------------------------------------------------------
     def onPaint(self, event):
         """ Draw the whole panel by using the wx device context."""
         dc = wx.PaintDC(self)
@@ -179,6 +177,7 @@ class PanelMap(wx.Panel):
         self._drawSensors(dc)
         self._drawStations(dc)
 
+#-----------------------------------------------------------------------------
     def updateDisplay(self, updateFlag=None):
         """ Set/Update the display: if called as updateDisplay() the function will 
             update the panel, if called as updateDisplay(updateFlag=?) the function
@@ -188,9 +187,8 @@ class PanelMap(wx.Panel):
         self.Update()
         self.toggle = not self.toggle
 
-#--PanelMap--------------------------------------------------------------------
+#-----------------------------------------------------------------------------
     def periodic(self , now):
         """ periodicly call back to do needed calcualtion/panel update"""
         # Call the onPaint to update the map display.
-        
         self.updateDisplay()

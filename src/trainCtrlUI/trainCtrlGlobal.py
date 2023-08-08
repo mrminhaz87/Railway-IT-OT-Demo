@@ -107,5 +107,4 @@ gAutoCA = CONFIG_DICT['AUTO_CA']
 iMainFrame = None   # UI MainFrame.
 iInfoPanel = None   # UI map display panel
 iMapMgr = None      # manager module to control all the compontents displayed on UI
-iPlcClient = None   # modbus client to connect to the PLC
 idataMgr = None     # manager module to process all the data.
