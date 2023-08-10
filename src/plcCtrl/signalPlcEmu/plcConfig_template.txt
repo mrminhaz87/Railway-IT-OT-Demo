@@ -1,10 +1,12 @@
-# This is the config file template for the module <monitorApp.py>
+# This is the config file template for the module <plcSimulatorSignal.py>
 # Setup the paramter with below format (every line follow <key>:<val> format, the
 # key can not be changed):
 
+#-----------------------------------------------------------------------------
 # Set the master PLC's name 
 PLC_NAME:PLC-01
 
+#-----------------------------------------------------------------------------
 # Define the ip addresses allowed to read PLC state: 
 # json list fomat: ["masterIP", "slave1IP", ...]
 ALLOW_R_L:["127.0.0.1", "192.168.0.10"]
@@ -13,6 +15,7 @@ ALLOW_R_L:["127.0.0.1", "192.168.0.10"]
 # json list fomat: ["masterIP", "slave1IP", ...]
 ALLOW_W_L:["127.0.0.1"]
 
+#-----------------------------------------------------------------------------
 # Define Realworld emulator ip
 RW_IP:127.0.0.1
 
@@ -22,6 +25,7 @@ RW_PORT:3001
 # Define PLC clock interval
 CLK_INT:0.6
 
+#-----------------------------------------------------------------------------
 # Define modbus TCP host IP, use 0.0.0.0 or localhost
 MD_BUS_IP:localhost
 

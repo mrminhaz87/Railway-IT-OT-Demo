@@ -40,6 +40,24 @@ if os.path.exists(gLibDir):
 import Log
 Log.initLogger(gTopDir, 'Logs', APP_NAME[0], APP_NAME[1], historyCnt=100, fPutLogsUnderDate=True)
 
+# Init the log type parameters.
+DEBUG_FLG   = False
+LOG_INFO    = 0
+LOG_WARN    = 1
+LOG_ERR     = 2
+LOG_EXCEPT  = 3
+
+def gDebugPrint(msg, prt=True, logType=None):
+    if prt: print(msg)
+    if logType == LOG_WARN:
+        Log.warning(msg)
+    elif logType == LOG_ERR:
+        Log.error(msg)
+    elif logType == LOG_EXCEPT:
+        Log.exception(msg)
+    elif logType == LOG_INFO or DEBUG_FLG:
+        Log.info(msg)
+
 #-----------------------------------------------------------------------------
 # Init the configure file loader.
 CFG_FD = os.path.join(dirpath, CFGDIR)
@@ -71,13 +89,6 @@ JUNCTION_TYPE       = 'JC'
 PERIODIC = 300      # update the main in every 300ms
 UDP_PORT = 3001
 
-# Init the log type parameters.
-DEBUG_FLG   = False
-LOG_INFO    = 0
-LOG_WARN    = 1
-LOG_ERR     = 2
-LOG_EXCEPT  = 3
-
 # Init the UI layout flags
 LAY_U = 0   # layout at up position  
 LAY_D = 1   # layout at down position 
@@ -95,6 +106,8 @@ LAY_V = 6   # vertical layout
 gTestMD = CONFIG_DICT['TEST_MD']      # test mode flag, True: the simulator will operate with control logic itself. 
 # False: The simultor will connect to the PLC, PLC will implement the control logic.
 gTranspPct = 70     # Windows transparent percentage.
+
+UI_TITLE = CONFIG_DICT['UI_TITLE']
 # main frame update rate 0.5 sec.
 gUpdateRate = float(CONFIG_DICT['UI_INTERVAL']) if float(CONFIG_DICT['UI_INTERVAL']) > 0 else 0.5
 gTrainDefSpeed = 10 # Train default speed 10 pixels per refersh frame.
@@ -109,17 +122,6 @@ gTrackConfig = OrderedDict()
 #gCollsionTestFlg = CONFIG_DICT['TEST_JC_COLLISION'] # flag used to enable test the train collision at the junction.
 #gTrainDistTestFlag = CONFIG_DICT['TEST_TR_DISTANCE'] # flag used to see if the minimum distance between trains are observed
 gTrainCfgDir = os.path.join(dirpath, CFGDIR, CONFIG_DICT['TR_CFG_FOLDER'])
-
-def gDebugPrint(msg, prt=True, logType=None):
-    if prt: print(msg)
-    if logType == LOG_WARN:
-        Log.warning(msg)
-    elif logType == LOG_ERR:
-        Log.error(msg)
-    elif logType == LOG_EXCEPT:
-        Log.exception(msg)
-    elif logType == LOG_INFO or DEBUG_FLG:
-        Log.info(msg)
 
 #-------<GLOBAL PARAMTERS>-----------------------------------------------------
 iMainFrame = None   # UI MainFrame.

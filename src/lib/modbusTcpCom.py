@@ -11,8 +11,8 @@
 #
 # Created:     2023/06/11
 # Version:     v_0.1
-# Copyright:   
-# License:     
+# Copyright:   Copyright (c) 2023 LiuYuancheng
+# License:     MIT License
 #-----------------------------------------------------------------------------
 """ Program Design:
 

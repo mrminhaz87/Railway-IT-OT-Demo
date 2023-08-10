@@ -217,7 +217,7 @@ class UIFrame(wx.Frame):
 #-----------------------------------------------------------------------------
 class MyApp(wx.App):
     def OnInit(self):
-        gv.iMainFrame = UIFrame(None, -1, gv.APP_NAME[0])
+        gv.iMainFrame = UIFrame(None, -1, gv.UI_TITLE)
         gv.iMainFrame.Show(True)
         return True
 

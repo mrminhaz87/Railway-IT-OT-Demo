@@ -10,8 +10,8 @@
 #
 # Version:     v0.1
 # Created:     2023/06/22
-# Copyright:   
-# License:     
+# Copyright:   Copyright (c) 2023 LiuYuancheng
+# License:     MIT License
 #-----------------------------------------------------------------------------
 
 """
