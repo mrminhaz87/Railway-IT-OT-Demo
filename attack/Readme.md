@@ -22,9 +22,13 @@ As shown the introduction and the attack road map, the hacker will do the attack
 
 ##### Attack Step1
 
+**Insert backdoor trojan to a node in IT-network via phishing email** 
+
 The attacker uses one normal user/staff (Alice)'s laptop to send a phishing email (contents a fake IT support application form with a file download link)  to the IT management team.
 
 ##### Attack Step2
+
+**Scan the IT-network to find the information to hack into the SCADA network**
 
 A remiss IT-service-support engineer Bob opened the phishing email, clicked the link and downloaded the backdoor trojan program. When the trojan is active, it changes Bob's laptop's remote login configuration, so the attacker is able to remotely check Bob's browser history,  cookies, commands history. After analyzed Bob's history and log, the attacking is able to access some company's credentials document and internal system operating manuals in the production management workstation. 
 
@@ -37,13 +41,19 @@ After attacker analyzed all the accessible documents in the workstation and Bob'
 
 ##### Attack Step3
 
-After tried every username/password in the record file, the attacker ssh login the maintenance laptop (in the SCADA netowork) successfully. He scanned the network to try to figure out the supervision network structure and the server's IP addresses, then he roughly understands the network topology of the SCADA network and found 2 servers may be the SCADA servers introduced in one of the user manuals he found in step2.
+**Find the break point and hack into a maintenance laptop in SCADA network **
+
+After tried every username/password in the record file, the attacker ssh login the maintenance laptop (in the SCADA network) successfully. He scanned the network to try to figure out the supervision network structure and the server's IP addresses, then he roughly understands the network topology of the SCADA network and found 2 servers may be the SCADA servers introduced in one of the user manuals he found in step2.
 
 ##### Attack Step4
+
+**Scan the SCADA network and analyze the traffic** 
 
 The attack tried to capture the p-cap of the 2 servers which he thought are SCADA servers, he finds the Modbus communication traffic packages. Based on the incoming Modbus message package length he figures out the trains' controller SCADA server (server A) IP address. Based on the outgoing Modbus package, he figured out the train's controller PLCs' IP address and some registers information (address and idx offset).
 
 ##### Attack Step5
+
+**Create command control dictionary based network traffic analysis and real-world observation** 
 
 The attacker created his own Modbus communication client (malware) program on the maintenance laptop, then he tries to connect to the PLC to run some PLC probing command to check whether this maintenance laptop is in the PLC's allow_read_whitelist. After he got successful fetching some data. Based on the fetched PLC data and the observation of the real-world emulator's trains state, the attacker created his mapping file of:
 
@@ -55,9 +65,13 @@ So the attacker knows how to monitor the trains' state, then he try to run some 
 
 ##### Attack Step6
 
+**Insert false command to overwrite trains auto-collision avoidance control **
+
 Based on the internal critical operator manuals the attacker found in step2, he also knows there is one PLC coil to enable/disable to trains' collision auto-avoidance setting. He analyzed the Modbus traffic, his trains PLC controller map and used his malware to insert the harmful PLC coils turn off command to overwrite the coils which he though may be used to disable the train collision auto-avoidance.
 
 ##### Attack Step7
+
+**Plan the attack and insert train emergency command to make the train collision accident**
 
 The attacker observed the real-world emulator, choose the train he wants to attack. Then he used his malware to insert train power off command to overwrite the PLC coils to active the targeted train's emergency stop. As the collision auto-avoidance is disabled in step 6, when the train behind the attacked trains arrived the attacked train location, the train accident happens.
 
