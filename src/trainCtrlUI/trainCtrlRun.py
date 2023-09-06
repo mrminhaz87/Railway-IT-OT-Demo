@@ -157,7 +157,7 @@ class UIFrame(wx.Frame):
         vbox0 = wx.BoxSizer(wx.VERTICAL)
         vbox0.AddSpacer(5)
         # c1,r0 : time display
-        font = wx.Font(16, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        font = wx.Font(16, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
         timeStr = 'Date and Time : ' + time.strftime(' %Y - %m - %d %H : %M : %S ',time.localtime(time.time()))
         self.timeInfo = wx.StaticText(self, label=timeStr)
         self.timeInfo.SetFont(font)
@@ -187,7 +187,7 @@ class UIFrame(wx.Frame):
             information.
         """
         flagsL = wx.LEFT
-        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        font = wx.Font(12, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
         rowMax = 4 # max number of train panels can be shown in one row.
         # Init the sizers.
         vbox0 = wx.BoxSizer(wx.VERTICAL)
@@ -229,7 +229,7 @@ class UIFrame(wx.Frame):
         flagsL = wx.LEFT
         vSizer = wx.BoxSizer(wx.VERTICAL)
         vSizer.AddSpacer(5)
-        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        font = wx.Font(12, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
         label = wx.StaticText(self, label=PanelTitle)
         label.SetFont(font)
         label.SetForegroundColour(wx.Colour("WHITE"))
@@ -256,14 +256,14 @@ class UIFrame(wx.Frame):
         vSizer = wx.BoxSizer(wx.VERTICAL)
         vSizer.AddSpacer(5)
         # Add the title
-        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        font = wx.Font(12, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
         label = wx.StaticText(self, label= "Control Panel")
         label.SetFont(font)
         label.SetForegroundColour(wx.Colour("WHITE"))
         vSizer.Add(label, flag=flagsL, border=2)
         vSizer.AddSpacer(5)
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
-        font = wx.Font(10, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        font = wx.Font(10, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
         caLabel = wx.StaticText(self, label= "> Trains Collision Auto-Avoidance:")
         caLabel.SetFont(font)
         caLabel.SetForegroundColour(wx.Colour("WHITE"))

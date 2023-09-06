@@ -37,7 +37,7 @@ class PanelTainCtrl(wx.Panel):
         startBmp = wx.Bitmap(os.path.join(gv.IMG_FD, 'reset32.png'), wx.BITMAP_TYPE_ANY)
         stoptBmp = wx.Bitmap(os.path.join(gv.IMG_FD, 'emgStop32.png'), wx.BITMAP_TYPE_ANY)
         resetBmp = wx.Bitmap(os.path.join(gv.IMG_FD, 'reload32.png'), wx.BITMAP_TYPE_ANY)
-        font = wx.Font(11, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        font = wx.Font(11, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
         vbox = wx.BoxSizer(wx.VERTICAL)
         label = wx.StaticText(self, label="Train: %s - %s" %(self.trackID, str(self.trainID)))
         label.SetFont(font)

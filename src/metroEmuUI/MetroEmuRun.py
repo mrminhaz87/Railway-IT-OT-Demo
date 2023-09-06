@@ -116,7 +116,7 @@ class UIFrame(wx.Frame):
         # Add the real word display panel.
         vbox1 = wx.BoxSizer(wx.VERTICAL)
         vbox1.AddSpacer(5)
-        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        font = wx.Font(12, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
         label = wx.StaticText(self, label= "RealWorld Metro System Emulator")
         label.SetFont(font)
         vbox1.Add(label, flag=wx.CENTRE, border=2)
@@ -131,7 +131,7 @@ class UIFrame(wx.Frame):
         flagsL = wx.LEFT
         vbox0 = wx.BoxSizer(wx.VERTICAL)
         vbox0.AddSpacer(5)
-        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        font = wx.Font(12, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
         label = wx.StaticText(self, label="Trains Control")
         label.SetFont(font)
         vbox0.Add(label, flag=flagsL, border=2)

@@ -42,7 +42,7 @@ class PanelTrainInfo(wx.Panel):
         flagsL = wx.LEFT
         sizer.AddSpacer(5)
         # Row 0: Set the panel label
-        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        font = wx.Font(12, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
         label = wx.StaticText(self, label="Trains Information")
         label.SetFont(font)
         label.SetForegroundColour(wx.Colour("WHITE"))
@@ -181,7 +181,7 @@ class PanelTrain(wx.Panel):
 #-----------------------------------------------------------------------------
     def _buidUISizer(self):
         flagsL = wx.LEFT
-        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        font = wx.Font(12, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
         # Init the sizer
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.AddSpacer(5)
@@ -201,7 +201,7 @@ class PanelTrain(wx.Panel):
         hbox.Add(self.speedGauge, flag=flagsL, border=2)
         vbox = wx.BoxSizer(wx.VERTICAL)
         vbox.AddSpacer(10)
-        font = wx.Font(10, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        font = wx.Font(10, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
         # Add the power display
         color = wx.Colour('GREEN') if self.powerState else wx.Colour('RED')
         labelStr = ' Power:ON' if self.powerState else ' Power:OFF'

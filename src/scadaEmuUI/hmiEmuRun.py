@@ -192,7 +192,7 @@ class UIFrame(wx.Frame):
         mSizer = wx.BoxSizer(wx.VERTICAL)
         mSizer.AddSpacer(5)
         # Added the map panel.
-        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        font = wx.Font(12, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
         label = wx.StaticText(self, label=" Railway Sensor-Signal SCADA HMI ")
         label.SetFont(font)
         mSizer.Add(label, flag=flagsL, border=2)
@@ -227,7 +227,7 @@ class UIFrame(wx.Frame):
 #-----------------------------------------------------------------------------
     def _buildPlcPnlsSizer(self, PanelTitle, panelKeySeq):
         flagsL = wx.LEFT
-        font = wx.Font(12, wx.DECORATIVE, wx.BOLD, wx.BOLD)
+        font = wx.Font(12, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
         vSizer = wx.BoxSizer(wx.VERTICAL)
         label = wx.StaticText(self, label=PanelTitle)
         label.SetFont(font)
