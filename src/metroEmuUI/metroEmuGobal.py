@@ -110,7 +110,7 @@ gTranspPct = 70     # Windows transparent percentage.
 UI_TITLE = CONFIG_DICT['UI_TITLE']
 # main frame update rate 0.5 sec.
 gUpdateRate = float(CONFIG_DICT['UI_INTERVAL']) if float(CONFIG_DICT['UI_INTERVAL']) > 0 else 0.5
-gTrainDefSpeed = 10 # Train default speed 10 pixels per refersh frame.
+gTrainDefSpeed = 5 # Train default speed 5 or 10 pixels per refersh frame.
 gSensorCount = 0    # number of sensors.
 gMinTrainDist = 80  # min distance between each trains by refresh rate
 gCollAvoid = CONFIG_DICT['COLL_AVOID']    # Auto avoid collision.

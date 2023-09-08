@@ -356,7 +356,8 @@ class MapMgr(object):
         """
         trainList = []
         for trainInfo in trainCfg:
-            trainObj = agent.AgentTrain(self, trainInfo['id'], trainInfo['head'], trackPts, trainLen=trainInfo['len'])
+            trainObj = agent.AgentTrain(self, trainInfo['id'], trainInfo['head'], trackPts, 
+                                        trainLen=trainInfo['len'])
             trainList.append(trainObj)
         return trainList
 

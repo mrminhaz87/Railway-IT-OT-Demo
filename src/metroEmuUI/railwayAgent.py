@@ -396,7 +396,8 @@ class AgentTrain(AgentTarget):
                 railwayPts - list of railway points.(train will also run under 
                 the list sequence.)
     """
-    def __init__(self, parent, trainID, initPos, railwayPts, trainLen=5, trainSpeed=10, railwayType=gv.RAILWAY_TYPE_CYCLE):
+    def __init__(self, parent, trainID, initPos, railwayPts, 
+                 trainLen=5, trainSpeed=gv.gTrainDefSpeed, railwayType=gv.RAILWAY_TYPE_CYCLE):
         """ Init the train control agent object.
         Args:
             parent (_type_): parent object.
@@ -485,7 +486,7 @@ class AgentTrain(AgentTarget):
         """ Check whether their is possible collision to the front train.
             Args:
                 frontTrain (_type_): _description_
-                threshold (int, optional): collision detection distance. Defaults to 40.
+                threshold (int, optional): collision detection distance. Defaults to 20.
         """
         if self.isWaiting: return False
         ftTail = frontTrain.getTrainPos(idx=-1) # front train tail position.
@@ -505,7 +506,7 @@ class AgentTrain(AgentTarget):
         for singalObj in signalList:
             x, y = singalObj.getPos()
             if self.checkNear(x, y, 20):
-                speed = 0 if singalObj.getState() else 10
+                speed = 0 if singalObj.getState() else gv.gTrainDefSpeed
                 self.setTrainSpeed(speed)
                 break
 
@@ -554,7 +555,7 @@ class AgentTrain(AgentTarget):
 
     def setEmgStop(self, emgStop):
         self.emgStop = emgStop
-        self.trainSpeed = 0 if self.emgStop else 10
+        self.trainSpeed = 0 if self.emgStop else gv.gTrainDefSpeed
 
     def setNextPtIdx(self, nextPtIdx):
         if nextPtIdx < len(self.railwayPts): 
@@ -582,7 +583,7 @@ class AgentTrain(AgentTarget):
         self.emgStop = False
         self.collsionFlg = False
         self.isWaiting = False
-        self.trainSpeed = 10
+        self.trainSpeed = gv.gTrainDefSpeed
         self.dockCount = 0
 
 #--AgentTrain------------------------------------------------------------------
@@ -613,7 +614,7 @@ class AgentTrain(AgentTarget):
                     trainPt[1] += int((nextPt[1]-trainPt[1])*scale)
             if self.dockCount == 1: 
                 self.dockCount -= 1
-                if self.trainSpeed == 0: self.trainSpeed = 10
+                if self.trainSpeed == 0: self.trainSpeed = gv.gTrainDefSpeed
         else:  # Train stop at the station.
             self.dockCount -= 1
 

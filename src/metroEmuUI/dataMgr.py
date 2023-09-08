@@ -57,6 +57,16 @@ class DataManager(threading.Thread):
             'ccline': None,
             'mtline': None
         }
+        # ccline have lowest piority: check whether other 2 line sensors are on
+        self.priorityConfig = [('nsline',0), None, 
+                               ('nsline', 4), None,
+                               ('nsline', 2), None,
+                               ('nsline', 2), None,
+                               ('weline', 7, 9), None,
+                               ('weline', 5, 11), None,
+                               ('weline', 3, 13), None,
+                               ('weline', 1, 15), None ]
+
         self.sensorPlcUpdateT = 0
         # init the local station data record dictionary
         self.stationsDict = {
@@ -239,6 +249,22 @@ class DataManager(threading.Thread):
             for key in self.sensorsDict.keys():
                 sensorAgent = gv.iMapMgr.getSensors(trackID=key)
                 self.sensorsDict[key] = sensorAgent.getSensorsState()
+            # update the cc sensor piority if connect to PLC
+            if not gv.gTestMD: self._updateSensorPriority()
+
+    def _updateSensorPriority(self):
+        if self.sensorsDict['ccline']:
+            pryLen = len(self.priorityConfig)
+            for i, val in enumerate(self.sensorsDict['ccline']):
+                if i < pryLen and self.priorityConfig[i]:
+                    priorityVal = self.priorityConfig[i]
+                    overWriteFlg = False 
+                    key, idxs = priorityVal[0], priorityVal[1:]
+                    for j in idxs:
+                        if j < len(self.sensorsDict[key]):
+                            overWriteFlg = overWriteFlg or self.sensorsDict[key][j]
+                    if val and overWriteFlg:
+                        self.sensorsDict['ccline'][i] = 0
 
     #-----------------------------------------------------------------------------
     def updateStationsData(self):
