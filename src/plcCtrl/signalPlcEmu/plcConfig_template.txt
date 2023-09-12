@@ -26,7 +26,8 @@ RW_PORT:3001
 CLK_INT:0.6
 
 #-----------------------------------------------------------------------------
-# Define modbus TCP host IP, use 0.0.0.0 or localhost
+# Define modbus TCP host IP, use 0.0.0.0 if you need to connect from out side
+# or localhost if test in signal machine
 MD_BUS_IP:localhost
 
 # Define modbus TCP host Port, normally use 502
