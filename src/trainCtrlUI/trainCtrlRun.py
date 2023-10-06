@@ -42,6 +42,7 @@ class UIFrame(wx.Frame):
         self.statusbar.SetStatusText('Test mode: %s' % str(gv.TEST_MD))
         # Init the local parameters:
         self.updateLock = False
+        self.plcOnline = True if gv.TEST_MD else False
         # Turn on all the trains power during init.
         self.loadTrainsPwrConfig()
         # Load the auto collision config setting 
@@ -51,7 +52,6 @@ class UIFrame(wx.Frame):
         # Set the periodic call back
         self.lastPeriodicTime = time.time()
         self.timer = wx.Timer(self)
-        self.updateLock = False
         self.Bind(wx.EVT_TIMER, self.periodic)
         self.timer.Start(gv.PERIODIC)  # every 500 ms
 
@@ -321,11 +321,12 @@ class UIFrame(wx.Frame):
                 # real module step 1: get data frome PLCs module.
                 gv.idataMgr.periodic(now)
                 # real module step 2: Update the Plc display
+                self.updatePlcConIndicator()
                 self.updatePlcPanels()
                 # real module step 3: mapping the plc info to trains info.
-                self.updateTrainsInfo()
+                if self.plcOnline: self.updateTrainsInfo()
             # Update the train inforation grid.
-            if gv.iMapMgr: 
+            if gv.iMapMgr and self.plcOnline: 
                 gv.iInfoPanel.updateTrainInfoGrid()
                 self.updateTrainsPanels()
             # update time display
@@ -336,8 +337,9 @@ class UIFrame(wx.Frame):
     def updatePlcConIndicator(self):
         """ Update the PLC's state panel connection state."""
         if gv.idataMgr is None: return False
+        self.plcOnline = gv.idataMgr.getConntionState(gv.PLC_ID)
         for plcPanel in self.plcPnls.values():
-            plcPanel.setConnection(gv.idataMgr.getConntionState(gv.PLC_ID))
+            plcPanel.setConnection(self.plcOnline)
         return True
     
 #-----------------------------------------------------------------------------

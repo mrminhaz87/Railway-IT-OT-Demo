@@ -165,14 +165,17 @@ class DataManager(object):
         self.regsDict = {}
         self.coilsDict = {}
         self.plcInfo = plcInfo
+        self.plcConnectionState = {}
         for key, val in plcInfo.items():
             plcIpaddr = val['ipaddress']
             plcPort = val['port']
             self.plcClients[key] = modbusTcpCom.modbusTcpClient(plcIpaddr, tgtPort=plcPort)
             if self.plcClients[key].checkConn():
                 gv.gDebugPrint('DataManager: Connected to PLC.', logType=gv.LOG_INFO)
+                self.plcConnectionState[key] = True
             else:
                 gv.gDebugPrint('DataManager: Failed to connect to PLC.', logType=gv.LOG_INFO)
+                self.plcConnectionState[key] = False
             self.regsDict[key] = []
             self.coilsDict[key] = []
         gv.gDebugPrint('TrainsHMI dataMgr inited', logType=gv.LOG_INFO)
@@ -186,7 +189,10 @@ class DataManager(object):
             self.regsDict[key] = self.plcClients[key].getHoldingRegs(hRegsAddr, hRegsNum)
             coilsAddr, coilsNum = self.plcInfo[key]['coilsInfo']
             self.coilsDict[key] = self.plcClients[key].getCoilsBits(coilsAddr, coilsNum)
-
+            if self.regsDict[key] is None or self.coilsDict[key] is None:
+                self.plcConnectionState[key] = False
+            else:
+                self.plcConnectionState[key] = True
     #-----------------------------------------------------------------------------
     # define all the get() function here.
     def getPlcHRegsData(self, plcid, startIdx, endIdx):
@@ -205,7 +211,7 @@ class DataManager(object):
     #-----------------------------------------------------------------------------
     def getConntionState(self, plcID):
         if plcID in self.plcClients.keys():
-            return self.plcClients[plcID].checkConn()
+            return self.plcClients[plcID].checkConn() and self.plcConnectionState[plcID]
         return False
 
     #-----------------------------------------------------------------------------
