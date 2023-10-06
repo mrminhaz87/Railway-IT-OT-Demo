@@ -12,10 +12,11 @@
 # License:     
 #-----------------------------------------------------------------------------
 
+
 import time
 import modbusTcpCom
 
-hostIp = '127.0.0.1'
+hostIp = '10.107.105.7'
 hostPort = 502
 
 client = modbusTcpCom.modbusTcpClient(hostIp)
@@ -28,10 +29,16 @@ while not client.checkConn():
 
 print('Target PLC accept connection request.')
 time.sleep(1)
-print('Inject front train detection sensor of train-we2...')
+print('Inject front train detection sensor holding register safe [hr10 val=0]  for  train-we0...')
 client.setCoilsBit(10, False)
 time.sleep(1)
-print("Inject train train-we1 emmergency stop.")
-client.setCoilsBit(0, False)
-print("inject train train-we2 power full trottle...")
+print("Inject train train-we1 emmergency stop [coil val=0] .")
+client.setCoilsBit(1, False)
+print("Inject train train-we0 power full trottle [coil val=1] ...")
 client.setCoilsBit(0, True)
+while True:
+    print('Inject front train detection sensor holding register safe [hr10 val=0]  for  train-we0...')
+    time.sleep(1)
+    print("Inject train train-we1 emmergency stop [coil val=0] .")
+    time.sleep(1)
+    print("Inject train train-we0 power full trottle [coil val=1] ...")
