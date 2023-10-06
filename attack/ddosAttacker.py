@@ -13,22 +13,26 @@
 #-----------------------------------------------------------------------------
 
 import time
-import modbusTcpCom
+from pyModbusTCP.client import ModbusClient
 count = 0 
 hostIp = '127.0.0.1'
 hostPort = 502
 
-client = modbusTcpCom.modbusTcpClient(hostIp)
 print('Try to connect to the target victim PLC: %s' %str(hostIp))
 print('Start PLC read request thread')
 print('Start pLC write request thread')
 timeVal = time.time()
-while not client.checkConn():
+for i in range(10):
     count +=1
     print('Try connect to the PLC')
-    reuslt = client.getCoilsBits(0, 4)
-    if not reuslt: print("connection rejected")
-    if count == 100:
+    client = ModbusClient(host=hostIp, port=hostPort, auto_open=True)
+    if client.open():
+        print("send 100 request.")
+        for i in range(100):
+            reuslt = client.client.read_coils(0, 4)
         timeInt = time.time() - timeVal
         print("PLC request sending frequency: %s" %str(100/timeInt))
         timeVal = time.time()
+    if not reuslt: print("connection rejected")
+    client.close()
+
