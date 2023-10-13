@@ -256,6 +256,7 @@ class UIFrame(wx.Frame):
             self.lastPeriodicTime = now
             if not gv.TEST_MD:
                 if gv.idataMgr: gv.idataMgr.periodic(now)
+                self.updatePlcConIndicator()
                 self.updatePlcPanels()
                 self.updateMapJunctionData()
                 self.updateMapStationData()
