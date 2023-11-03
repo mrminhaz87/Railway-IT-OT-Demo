@@ -98,7 +98,7 @@ class udpClient(object):
                     _, _, messageSZ = data.decode(CODE_FMT).split(';') 
                     data = self.receiveChunk(int(messageSZ))
                 return data
-            except ConnectionResetError as error:
+            except Exception as error:
                 print("udpClient;sendMsg(): Can not connect to the server!")
                 print(error)
                 # self.disconnect() no need to diconnect if we want to do reconnect.

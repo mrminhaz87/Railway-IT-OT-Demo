@@ -43,7 +43,7 @@ class PanelMap(wx.Panel):
     def _loadBitMaps(self):
         """ Load the internal usage pictures as bitmaps."""
         imgDict = {}
-        imgPath = os.path.join(gv.IMG_FD, 'Alert.png')
+        imgPath = os.path.join(gv.IMG_FD, 'alert.png')
         if os.path.exists(imgPath):
             png = wx.Image(imgPath, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
             imgDict['alert'] = png
