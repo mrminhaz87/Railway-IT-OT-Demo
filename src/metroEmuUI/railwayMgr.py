@@ -485,14 +485,14 @@ class MapMgr(object):
                 if not result: train.checkSignal(self.signals[key])        
                 # stop the train if it got collision at any junction.
                 if collsionTrainsDict and i in collsionTrainsDict[key]:
-                    train.setEmgStop(True)
+                    if not gv.gJuncAvoid: train.setEmgStop(True)
                 train.updateTrainPos()               
             # update all the track's sensors state afte all the trains have moved.
             self.sensors[key].updateActive(val)
             # updaste all the signal, if test mode (not connect to PLC) call the 
             # buildin signal control logic, else the data manager will read the signal 
             # infromation from PLC then do the auto update.
-            if gv.gTestMD: self.updateSignalState(key)
+            if gv.gTestMD or gv.gJuncAvoid : self.updateSignalState(key)
 
         # update the station train's docking state
         for key, val in self.stations.items():

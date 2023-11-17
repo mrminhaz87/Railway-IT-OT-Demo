@@ -18,10 +18,14 @@ UDP_PORT:3001
 UI_TITLE:2D Railway[Metro] System Real-world Emulator
 
 # Init the UI update interval:
-UI_INTERVAL:0.8
+UI_INTERVAL:2
 
 # Init Control paramters
+# Trains collision avoidence flag.
 COLL_AVOID:True
+
+# Trains Junction auto correct flag.(Check junction state and auto correct wrong PLC signal)
+JUNC_AVOID:True
 
 # Set train dock time: ==0 train will stay in station in a random Interval, > 0 num of time 
 # circle train will stay in 

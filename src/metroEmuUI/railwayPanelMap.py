@@ -107,7 +107,6 @@ class PanelMap(wx.Panel):
             dc.DrawText('Last update Time: '+str(timeStr), 80, 860)
             dc.DrawText('Connection State: '+str(connState), 80, 875)
 
-
 #-----------------------------------------------------------------------------
     def _drawJunction(self, dc):
         """ Draw the junction 
@@ -116,7 +115,7 @@ class PanelMap(wx.Panel):
         for item in gv.iMapMgr.getJunction():
             pos = item.getPos()
             if item.getCollition():
-                if self.toggle:
+                if self.toggle and not gv.gJuncAvoid:
                     dc.DrawBitmap(self.bitMaps['alert'], pos[0]-15, pos[1]-15)
                 else:
                     dc.SetPen(wx.Pen('RED', width=1, style=wx.PENSTYLE_SOLID))

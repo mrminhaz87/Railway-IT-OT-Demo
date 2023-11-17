@@ -118,7 +118,8 @@ gUpdateRate = float(CONFIG_DICT['UI_INTERVAL']) if float(CONFIG_DICT['UI_INTERVA
 gTrainDefSpeed = 5 # Train default speed 5 or 10 pixels per refersh frame.
 gSensorCount = 0    # number of sensors.
 gMinTrainDist = 80  # min distance between each trains by refresh rate
-gCollAvoid = CONFIG_DICT['COLL_AVOID']    # Auto avoid collision.
+gCollAvoid = CONFIG_DICT['COLL_AVOID']      # Auto avoid collision.
+gJuncAvoid = CONFIG_DICT['JUNC_AVOID']      # Auto correct juction state.
 gDockTime = int(CONFIG_DICT['DOCK_TIME'])
 
 gPlcTimeout = int(CONFIG_DICT['PLC_TIMEOUT'])

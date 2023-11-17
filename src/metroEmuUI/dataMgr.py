@@ -207,8 +207,9 @@ class DataManager(threading.Thread):
         try:
             reqDict = json.loads(reqJsonStr)
             if gv.iMapMgr:
-                for key, val in reqDict.items():
-                    gv.iMapMgr.setSingals(key, val)
+                if not gv.gJuncAvoid:
+                    for key, val in reqDict.items():
+                        gv.iMapMgr.setSingals(key, val)
                 respStr = json.dumps({'result': 'success'})
         except Exception as err:
             gv.gDebugPrint("setSignals() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
