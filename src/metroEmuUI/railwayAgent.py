@@ -481,6 +481,12 @@ class AgentTrain(AgentTarget):
             if dist <= threshold: return True
         return False
 
+    def checkTHsensor(self, posX, posY, threshold):
+        """ Check the train head sensor detection."""
+        pos = self.pos[0]
+        dist = math.sqrt((pos[0] - posX)**2 + (pos[1] - posY)**2)
+        return dist <= threshold
+
 #--AgentTrain------------------------------------------------------------------
     def checkCollFt(self, frontTrain, threshold = 25):
         """ Check whether their is possible collision to the front train.
@@ -505,7 +511,7 @@ class AgentTrain(AgentTarget):
         """
         for singalObj in signalList:
             x, y = singalObj.getPos()
-            if self.checkNear(x, y, 20):
+            if self.checkNear(x, y, 5) or self.checkTHsensor(x, y, 20):
                 speed = 0 if singalObj.getState() else gv.gTrainDefSpeed
                 self.setTrainSpeed(speed)
                 break

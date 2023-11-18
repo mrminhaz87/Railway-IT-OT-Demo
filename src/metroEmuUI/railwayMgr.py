@@ -171,7 +171,7 @@ class MapMgr(object):
             signal = agent.AgentSignal(self, info['id'], info['pos'], dir=info['dir'])
             signal.setTriggerOnSensors(info['tiggerS'], info['onIdx'])
             signal.setTriggerOffSensors(info['tiggerS'], info['offIdx'])
-            self.signals['nsline'] .append(signal)
+            self.signals['nsline'].append(signal)
 
         # set all the signal on track ccline
         trackSignalConfig_cc = [
@@ -461,6 +461,29 @@ class MapMgr(object):
             for signal in self.signals[lineKey]:
                 signal.updateSingalState()
 
+    def autoCorrectSignalState(self):
+        """ Correct the CC line signal if got error, if both signal are on, turn 
+            off the cc line signal to make the cc line train pass 1st. This function
+            actived by the 
+        """
+        checkPair = [
+            ('nsline', (0, 1)),
+            ('nsline', (2,)),
+            ('nsline', (3,)),
+            ('weline', (6, 7)),
+            ('weline', (4, 5)),
+            ('weline', (2, 3)),
+            ('weline', (0, 1))
+        ]
+        for i, signal in enumerate(self.signals['ccline']):
+            checkRst = signal.getState()
+            if checkRst:
+                key, val = checkPair[i]
+                for idx in val:
+                    checkRst = checkRst and self.signals[key][idx].getState()
+            # If both signal on state happens correct the CC line signal.
+            if checkRst: signal.setState(False)
+
 #-----------------------------------------------------------------------------
     def periodic(self , now):
         """ Periodicly call back function. This function need to be called before the 
@@ -492,7 +515,9 @@ class MapMgr(object):
             # updaste all the signal, if test mode (not connect to PLC) call the 
             # buildin signal control logic, else the data manager will read the signal 
             # infromation from PLC then do the auto update.
-            if gv.gTestMD or gv.gJuncAvoid : self.updateSignalState(key)
+            if gv.gTestMD or gv.gJuncAvoid : 
+                self.updateSignalState(key)
+                self.autoCorrectSignalState()
 
         # update the station train's docking state
         for key, val in self.stations.items():
