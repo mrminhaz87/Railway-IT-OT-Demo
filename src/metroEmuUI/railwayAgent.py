@@ -312,14 +312,12 @@ class AgentStation(AgentTarget):
                 #         train.setDockCount(max(minDockCount, self.dockCount))
                 #     # Reset empty count when station is occupied
                 #     self.emptyCount = 0
-                if train.getDockCount() == 0:
-                    train.setDockCount(self.dockCount)
+                if train.getDockCount() == 0: train.setDockCount(self.dockCount)
                 return
             # Check whether the train need to be stopped by the station signal
             headPt = train.getTrainPos(idx=0) 
             if self._checkNearSignal(headPt):
-                train.setWaiting(self.signalState)
-                return 
+                train.setWaiting(self.signalState) 
         self.dockState = False
         if gv.gTestMD: self.setSignalState(False)
 
