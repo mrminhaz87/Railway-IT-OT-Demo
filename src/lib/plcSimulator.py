@@ -94,9 +94,8 @@ class RealWorldConnector(object):
         if self.recoonectCount <= 0:
             Log.info('Try to reconnect to the realword.')
             self.realworldOnline = self._loginRealWord(plcID=self.plcID)
-            if not self.realworldOnline: self.recoonectCount = RECON_INT
+            self.recoonectCount = RECON_INT
         self.recoonectCount -= 1
-        time.sleep(1)
 
 #-----------------------------------------------------------------------------
     def fetchRWInputData(self, rqstType='input', inputDict={}):
