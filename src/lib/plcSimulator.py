@@ -31,6 +31,8 @@ import Log
 import udpCom
 import modbusTcpCom
 
+RECON_INT = 30 # reconnection time interval default set 30 sec
+
 # Define all the module local untility functions here:
 #-----------------------------------------------------------------------------
 def parseIncomeMsg(msg):
@@ -63,7 +65,7 @@ class RealWorldConnector(object):
             'port': address[1]
         }
         self.rwConnector = udpCom.udpClient((self.realwordInfo['ip'], self.realwordInfo['port']))
-        self.recoonectCount = 30
+        self.recoonectCount = RECON_INT
         # Test login the real world emulator
         self.plcID = self.parent.getPlcID()
         self.realworldOnline = self._loginRealWord(plcID= self.plcID)
@@ -88,11 +90,12 @@ class RealWorldConnector(object):
 
 #-----------------------------------------------------------------------------
     def reConnectRW(self):
-        if self.recoonectCount == 0:
+        """ Try to reconnect to the real world emulator."""
+        if self.recoonectCount <= 0:
             Log.info('Try to reconnect to the realword.')
             self.realworldOnline = self._loginRealWord(plcID=self.plcID)
-            if not self.realworldOnline: self.recoonectCount = 30
-        self.recoonectCount -=1
+            if not self.realworldOnline: self.recoonectCount = RECON_INT
+        self.recoonectCount -= 1
         time.sleep(1)
 
 #-----------------------------------------------------------------------------
