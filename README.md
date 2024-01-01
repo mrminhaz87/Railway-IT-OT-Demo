@@ -9,6 +9,12 @@
 - Railway Stations Sensor-Signal System Control PLC Simulator
 - Railway Trains Sensor-Power System Control PLC Simulator
 
+##### Project Use Case: 
+
+We are glad to share that the Railway [Metro] IT/OT Emulation System Cyber Security Test Platform we developed this year was used for building one part of the cyber-attack target training system in the NATO CCDCOE Cross Sward 2023 offensive cyber exercise. LinkedIn post 2: [link](https://www.linkedin.com/posts/natoccdcoe_crossedswords-activity-7140986334961217536-7dM5/?utm_source=share&utm_medium=member_desktop)
+
+![](doc/img/linkedinpost2.png)
+
 [TOC]
 
 ------

@@ -54,6 +54,8 @@ class udpClient(object):
     def __init__(self, ipAddr):
         """ Create an ipv4 (AF_INET) socket object using the udp protocol (SOCK_DGRAM)
             init example: client = udpClient(('127.0.0.1', 502))
+            Args:
+                ipAddr (tuple(str(), int())): IP address tuple ip + port.
         """
         self.ipAddr = ipAddr
         self.bufferSize = BUFFER_SZ
