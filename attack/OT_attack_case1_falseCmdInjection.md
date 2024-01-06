@@ -84,7 +84,7 @@ The Red Team Command and Control (RTC2) server, commonly known as a C&C server, 
 
 ##### Modbus false command injector program
 
-The false command injection program will provide False Data Injection (FDI) and False Command Injection (FCI) function for red team attacker to inject Modbus control data/command to either the PLC or HMI system as shown in below example: 
+The false command injection program will provide False Data Injection (FDI) and False Command Injection (FCI) function for red team attacker to inject Modbus control data/command to either the PLC or HMI system as shown in below common False command / data injection example: 
 
 ![](img/falseDataInjection.png)
 
@@ -94,3 +94,86 @@ The false command injection program will provide False Data Injection (FDI) and 
 - The injector will issue the illegal/false Modbus command (such as inject the train front detection sensor’s holding register’s state) to make the PLC generate the incorrect electrical signal to the train then cause the trains accident happens.
 
 > Modbus false command injector program program link: [GitHub Repo](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/falseCmdInjector)
+
+
+
+------
+
+### Train Operation Workshop and Attack Procedures 
+
+#### Train Operation Basic Background Knowledge Introduction 
+
+There will be a short work shop to introduce the train basic train control part in the railway system before the red team members can implement the attack. The train cyber range network topology is shown below : 
+
+![](img/topology.png)
+
+The false data injection program will be implanted in one of the computer in the Operational room network, we named it as rail_op_victim. This computer is in the PLC's white list. 
+
+**Real world Emulator Train Operation Introduction**
+
+The trains on the real-world emulator will be under one of the below three states : 
+
+![](img/TrainState.png)
+
+The train operator can monitor the train state (speed, throttle state, break state and power state) from the Train control HMI panel. 
+
+**Train’s Senor-Power physical wire connection to PLC and auto control logic** 
+
+The train content 2 safety control to avoid collision happens: 
+
+- Auto collision avoidance : each train will have a front collision detection sensor, when the sensor detected front got a train in a distance, it will auto trigger the break to slow down the train speed. 
+- Manual collision avoidance : when the train operator find the train speed got exception or he think if there is a possible collision, he can press the train emergency stop button to stop the train. 
+
+The train control PLC logic is shown below: 
+
+![](img/TrainSafeCtrl.png)
+
+- For each PLC there will be one coil to control the train's power, when the coils is turn off, the train throttle will be set to 0 and the break will on. 
+- The train sensor will be linked to PLC's input, the sensor state will be record in a PLC holding register (HR0), then the holding register will trigger the ladder logic to change the break control coil. 
+- The train speed sensor will be record in another holding register(HR1) and the HMI will read the speed data from the register. 
+
+In normal state, the front collision detection sensor is not allowed to be changed by any Modbus control cmd from HMI. It can only be set by the train’s electrical sensor (such as a radar).
+
+Attack malware will use illegal cmd to overwrite the front collision sensor’s state to mess up the train’s auto control logic to cause the trains accident
+
+#### OT-Attack Procedures 
+
+As Introduced in the previous section, we need to implement 2 kind of attack False Data Injection (FDI) and False Command Injection (FCI) to bypass the auto and manual train collision avoidance  safety mechanism to make the train accident happens. 
+
+False Data Injection (FDI) :  we need to inject the incorrect front sensor detection data in the PLC's sensor data record holding register to bypass the auto collision avoidance mechanism. 
+
+False Command Injection : we need to inject the incorrect train power control command to the train power coil to override the train operator's emergency stop action. 
+
+##### Attack Pre-condition Introduction
+
+In this demo, the false data injector has been installed in the previous IT-network attack. The victim machine (ip) which will the run the injector is in trains control PLC ‘s allow read and allow write list. The effected VMs in the OT network is shown below: 
+
+![](img/AttackDiagram.png)
+
+The attack demo will show a false command injector program to attack the OT-system control chain: Train Control HMI -> Train Control PLC -> Real-world Trains in the railway system will illegal PLC Modbus control request. 
+
+The injector will issue the illegal/false Modbus command (such as inject the train front detection sensor’s holding register’s state) to make the PLC generate the incorrect electrical signal to the train then cause the trains accident happens.
+
+##### Attack Procedure Introduction 
+
+To make the train collision accident happens below: 
+
+![](img/collsision.png)
+
+The attack malware (injector) need to repeat inject at less 3 commands in two trains PLC under the frequency which higher than trains operator.
+
+1. Keep sending power cut off command to the front train (ccline-0) to make it stop.
+2. Keep send full throttle command to behind train (ccline-1) to make it rush to the front train (ccline-0) .
+3. To avoid the behind train (ccline-1) collision detection sensor trigger train break, keep injecting the detection sensor clear cmd (holding register val=0, front safe) to ccline-1 PLC.
+
+Then the accident will happen, the attack is possible to be detected by train operator if he found the train ccline-1’s throttle and speed is unusual.
+
+**How the malware to prevent the train operator do emergency stop to save train if he detected the attack/exception state:**
+
+As shown below PLC clock cycle : 
+
+![](img/plcClock.png)
+
+1. PLC will accept the command from t0 to t1 and update its memory.
+2. Plc will execute its ladder logic based on the latest memory state at t1. the execute take a very short period t1 - t2.
+3. The attacker will send multiple false cmd  in high sequency try to overwrite the train operator’s correct control command. Unless the operator can press the train emergency stop button supper fast (which is impossible faster than the malware program), then he will not be able to stop the train accident.
