@@ -88,7 +88,7 @@ This program serves a dual purpose by offering both False Data Injection (FDI) a
 
 ![](img/falseDataInjection.png)
 
-- he Modbus data injector malware is an adaptation of the backdoor trojan program `<backdoorTrojan.py>`, where a plc-Modbus communication module is integrated. This modification enables the C2 Emulation system to remotely control and utilize the injector for launching false command injection attacks.
+- The Modbus data injector malware is an adaptation of the backdoor trojan program `<backdoorTrojan.py>`, where a plc-Modbus communication module is integrated. This modification enables the C2 Emulation system to remotely control and utilize the injector for launching false command injection attacks.
 
 - The attack demonstration will spotlight the false command injector program targeting the OT-system control chain: `Train Control HMI` -> `Train Control PLC` -> `Real-world Trains in the railway system` through illicit PLC Modbus control requests. The injector will execute an illegal/false Modbus command, such as injecting the state of the train front detection sensor's holding register, prompting the PLC to generate an incorrect electrical signal to the train, resulting in a simulated train accident. This showcase underscores the potential impact of false command injection on the safety and integrity of the railway system.
 
@@ -98,15 +98,16 @@ This program serves a dual purpose by offering both False Data Injection (FDI) a
 
 ------
 
-### Train Operation Workshop and Attack Procedures 
+### Train Operation and Attack Procedures 
 
 #### Train Operation Basic Background Knowledge Introduction 
 
-There will be a short work shop to introduce the train basic train control part in the railway system before the red team members can implement the attack. The train cyber range network topology is shown below : 
+
+There will be a brief workshop to precede the implementation of the attack, providing an introduction to the fundamental control aspects of trains within the railway system. The cyber range network topology for the train simulation is depicted below:
 
 ![](img/topology.png)
 
-The false data injection program will be implanted in one of the computer in the Operational room network, we named it as rail_op_victim. This computer is in the PLC's white list. 
+The false data injection program will be implanted in one of the computer in the railway operational room sub-network, we named it as `rail_op_victim`. This computer's IP address is in the PLC's white list. 
 
 **Real world Emulator Train Operation Introduction**
 
@@ -114,42 +115,43 @@ The trains on the real-world emulator will be under one of the below three state
 
 ![](img/TrainState.png)
 
-The train operator can monitor the train state (speed, throttle state, break state and power state) from the Train control HMI panel. 
+The trains operator/driver can monitor the train state (current speed, throttle state, break state and power state) from the Train Control HMI program. 
 
 **Train’s Senor-Power physical wire connection to PLC and auto control logic** 
 
-The train content 2 safety control to avoid collision happens: 
+The trains system incorporates two safety control mechanisms to prevent collisions:
 
-- Auto collision avoidance : each train will have a front collision detection sensor, when the sensor detected front got a train in a distance, it will auto trigger the break to slow down the train speed. 
-- Manual collision avoidance : when the train operator find the train speed got exception or he think if there is a possible collision, he can press the train emergency stop button to stop the train. 
+- **Auto Collision Avoidance**: Each train is equipped with a front collision detection sensor. When this sensor identifies the presence of another train within a specified distance, it automatically triggers the brakes to slow down the train speed, ensuring collision avoidance through automated response.
+- **Manual Collision Avoidance**: In addition to the automated system, train operators have the ability to intervene manually. If an operator observes irregular train speed or anticipates a potential collision, they can activate the train's emergency stop button, bringing the train to an immediate halt. This manual intervention provides an additional layer of control for addressing unforeseen situations and ensuring the safety of the railway system.
 
-The train control PLC logic is shown below: 
+The train control PLC wire connection and the ladder logic is shown below: 
 
 ![](img/TrainSafeCtrl.png)
 
-- For each PLC there will be one coil to control the train's power, when the coils is turn off, the train throttle will be set to 0 and the break will on. 
-- The train sensor will be linked to PLC's input, the sensor state will be record in a PLC holding register (HR0), then the holding register will trigger the ladder logic to change the break control coil. 
-- The train speed sensor will be record in another holding register(HR1) and the HMI will read the speed data from the register. 
+- For each Programmable Logic Controller (PLC), a dedicated coil is assigned to regulate the train's power. When this coil is deactivated, the train's throttle is set to 0, and the brakes are engaged. 
+- The train sensor, linked to the PLC's input, records its state in a PLC holding register (HR0). Subsequently, the holding register triggers the ladder logic, initiating a change in the brake control coil.
+- Additionally, the train speed sensor data is recorded in a separate holding register (HR1), accessible to the Human Machine Interface (HMI), which reads and displays the speed information
 
-In normal state, the front collision detection sensor is not allowed to be changed by any Modbus control cmd from HMI. It can only be set by the train’s electrical sensor (such as a radar).
+Under normal operating conditions, the front collision detection sensor is safeguarded against modifications via any Modbus control command from the HMI. Its settings can solely be altered by the train's dedicated electrical sensor, such as a radar.
 
-Attack malware will use illegal cmd to overwrite the front collision sensor’s state to mess up the train’s auto control logic to cause the trains accident
+In the event of an attack, malicious commands will be employed to unlawfully overwrite the state of the front collision sensor. This illicit manipulation aims to disrupt the train's automatic control logic, potentially leading to a collision scenario.
 
 #### OT-Attack Procedures 
 
-As Introduced in the previous section, we need to implement 2 kind of attack False Data Injection (FDI) and False Command Injection (FCI) to bypass the auto and manual train collision avoidance  safety mechanism to make the train accident happens. 
+As mentioned in the preceding section, we are required to execute two types of attacks: False Data Injection (FDI) and False Command Injection (FCI), aimed at circumventing the safety mechanisms for both auto and manual train collision avoidance, ultimately leading to a simulated train accident.
 
-False Data Injection (FDI) :  we need to inject the incorrect front sensor detection data in the PLC's sensor data record holding register to bypass the auto collision avoidance mechanism. 
+- **False Data Injection (FDI)** :  In this attack, the objective is to inject inaccurate data into the PLC's sensor data record holding register, specifically targeting the front sensor detection. By manipulating this data, we aim to deceive and bypass the auto collision avoidance mechanism, tricking the system into failing to detect potential collisions.
+- **False Command Injection** : In this attack scenario, our goal is to inject incorrect commands into the train power control, specifically targeting the coil responsible for controlling the train's power. By overriding the normal functioning of this control mechanism, we intend to circumvent the train operator's emergency stop action, thereby compromising the manual collision avoidance safety mechanism.
 
-False Command Injection : we need to inject the incorrect train power control command to the train power coil to override the train operator's emergency stop action. 
+These attacks collectively illustrate the potential vulnerabilities in the train's safety controls, emphasizing the importance of robust cybersecurity measures in critical infrastructure systems.
 
 ##### Attack Pre-condition Introduction
 
-In this demo, the false data injector has been installed in the previous IT-network attack. The victim machine (ip) which will the run the injector is in trains control PLC ‘s allow read and allow write list. The effected VMs in the OT network is shown below: 
+In this demo, the false data injector has been installed in the previous IT-network attack. The victim machine (IP address) which will the run the injector is in trains control PLC ‘s allow read and allow write white list. The effected VMs in the OT network is shown below: 
 
 ![](img/AttackDiagram.png)
 
-The attack demo will show a false command injector program to attack the OT-system control chain: Train Control HMI -> Train Control PLC -> Real-world Trains in the railway system will illegal PLC Modbus control request. 
+The attack demo will show a false command injector program to attack the OT-system control chain: `Train Control HMI` -> `Train Control PLC` -> `Real-world Trains` in the railway system with illegal PLC Modbus control request. 
 
 The injector will issue the illegal/false Modbus command (such as inject the train front detection sensor’s holding register’s state) to make the PLC generate the incorrect electrical signal to the train then cause the trains accident happens.
 
@@ -159,23 +161,25 @@ To make the train collision accident happens below:
 
 ![](img/collsision.png)
 
-The attack malware (injector) need to repeat inject at less 3 commands in two trains PLC under the frequency which higher than trains operator.
+The attack malware (injector) is designed to repetitively inject a minimum of three commands into the PLCs of two trains, maintaining a frequency higher than that of the train operators. The specific actions involve:
 
-1. Keep sending power cut off command to the front train (ccline-0) to make it stop.
-2. Keep send full throttle command to behind train (ccline-1) to make it rush to the front train (ccline-0) .
-3. To avoid the behind train (ccline-1) collision detection sensor trigger train break, keep injecting the detection sensor clear cmd (holding register val=0, front safe) to ccline-1 PLC.
+1. Continuously sending power cut-off commands to the front train (ccline-0), forcing it to come to a halt.
+2. Persistently dispatching full throttle commands to the rear train (ccline-1), compelling it to accelerate towards the front train (ccline-0).
+3. In order to prevent the collision detection sensor of the rear train (ccline-1) from triggering the train's brakes, consistently injecting the detection sensor clear command (holding register value = 0, indicating front is safe) to the ccline-1 PLC.
 
-Then the accident will happen, the attack is possible to be detected by train operator if he found the train ccline-1’s throttle and speed is unusual.
+This sequence of commands, when executed, sets the stage for a simulated train accident. It is noteworthy that the attack may potentially be detected by the train operator if anomalies such as unusual throttle and speed readings on train ccline-1 are observed. Such detection underscores the importance of vigilance and monitoring in identifying and mitigating cyber threats to railway systems.
+
+
 
 **How the malware to prevent the train operator do emergency stop to save train if he detected the attack/exception state:**
 
-As shown below PLC clock cycle : 
+As shown below one PLC clock cycle : 
 
 ![](img/plcClock.png)
 
-1. PLC will accept the command from t0 to t1 and update its memory.
-2. Plc will execute its ladder logic based on the latest memory state at t1. the execute take a very short period t1 - t2.
-3. The attacker will send multiple false cmd  in high sequency try to overwrite the train operator’s correct control command. Unless the operator can press the train emergency stop button supper fast (which is impossible faster than the malware program), then he will not be able to stop the train accident.
+1. The PLC is designed to accept commands within the time interval from t0 to t1 and update its memory accordingly.
+2. Subsequently, the PLC executes its ladder logic, utilizing the most recent memory state as of t1, and completes this process within a very short period, t1 - t2.
+3. The attacker will send multiple false data / command in high sequency to try to overwrite the train operator’s correct control command. Unless the operator can press the train emergency stop button supper fast (which is impossible faster than the malware program), then he will not be able to stop the train accident.
 
 
 
@@ -183,31 +187,33 @@ As shown below PLC clock cycle :
 
 ### Red Team Attack Detail Steps
 
-As the red team attackers are our side the railway cyber range network. So to launch the attack then need to use the attack control C2 system. As introduced in the Attack Pre-condition Introduction section. The false data injection program is already executed in on of the maintenance computer in the cyber range, so when the red team attacker login the C2, then will see the false data/cmd injection program has been registered in the C2 as shown below : ![](img/C2Img/Register.png)
+Given that the red team attackers operate outside the railway cyber range network, they rely on the attack control Command and Control (C2) system to execute the assault. As detailed in the Attack Pre-condition Introduction section, the false data injection program has been previously deployed on one of the maintenance computers within the cyber range. Consequently, when the red team attacker accesses the C2 system, they will see the false data/cmd injection program has been registered in the C2 as shown below : 
 
-Before start to inject the data / command, the red team attacker needs to read the PLC data first. To assign a PLC task to the injector select link to task detail => Assign a special task via Json (in the malware tasks control page)
+![](img/C2Img/Register.png)
+
+Before start to inject the data / command, the red team attacker needs to read the PLC data first. To assign a PLC read task to the injector, select link to task detail => Assign a special task via Json (in the malware tasks control page).
 
 ##### Read Holding Register State
 
-Select the false Modbus data injector page, then select the **Assign a special task via Json**, then fill in the task detail : 
+Select the false Modbus data injector page, then select the `Assign a special task via Json`, then fill in the task detail : 
 
 - TaskType: `modbus`
 - Repeat: `int <number of the injection repeat times>`
 - Tasks data: `read;reg;<start Holding register index>;<offset>`
 
-Read Holding Register State
+Read PLC holding register state :
 
 ![](img/C2Img/readReg.png)
 
-Press the `submit` button, when the false data injector report the task finished, check the result by click the `Show task result` button (As shown below the red team attacker can read the holding register data from HR0 to HR3) : 
+Press the `submit` button, when the false data injector reports the task finished, check the result by click the `Show task result` button (As shown below the red team attacker can read the holding register data from HR0 to HR3) : 
 
 ![](img/c2Img/readRegRst.png)
 
-After several try, the attacker can identify which holding registers are used in the PLC.
+After several tries, the attacker can identify which holding registers are used in the PLC.
 
 ##### Read Output Coils State
 
-Same as the previous steps, the red team attacker can fill in the task detail below to red the coil state to identify all the coils used by the PLC : 
+Same as the previous steps, the red team attacker can fill in the task detail below to read the coil state to identify all the coils used by the PLC : 
 
 - TaskType: `modbus`
 - Repeat: `int <number of the injection repeat times>`
@@ -217,9 +223,9 @@ Same as the previous steps, the red team attacker can fill in the task detail be
 
 
 
-##### Launch False Data Injection Attack
+##### Initiating False Data Injection Attack
 
-The red team need to override the train detection sensor's record in the holding register : send not detected val 0 to keep override the train detection sensor feedback data 1.  
+To execute the false data injection attack, the red team must override the recorded information in the train detection sensor's holding register. This involves consistently sending the "not detected" value (0) to perpetually overwrite the feedback data (1) from the train detection sensor.
 
 - TaskType: `modbus`
 - Repeat: `100000`
@@ -231,9 +237,9 @@ After injected the sensor data the attacker can override the auto collision avoi
 
 
 
-##### Launch False Command Injection Attack
+##### Initiating False Command Injection Attack
 
-The red team need to override the train emergency control coil's value : keep sending the emergency stop OFF value to the related PLC.  
+To carry out the false command injection attack, the red team must manipulate the train emergency control coil's value. This entails continually sending the "emergency stop OFF" value to the corresponding Programmable Logic Controller (PLC).
 
 - TaskType: `modbus`
 - Repeat: `10000`
@@ -245,9 +251,9 @@ Press the `submit` button, when the false data injector report the task finished
 
 ![](img/C2Img/writeCoilRst.png)
 
-
-
 ##### Attack Demo Video
+
+Upon completion of the initiation of False Data Injection (FDI) and False Command Injection (FCI), the tangible impact of the attack will be demonstrated in the video below:
 
 https://www.youtube.com/watch?v=J0qpOhigNL8&t=16s
 
