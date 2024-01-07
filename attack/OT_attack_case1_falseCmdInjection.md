@@ -1,10 +1,10 @@
-# OT Cyber Attack on PLC [Study case 01] : False Data / Cmd Injection Attack Case
+# OT Cyber Attack Demo on PLC [Case Study 01] : False Data / Cmd Injection Attack Case
 
-**Project Design Purpose** : We want to create some demo / study case to use the Railway[Metro] IT/OT System Cyber Security Test Platform, the Red Team C2 System and the Modbus false data injector program to demo how a hacker launch an OT(operational technology) Cyber Attack on railway train control PLC (Programmable logic controller) which may caused the trains collision accident. This attack cases is proposed as one of the attack demo cases in the Cross Sword 2023 Test-Run.
+**Project Design Purpose** : The objective of this case study is to develop a demonstration and workshop utilizing the Railway (Metro) IT/OT System Cyber Security Test Platform, the Red Team Command and Control (C2) System, and the Modbus false data injector program. Our aim is to showcase how a hacker (red team member) could potentially launch an Operational Technology (OT) Cyber Attack on the programmable logic controllers (PLCs) governing railway train control, with the potential consequence of causing a collision accident between two trains. This particular attack scenario is proposed as one of the demonstration cases for the Cross Sword 2023 Test-Run, providing a realistic and controlled environment to assess the cybersecurity resilience of the railway infrastructure.
 
 **Attacker Vector** :  Modbus False Data / Command Injection
 
-Important : The demonstrated attack case is used for education and training for any level of IT-OT cyber security ICS course, don't apply it on any real world system.
+> Important : The demonstrated attack case is used for education and training for different level of IT-OT cyber security ICS course, please don't apply it on any real world system.
 
 [TOC]
 
@@ -12,28 +12,28 @@ Important : The demonstrated attack case is used for education and training for 
 
 ### Introduction
 
-The Attack Study Case include 3 sub project : 
+The attack study case comprises three sub-projects :
 
 - Railway[Metro] IT/OT System Mini Cyber Range System [link of project document](https://github.com/LiuYuancheng/Railway_IT_OT_System_Cyber_Security_Platform)
 - Red Team C2 Emulation system [link of project document](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/c2Emulator)
 - Modbus false command injector program [link of project document](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/falseCmdInjector) 
 
-In this study case, we assume the hacker has implanted the false command injector program Via IT-Attack (such as using phishing email) to one of the maintenance computer in the SCADA supervision network. The attack study case will show how a red team attacker outside the railway mini cyber range launch one OT-Modbus false data injection attack and one OT-Modbus false command injection attack to the Railway train control PLC by using the Red team C2 system from internet and by pass the firewall's detection.
+In this study case, we envision a scenario where a red team attacker/hacker successfully implants the false command injector program via an IT-Attack, such as employing a phishing email, targeting one of the maintenance computers in the SCADA supervision network. The attack study case will illustrate how a red team attacker, external to the railway mini cyber range, executes an OT Modbus false data injection attack and an OT Modbus false command injection attack on the Railway train control programmable logic controller (PLC). This will be accomplished by utilizing the Red Team C2 system from the internet and successfully bypassing the firewall's detection mechanisms.
 
-The attack road map is shown below : 
+The attack detailed road map is shown below : 
 
 ![](img/attackRoadmap.png)
 
 Key Tactics, techniques, and procedures (TTP) of the attack: 
 
-- The red team attacker will control the Malicious-Action-Programs via RTC2's web-UI from any where in the internet.
-- All the communication between Malicious-Action-Programs and C2 are camouflaged as normal https POST request and response. The package size will be very small ( less than 1KB ) to avoid trigger the firewall's download/upload alert.
-- The Malicious-Action-Programs will inject wrong data under high frequency to keep overwriting the train detection sensor state value read by PLC during launching the false data injection to mass up the train collision safety mechanism. 
-- After false data injection attack successful, the Malicious-Action-Programs will send wrong control train throttle command to make the train collision happens. 
+- The red team attacker will remotely control the Malicious-Action-Programs through RTC2's web-UI, enabling access from any location on the internet.
+- To camouflage the communication, all interactions between the Malicious-Action-Programs and the Command and Control (C2) system will be disguised as standard HTTPS POST requests and responses. Notably, the package size will be kept minimal (less than 1KB) to prevent triggering the firewall's alert mechanisms related to download/upload activities.
+- The Malicious-Action-Programs will execute a high-frequency injection of inaccurate data, deliberately overwriting the state values of train detection sensors read by the PLC. This continuous false data injection aims to disrupt the train collision safety mechanism.
+- Following the successful execution of the false data injection attack, the Malicious-Action-Programs will transmit incorrect commands to control the train throttle, intentionally inducing a collision between trains. This multi-step approach is designed to exploit vulnerabilities in the system's detection and control mechanisms, posing a significant threat to the overall safety of the railway infrastructure.
 
 #### Background Knowledge 
 
-In this section we will introduce some basic general knowledge about each such system and the attack vector TTP. 
+Within this section, we aim to provide fundamental, general knowledge about each respective system and elucidate the Tactics, Techniques, and Procedures (TTP) associated with the attack vectors. This foundational information will serve as a primer for understanding the intricate details of the systems involved and the methodologies employed in the attack scenarios.
 
 ##### False Data Injection (FDI) and False Command Injection (FCI)
 
@@ -59,14 +59,14 @@ In summary, while both FDI and FCI attacks target OT systems, FDI focuses on man
 
 ##### Railway[Metro] IT/OT System Mini Cyber Range System
 
-The Railway[Metro] IT/OT System Security Mini Cyber range is a mini railway operation company IT/OT network emulation system for the ICS researcher or instructor to test their IT/OT-attack and defense solution or used for ICS security training and education purpose. The whole system contents 4 main part networks (as show in the below diagram) :
+The Railway[Metro] IT/OT System Security Mini Cyber Range serves as a compact emulation system for a railway operation company's IT/OT network. It caters to ICS researchers and instructors, providing a platform to assess and refine their IT/OT attack and defense solutions, as well as facilitating ICS security training and education. The comprehensive system is organized into four main network components, as illustrated in the diagram below:
 
 ![](img/railwayCyberRange.jpg)
 
-1. **Cooperate network**: A subnet simulates a normal railway company cooperate IT network with different function/ERP servers (email, DMZ, staff management) and the production management workstation (production log archiving database, internal document server, operator manuals)
-2. **Supervision SCADA network**: A subnet simulate the SCADA system network with different SCADA data/historian servers, different HMI computers for system operators and maintenance computers for ICS/OT-system engineers.
-3. **Production network**: A subnet contents different PLC simulators program.
-4. **Physical real-world emulation network**: A subnet contents railway real-word components emulation program to show the physical effect of the real-work items.
+- **Cooperate network**: This subnet replicates a typical railway company's corporate IT network, encompassing various functional servers (email, DMZ, staff management) and a production management workstation. This workstation hosts essential components such as the production log archiving database, internal document server, and operator manuals.
+- **Supervision SCADA network**: Simulating the SCADA system network, this subnet features distinct SCADA data/historian servers, multiple HMI computers for system operators, and maintenance computers dedicated to ICS/OT-system engineers.
+- **Production network**: This subnet houses diverse PLC simulator programs, contributing to a realistic representation of the production environment within the railway system.
+- **Physical real-world emulation network**: In this subnet, railway real-world components are emulated to demonstrate the tangible effects of actual items in the real working environment.
 
 >  Railway[Metro] IT/OT System Mini Cyber Range System Project link : [GitHub Repo](https://github.com/LiuYuancheng/Railway_IT_OT_System_Cyber_Security_Platform)
 
@@ -78,20 +78,19 @@ The Red Team Command and Control (RTC2) server, commonly known as a C&C server, 
 
 ![](img/c2overview.png)
 
-> Red Team C2 Emulation System Project Link : [GitHub Repo](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/c2Emulator)
+> Red Team C2 Emulation System Project link : [GitHub Repo](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/c2Emulator)
 
 
 
-##### Modbus false command injector program
+##### Modbus False Command Injector Program
 
-The false command injection program will provide False Data Injection (FDI) and False Command Injection (FCI) function for red team attacker to inject Modbus control data/command to either the PLC or HMI system as shown in below common False command / data injection example: 
+This program serves a dual purpose by offering both False Data Injection (FDI) and False Command Injection (FCI) capabilities, enabling red team attackers to inject Modbus control data/commands into either the Programmable Logic Controller (PLC) or Human Machine Interface (HMI) system. Illustrated below is a common example of false command/data injection:
 
 ![](img/falseDataInjection.png)
 
-- This Modbus data injector malware is modified from the backdoor trojan program <backdoorTrojan.py> by adding the plc-Modbus communication module so the C2 Emulation system can remote control it and use it to launch the false command injection attack 
+- he Modbus data injector malware is an adaptation of the backdoor trojan program `<backdoorTrojan.py>`, where a plc-Modbus communication module is integrated. This modification enables the C2 Emulation system to remotely control and utilize the injector for launching false command injection attacks.
 
-- The attack demo will show a false command injector program to attack the OT-system control chain : `Train Control HMI` -> `Train Control PLC` -> `Real-world Trains in the railway system` will illegal PLC Modbus control request. 
-- The injector will issue the illegal/false Modbus command (such as inject the train front detection sensor’s holding register’s state) to make the PLC generate the incorrect electrical signal to the train then cause the trains accident happens.
+- The attack demonstration will spotlight the false command injector program targeting the OT-system control chain: `Train Control HMI` -> `Train Control PLC` -> `Real-world Trains in the railway system` through illicit PLC Modbus control requests. The injector will execute an illegal/false Modbus command, such as injecting the state of the train front detection sensor's holding register, prompting the PLC to generate an incorrect electrical signal to the train, resulting in a simulated train accident. This showcase underscores the potential impact of false command injection on the safety and integrity of the railway system.
 
 > Modbus false command injector program program link: [GitHub Repo](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/falseCmdInjector)
 
@@ -177,3 +176,83 @@ As shown below PLC clock cycle :
 1. PLC will accept the command from t0 to t1 and update its memory.
 2. Plc will execute its ladder logic based on the latest memory state at t1. the execute take a very short period t1 - t2.
 3. The attacker will send multiple false cmd  in high sequency try to overwrite the train operator’s correct control command. Unless the operator can press the train emergency stop button supper fast (which is impossible faster than the malware program), then he will not be able to stop the train accident.
+
+
+
+------
+
+### Red Team Attack Detail Steps
+
+As the red team attackers are our side the railway cyber range network. So to launch the attack then need to use the attack control C2 system. As introduced in the Attack Pre-condition Introduction section. The false data injection program is already executed in on of the maintenance computer in the cyber range, so when the red team attacker login the C2, then will see the false data/cmd injection program has been registered in the C2 as shown below : ![](img/C2Img/Register.png)
+
+Before start to inject the data / command, the red team attacker needs to read the PLC data first. To assign a PLC task to the injector select link to task detail => Assign a special task via Json (in the malware tasks control page)
+
+##### Read Holding Register State
+
+Select the false Modbus data injector page, then select the **Assign a special task via Json**, then fill in the task detail : 
+
+- TaskType: `modbus`
+- Repeat: `int <number of the injection repeat times>`
+- Tasks data: `read;reg;<start Holding register index>;<offset>`
+
+Read Holding Register State
+
+![](img/C2Img/readReg.png)
+
+Press the `submit` button, when the false data injector report the task finished, check the result by click the `Show task result` button (As shown below the red team attacker can read the holding register data from HR0 to HR3) : 
+
+![](img/c2Img/readRegRst.png)
+
+After several try, the attacker can identify which holding registers are used in the PLC.
+
+##### Read Output Coils State
+
+Same as the previous steps, the red team attacker can fill in the task detail below to red the coil state to identify all the coils used by the PLC : 
+
+- TaskType: `modbus`
+- Repeat: `int <number of the injection repeat times>`
+- Tasks data: `read;coil;<start coil index>;<offset>`
+
+![](img/C2Img/readCoilRst.png)
+
+
+
+##### Launch False Data Injection Attack
+
+The red team need to override the train detection sensor's record in the holding register : send not detected val 0 to keep override the train detection sensor feedback data 1.  
+
+- TaskType: `modbus`
+- Repeat: `100000`
+- Tasks data: `write;reg;3;0`
+
+![](img/C2Img/writeReg.png)
+
+After injected the sensor data the attacker can override the auto collision avoidance mechanism.
+
+
+
+##### Launch False Command Injection Attack
+
+The red team need to override the train emergency control coil's value : keep sending the emergency stop OFF value to the related PLC.  
+
+- TaskType: `modbus`
+- Repeat: `10000`
+- Tasks data: `write;coil;3;1`
+
+![](img/C2Img/writeCoil.png)
+
+Press the `submit` button, when the false data injector report the task finished, check the result by click the `Show task result` button : 
+
+![](img/C2Img/writeCoilRst.png)
+
+
+
+##### Attack Demo Video
+
+https://www.youtube.com/watch?v=J0qpOhigNL8&t=16s
+
+
+
+------
+
+> Last edit by LiuYuancheng(liu_yuan_cheng@hotmail.com) at 06/01/2024, if you have any problem, please send me a message.  Copyright (c) 2023 LiuYuancheng
