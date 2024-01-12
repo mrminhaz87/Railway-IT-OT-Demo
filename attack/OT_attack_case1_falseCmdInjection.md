@@ -57,7 +57,7 @@ In summary, while both FDI and FCI attacks target OT systems, FDI focuses on man
 
 
 
-##### Railway[Metro] IT/OT System Mini Cyber Range System
+##### Railway[Metro] IT/OT  Mini Cyber Range System
 
 The Railway[Metro] IT/OT System Security Mini Cyber Range serves as a compact emulation system for a railway operation company's IT/OT network. It caters to ICS researchers and instructors, providing a platform to assess and refine their IT/OT attack and defense solutions, as well as facilitating ICS security training and education. The comprehensive system is organized into four main network components, as illustrated in the diagram below:
 
