@@ -26,12 +26,27 @@ The attack detailed road map is shown below :
 
 Key Tactics, techniques, and procedures (TTP) of the attack: 
 
-- The red team attacker will remotely control the Malicious-Action-Programs through RTC2's web-UI, enabling access from any location on the internet.
-- To camouflage the communication, all interactions between the Malicious-Action-Programs and the Command and Control (C2) system will be disguised as standard HTTPS POST requests and responses. Notably, the package size will be kept minimal (less than 1KB) to prevent triggering the firewall's alert mechanisms related to download/upload activities.
+**Remote Attack Control**
+
+- **Tactics** : Centralized Program Control  
+- **Techniques** : Use A Command and Control (C2) system that enables attackers to manage and control compromised systems.
+- **Procedures**: The red team attacker will remotely control the Malicious-Action-Programs through RTC2's web-UI, the attack control can be from any location of the internet. 
+
+**Camouflage the Communication**
+
+- **Tactics** : Traffic Encryption and Obfuscation
+- **Techniques** : Using encryption algorithms to protect control messages and employing obfuscation methods to make the encrypted data more challenging to interpret.
+- **Procedures :**To camouflage the communication, all interactions between the Malicious-Action-Programs and the Command and Control (C2) system will be disguised as standard HTTPS POST requests and responses. Notably, the package size will be kept minimal (less than 1KB) to prevent triggering the firewall's alert mechanisms related to download/upload activities.
+
 - The Malicious-Action-Programs will execute a high-frequency injection of inaccurate data, deliberately overwriting the state values of train detection sensors read by the PLC. This continuous false data injection aims to disrupt the train collision safety mechanism.
+
 - Following the successful execution of the false data injection attack, the Malicious-Action-Programs will transmit incorrect commands to control the train throttle, intentionally inducing a collision between trains. This multi-step approach is designed to exploit vulnerabilities in the system's detection and control mechanisms, posing a significant threat to the overall safety of the railway infrastructure.
 
-#### Background Knowledge 
+  
+
+------
+
+### Background Knowledge 
 
 Within this section, we aim to provide fundamental, general knowledge about each respective system and elucidate the Tactics, Techniques, and Procedures (TTP) associated with the attack vectors. This foundational information will serve as a primer for understanding the intricate details of the systems involved and the methodologies employed in the attack scenarios.
 
@@ -256,6 +271,14 @@ Press the `submit` button, when the false data injector report the task finished
 Upon completion of the initiation of False Data Injection (FDI) and False Command Injection (FCI), the tangible impact of the attack will be demonstrated in the video below:
 
 https://www.youtube.com/watch?v=J0qpOhigNL8&t=16s
+
+
+
+------
+
+#### Problem and Solution
+
+Refer to `doc/ProblemAndSolution.md`
 
 
 

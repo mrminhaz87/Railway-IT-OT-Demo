@@ -49,12 +49,16 @@ Based on the attack detailed road map there will 4 TTP of the attack scenario :
 **Denial of Service (DoS)**
 
 - **Tactic:** Disrupting normal network operations.
+
 - **Technique:** Flooding the network with ARP spoofed packets can lead to a breakdown in network communication, causing denial of service for legitimate users.
+
 - **Procedures** : After the ARP Cache Poisoning attack successful, apply the specific network packet drop filter (Modbus) to packets to denial/block the HMI to PLC communicate without make influence of other traffic. 
 
+  
 
+------
 
-#### Background Knowledge 
+### Background Knowledge 
 
 Within this section, we aim to provide fundamental, general knowledge about each respective system and elucidate the Tactics, Techniques, and Procedures (TTP) associated with the attack vectors. This foundational information will serve as a primer for understanding the intricate details of the systems involved and the methodologies employed in the attack scenarios.
 
@@ -120,12 +124,79 @@ The program contents 2 main part:
 
 This is the program modules workflow diagram: 
 
-![](../doc/img/scadaHMI/workflow.png)
+![](img/ArpSpoofing/hmiworkflow.png)
 
 So during the attack, to denial the HMI service, we need to drop both of the 2 Modbus communication channel. 
 
 #### OT-Attack Procedures 
 
-As introduced in the previous section, we are required to implement 2 types of attacker : Arp spoofing and packet drop. The effected VMs in the OT network is shown below: 
+In this demo, the attack tool Ettercap will be pre-installed by the previous IT-system-attack. As introduced in the previous section, we are required to implement 2 types of attacker : Arp spoofing and packet drop. The effected VMs in the OT network is shown below: 
 
 ![](img/ArpSpoofing/attackTopology.png)
+
+The attack demo will show a Ettercap wrapper program to do the ARP poisoning to the railway  OT sensor-signal system control chain: `Railway Sensor-Signal Control HMI` -> `SCADA sypervision network router` -> `Junction control PLCs & sitation control signals` . The attacker will apply a packets filter to the traffic between the Railway-SCADA-HMI and 2 PLCs(junction and station) to drop all the Modbus traffic packets to cut off the connection of railway state monitoring system.
+
+**Observation during the attack :**
+
+- When the attack happens, the Railway SCADA HMI PLC connection indicators will show total lose connection. All the data on the railway-SCADA-HMI will not update.
+- The railway HQ operator is able to detect the attack. But if he tries to use ping or other not Modbus(TCP-port 502) to test the network connection, he will not find any network problem.
+
+The effect detail is shown below:
+
+![](img/ArpSpoofing/AttackObservation.png)
+
+When the attack happens, the railway HQ operator may observe below situation :
+
+- All the data on the railway-SCADA-HMI will not update. 
+
+- The PLC connection indicators on railway-SCADA-HMI will show lose connection (change from green color to gray color). 
+
+
+
+------
+
+### Red Team Attack Detail Steps
+
+Given that the red team attackers operate outside the railway cyber range network, they rely on the attack control Command and Control (C2) system to execute the assault. As detailed in the Attack Pre-condition Introduction section, the ARP spoofing attacker program has been previously deployed on one of the maintenance computers within the cyber range. Consequently, when the red team attacker accesses the C2 system, they will see the ARP spoofing attacker program "packetDropper" has been registered in the C2 as shown below : 
+
+![](img/ArpSpoofing/register.png)
+
+##### Start APR Spoofing Packet Drop Attack from C2
+
+Select the PacketDropper control page, then select the **Assign a special task via Json**, then fill in the task detail : 
+
+- TaskType: `packetDrop`
+- Repeat: `1`
+- Tasks data: `packetDropper <filter name>`
+
+![](img/ArpSpoofing/PacketDrop.png)
+
+Press the `submit` button, when the Ettercap wrapper report the task running,the Ettercap will applied the filter to keep block the traffic which incoming or outgoing the target. For the target information, please refer to the filter.json file, below is one dropper filter example, you can create your own filter and put in the filters folder and give a filter unique name in the filter.json file so you can apply it on the traffic:
+
+```
+"packetDropper" : {
+    "ipaddress": "10.107.107.5",
+    "protocalType": "TCP",
+    "port":502,
+    "description": "Drop all the packets from and to the IP address",
+    "filterFile": "atk.ef"
+}
+```
+
+##### Attack Demo Video
+
+To check the demo video, please refer to this link in my you tube channel: https://www.youtube.com/watch?v=QmB0nJU1_q4
+
+
+
+------
+
+#### Problem and Solution
+
+Refer to `doc/ProblemAndSolution.md`
+
+
+
+------
+
+> Last edit by LiuYuancheng(liu_yuan_cheng@hotmail.com) at 13/01/2024, if you have any problem, please send me a message.  Copyright (c) 2023 LiuYuancheng
