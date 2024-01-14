@@ -8,6 +8,29 @@
 
 [TOC]
 
+**Table of Contents**
+
+- [OT Cyber Attack Demo on PLC [Case Study 01] : False Data / Cmd Injection Attack Case](#ot-cyber-attack-demo-on-plc--case-study-01----false-data---cmd-injection-attack-case)
+    + [Introduction](#introduction)
+    + [Background Knowledge](#background-knowledge)
+        * [False Data Injection (FDI) and False Command Injection (FCI)](#false-data-injection--fdi--and-false-command-injection--fci-)
+        * [Railway[Metro] IT/OT  Mini Cyber Range System](#railway-metro--it-ot--mini-cyber-range-system)
+        * [Red Team C2 Emulation System](#red-team-c2-emulation-system)
+        * [Modbus False Command Injector Program](#modbus-false-command-injector-program)
+    + [Train Operation and Attack Procedures](#train-operation-and-attack-procedures)
+      - [Train Operation Basic Background Knowledge Introduction](#train-operation-basic-background-knowledge-introduction)
+      - [OT-Attack Procedures](#ot-attack-procedures)
+        * [Attack Pre-condition Introduction](#attack-pre-condition-introduction)
+        * [Attack Procedure Introduction](#attack-procedure-introduction)
+    + [Red Team Attack Detail Steps](#red-team-attack-detail-steps)
+        * [Read Holding Register State](#read-holding-register-state)
+        * [Read Output Coils State](#read-output-coils-state)
+        * [Initiating False Data Injection Attack](#initiating-false-data-injection-attack)
+        * [Initiating False Command Injection Attack](#initiating-false-command-injection-attack)
+        * [Attack Demo Video](#attack-demo-video)
+      
+      - [Problem and Solution](#problem-and-solution)
+
 ------
 
 ### Introduction
