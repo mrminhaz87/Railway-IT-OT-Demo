@@ -11,9 +11,9 @@
 **Table of Contents**
 
 - [OT Cyber Attack Demo on HMI  [Case Study 02] : ARP Spoofing Attack Case](#ot-cyber-attack-demo-on-hmi---case-study-02----arp-spoofing-attack-case)
-    
+  
     + [Introduction](#introduction)
-        
+      
         * [Key Tactics, techniques, and procedures (TTP) of the attack](#key-tactics--techniques--and-procedures--ttp--of-the-attack)
     + [Background Knowledge](#background-knowledge)
         * [ARP Spoofing Attack](#arp-spoofing-attack)
@@ -26,7 +26,7 @@
     + [Red Team Attack Detail Steps](#red-team-attack-detail-steps)
         * [Start APR Spoofing Packet Drop Attack from C2](#start-apr-spoofing-packet-drop-attack-from-c2)
         * [Attack Demo Video](#attack-demo-video)
-      
+        
       - [Problem and Solution](#problem-and-solution)
 
 
@@ -37,7 +37,7 @@
 
 The attack study case comprises three sub-projects :
 
-- Railway[Metro] IT/OT System Mini Cyber Range System [link of project document](https://github.com/LiuYuancheng/Railway_IT_OT_System_Cyber_Security_Platform)
+- Railway[Metro] IT/OT System Mini Cyber Range System [> Link of project document](https://github.com/LiuYuancheng/Railway_IT_OT_System_Cyber_Security_Platform)
 - Red Team C2 Emulation system [link of project document](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/c2Emulator)
 - Ettercap Wrapper program [link of project document](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/ettercapWrapper)
 
