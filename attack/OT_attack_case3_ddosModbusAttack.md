@@ -1,6 +1,6 @@
 # OT Cyber Attack Demo on PLC [ Case Study 03 ] : DDoS Attack Case
 
-**Project Design Purpose** : The objective of this case study is to develop a workshop which utilizing the Railway (Metro) IT/OT System Cyber Security Test Platform (mini cyber range) , DDoS Attack Management System and DDoS PLC(Modbus-TCP) Attacker for demonstrating the distributed denial-of-service attack on one in the OT system. Our aim is to showcase how a hacker (cyber range red team member) could potentially launch a DDoS attack on the OT Programable Logic Controller which caused interruption on the PLC control chain. This particular attack scenario is proposed as one of the demonstration cases for the Cross Sword 2023 Test/Partners-Run, providing a realistic and controlled environment to assess the cybersecurity resilience of the railway infrastructure.
+**Project Design Purpose** : The objective of this case study is to develop a workshop which utilizing the Railway (Metro) IT/OT System Cyber Security Test Platform (mini cyber range) , DDoS Attack Management System and DDoS PLC (Modbus-TCP) Attacker Program for demonstrating how the IT distributed denial-of-service attack can make influence on the OT system. Our aim is to showcase how a hacker (cyber range red team member) could potentially launch a DDoS attack targets to the OT Programable Logic Controller which caused interruption on the SCADA-HMI-PLC control chain. This particular attack scenario is proposed as one of the demonstration cases for the Cross Sword 2023 Test/Partners-Run, providing a realistic and controlled environment to assess the cybersecurity resilience of the railway infrastructure.
 
 **Attacker Vector** :  Distributed denial-of-service attack
 
@@ -15,42 +15,42 @@
 The attack study case comprises three sub-projects :
 
 - Railway[Metro] IT/OT System Mini Cyber Range System [> Link of project document](https://github.com/LiuYuancheng/Railway_IT_OT_System_Cyber_Security_Platform)
-- DDoS Attack Management System [> Link of the project document](https://github.com/LiuYuancheng/Python_Malwares_Repo/blob/main/src/ddosAttacker/readme.md)
-- DDoS PLC(Modbus-TCP) Attacker  [> Link of the project document](https://github.com/LiuYuancheng/Python_Malwares_Repo/blob/main/src/ddosPlcAttacker/readme.md)
+- DDoS Attack Management System [> Link of project document](https://github.com/LiuYuancheng/Python_Malwares_Repo/blob/main/src/ddosAttacker/readme.md)
+- DDoS PLC(Modbus-TCP) Attacker program  [> Link of project document](https://github.com/LiuYuancheng/Python_Malwares_Repo/blob/main/src/ddosPlcAttacker/readme.md)
 
-In this study case, we envision a scenario where a red team attacker/hacker successfully implants the DDoS-Attack-Program on several computers in the railway system  cooperate network, the supervision network and even the production network an IT-Network-Attack (such as employing a phishing email). The target is one of the PLC in the production network which will control the trains power.  The attack study case will illustrate how a red team attacker, external to the railway mini cyber range, control multiple DDoS attacker to launch the DDoS Modbus-TCP requests attack at the same time to Interrupt the normally OT HMI-PLC control chain.  This will be accomplished by utilizing the Red Team C2 DDoS Attack Management System from the internet and successfully bypassing the firewall's detection mechanisms.
+In this study case, we envision a scenario where a red team attacker/hacker successfully implants the DDoS-Attack-Program on several computers in the railway company cooperate network, the supervision network and even the production network via an IT-Network-Attack (such as employing a phishing email). The target is one of the PLCs in the production network which controls the trains.  The attack study case will illustrate how a red team attacker, external to the railway mini cyber range, control multiple DDoS attacker programs to launch the DDoS Modbus-TCP requests attack simultaneously to Interrupt the normally OT HMI-PLC control chain.  The attack control will be accomplished by utilizing the Red Team C2 DDoS Attack Management System from the internet and successfully bypassing the firewall's detection mechanisms.
 
 The attack detailed road map is shown below : 
 
 ![](img/ddos/ddosAtkRoadmap.png)
 
-##### Key Tactics, techniques, and procedures (TTP) of the attack
+##### Key Tactics, Techniques, and Procedures (TTP) of the attack
 
-Based on the attack detailed road map there will 4 kinds TTP are included in the ARP spoofing attack scenario : 
+Based on the attack detailed road map there will four kinds of TTP are included in the DDoS attack scenario : 
 
 **Botnets:**
 
 - **Tactic:** Enlist a large number of compromised devices to form a botnet.
 - **Technique:** Malicious actors infect and control a network of computers, servers, or IoT devices (botnet) to generate and send a massive volume of traffic to the target.
-- **Procedures**: To simulate the botnets DDoS attack, we configured 3 nodes in different network to send the high frequency Modbus-TCP request. 
+- **Procedures**: To simulate the botnets DDoS attack, we configured at least three nodes in different network to send high frequency Modbus-TCP request to the target PLC. 
 
 **Amplification Attacks:**
 
 - **Tactic:** Increase the volume of attack traffic.
 - **Technique:** Exploit protocols that allow a small request to trigger a much larger response. Examples include DNS amplification, NTP amplification, and SNMP reflection attacks.
-- **Procedures** : Each  DDoS attacker will parallel start as much thread (100+) as possible to fully use the nodes' network bandwidth to sending the request simultaneously. 
+- **Procedures** : Each  DDoS attacker will parallel start as much thread (100+) as possible to fully use the nodes' network bandwidth to sending the request simultaneously. The totally request volume will be about 80k ~ 120K requests / min.
 
 **Layer 7 Attacks (Application Layer):**
 
 - **Tactic:** Exploit vulnerabilities in the application layer.
 - **Technique:** Target specific applications or services to exhaust server resources. Examples include HTTP floods, Slowloris attacks, and application-specific exploits.
-- **Procedures**: The attack is targeting the PCL's firmware via ModBus-TCP protocol, Modbus-TCP is an Ethernet-based variant of the Modbus protocol, which is commonly used in industrial automation systems for communication between programmable logic controllers (PLCs), computers, and other devices. Modbus-TCP is designed to operate over TCP/IP networks and is used for reading and writing data between devices in real-time industrial applications.
+- **Procedures**: The attack is targeting the PCL's firmware via Modbus-TCP floods request, Modbus-TCP protocol is an Ethernet-based variant of the Modbus protocol, which is commonly used in industrial automation systems for communication between programmable logic controllers (PLCs), computers, and other devices. It is designed to operate over TCP/IP networks and is used for reading and writing data between devices in real-time industrial applications.
 
 **Bot Spoofing and Obfuscation:**
 
 - **Tactic:** Evade detection and analysis.
 - **Technique:** Employ techniques to make the malicious traffic appear more legitimate, such as using diverse user agents, randomizing payloads, or mimicking legitimate user behavior.
-- **Procedures :**To camouflage the communication, all interactions between the Malicious-Action-Programs and the Command and Control (C2) system will be disguised as standard HTTPS POST requests and responses, the key control message will be encrypted via pre-set session key. Notably, the package size will be kept minimal (less than 1KB) to prevent triggering the firewall's alert mechanisms related to download/upload activities.
+- **Procedures :**To camouflage the communication between attacker programs and the RTC2 hub, all interactions between the Malicious-Action-Programs and the Command and Control (C2) system will be disguised as standard HTTPS POST requests and responses, the key control message will be encrypted via pre-set session key. Notably, the package size will be kept minimal (less than 1KB) to prevent triggering the firewall's alert mechanisms related to download/upload activities.
 
 
 
@@ -58,12 +58,14 @@ Based on the attack detailed road map there will 4 kinds TTP are included in the
 
 ### Background Knowledge 
 
-Within this section, we aim to provide fundamental, general knowledge about each respective system and elucidate the Tactics, Techniques, and Procedures (TTP) associated with the attack vectors. This foundational information will serve as a primer for understanding the intricate details of the systems involved and the methodologies employed in the attack scenarios. We will introduce 4 main parts so you can got more detailed information about the whole project
+Within this section, we aim to provide fundamental, general knowledge about each respective system and elucidate the Tactics, Techniques, and Procedures (TTP) associated with the attack vectors. This foundational information will serve as a primer for understanding the intricate details of the systems involved and the methodologies employed in the attack scenarios. We will introduce 4 main parts so you can got more detailed information about the whole case study :
 
 1. Distributed denial-of-service attack background knowledge 
 2. Railway[Metro] IT/OT Mini Cyber Range System and The Train Control HMI System 
 3. C2 Based DDoS Attack Management System
-4. Modbus-TCP PLC DDoS attacker
+4. Modbus-TCP PLC DDoS attacker Program
+
+
 
 ##### Distributed denial-of-service attack
 
@@ -75,13 +77,17 @@ From a high level, a DDoS attack is like an unexpected traffic jam clogging up t
 
 ![](img/ddos/ddosApplayer.png)
 
-Reference: https://www.cloudflare.com/learning/ddos/what-is-a-ddos-attack/
+>  Reference: https://www.cloudflare.com/learning/ddos/what-is-a-ddos-attack/
+
+
 
 ##### Railway[Metro] IT/OT Mini Cyber Range System
 
 For the Railway IT/OT System general introduction please refer refer to the [study case 1](OT_attack_case1_falseCmdInjection.md), the cyber range system diagram is shown below:
 
 ![](img/railwayCyberRange.jpg)
+
+In this attack case study, the effected system are one of the train control monitoring HMI(Human-Machine Interface) and one PLC set. 
 
 **Human-Machine Interface**: In the context of industrial automation and control systems, OT HMI refers to the Human-Machine Interface used in Operational Technology (OT) environments. OT encompasses the technologies and systems used to monitor and control physical devices, processes, and infrastructure in sectors like manufacturing, energy, utilities, and transportation.
 
@@ -91,12 +97,11 @@ For the Railway IT/OT System general introduction please refer refer to the [stu
 
 The Trains Control HMI contents below components and function:
 
-- Trains information panel with a grid to show the trains related information: Train-ID, Speed, Current, Voltage and power state.
-- Trains Power control button for use to turn on/off the trains' power.
+- Trains information panel with a gauge to show the trains related information: Train-ID, Speed, Current, Voltage and power state.
+- Trains Power control button for use to reset or turn off the trains' power.
 - PLC state display panel to show the state of holding registers and output coils.
-- Date & time display panel.
 
-For the HMI system detail please refer to this document :  [TRAIN-HMI-1 DOC](https://github.com/LiuYuancheng/Railway_IT_OT_System_Cyber_Security_Platform/blob/main/doc/trainsCtrlHMI.md)
+> For the HMI system detail please refer to this document :  [TRAIN-HMI-1 DOC](https://github.com/LiuYuancheng/Railway_IT_OT_System_Cyber_Security_Platform/blob/main/doc/trainsCtrlHMI.md)
 
 
 
@@ -110,21 +115,21 @@ DDoS attacks achieve effectiveness by utilizing multiple compromised computer sy
 2. The **DDoS Attack Actors** **Repository** contents several attack actors to send different kinds of network request (such SSH, https-GET, https-POST, SMB login...) to the target. Each attack actor object will be assembled in a attack thread and put in to the attack pool of the related DDoS attacker.
 3. The **DDos Control Hub** is used to link all the DDoS attackers together so the user can monitor the current attack state and control each DDoS attacker via the hub's web interface.
 
-For the detail system design, please refer to the project repo: [DDOS management system repo](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/ddosAttacker)
+>  For the detail system design, please refer to the project repo: [DDOS Management System Repo](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/ddosAttacker)
 
 
 
-##### Modbus-TCP PLC DDoS attacker
+##### Modbus-TCP PLC DDoS Attacker
 
-This PLC DDoS attack program is modified from the standard DDoS attack program `<DDoSattacker.py>` [source_code](https://github.com/LiuYuancheng/Python_Malwares_Repo/blob/main/src/ddosAttacker/ddosAttacker.py)  by adding the PLC Modbus-TCP communication module. As it inherited the standard DDoS attacker program, the red team attackers can use our [DDoS C2 Hub](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/ddosAttacker)  remote control the DDoS attack procedure to interrupt the XS2023 railway OT system's Modbus communication between  `Train Control PLCs (PCL07/08)` and  the `Train Control HMI`.
+This PLC DDoS attack program is modified from the standard DDoS attack program `<DDoSattacker.py>` [source_code](https://github.com/LiuYuancheng/Python_Malwares_Repo/blob/main/src/ddosAttacker/ddosAttacker.py)  by adding the PLC Modbus-TCP communication module. As it inherited the standard DDoS attacker program, the red team attackers can use our [DDoS C2 Hub](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/ddosAttacker)  remote control the DDoS attack procedure to interrupt the railway OT system's Modbus communication between  `Train Control PLCs (PCL07/08)` and  the `Train Control HMI`.
 
-The DDoS attacker is the main program running on each node to implement the DDoS attack, the user can config the attack type, attack threads number and the attack start / stop time. The attacker will have a thread pool, each attack actor need to be assembled in a attack thread then running parallel in the pool. The DDoS attacker system work flow is shown below :
+Eahc attacker will have a threads pool, each attack actor needs to be assembled in a attack thread then running parallel in the pool. The DDoS attacker system work flow is shown below :
 
 ![](img/ddos/systemWorkflow.png)
 
-Each DDoS Attacker will also report its current attack state to the control hub regularly and fetch the user's control request. The user can start / pause each DDoS attacker's attack process from the hub web user interface. Each Attacker will have its local attack actors repository, during the attacker initialization, the attacker will import the actors from local to build its attack threads pool based on the loaded config file. For each attacker, the max thread number and the request sending speed are different based on the node's hardware spec.
+Each DDoS Attacker will also report its current attack state to the control hub regularly and fetch the user's control request. The user can start / pause each DDoS attacker's attack process from the RTC2 hub web user interface. Each Attacker will have its local attack actors repository, during the attacker initialization, the attacker will import the actors from local to build its attack threads pool based on the loaded config file. For each attacker, the max thread number and the request sending speed are different based on the node's hardware spec.
 
-For the detail system design, please refer to the project repo [link](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/ddosAttacker)
+> For the Modbus-TCP PLC DDoS Attacker program design, please refer to the project repo [Modbus-TCP PLC DDoS Attacker Doc Link](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/ddosAttacker)
 
 
 
@@ -143,8 +148,8 @@ There will be a brief workshop to precede the implementation of the attack, prov
 
 The HMI program contents 2 main parts: 
 
-- **Main user interface** : A Train State UI to show the  train information, the control the train power and the PLC set [PLC-06, PLC-07] state with the digital I/O information, 
-- **PLC communication thread** : communicate with the Train Controler PLC Simulators to control PLC Simulator through Modbus TCP and get the OT data.
+- **Main user interface** : A train state UI to show the  train information, control the train power and display the PLC set [PLC-06, PLC-07] state with the digital I/O information, 
+- **PLC communication thread** : control and communicate with the train controller PLC simulators through Modbus TCP and get the related sensor or coils' electrical signal data.
 
 This is the program modules workflow diagram: 
 
@@ -152,9 +157,9 @@ This is the program modules workflow diagram:
 
 #### OT-Cyber-Attack Procedures 
 
-The DDoS attack on PLC will show 3 red team attack machines (with the Modbus DDoS attackers) sending high frequency DDoS Modbus-TCP request to jam the Modbus channel `Train Control HMI` => `Train Control PLC` (as shown in the below diagram).
+The DDoS attack on PLC will show four red team attack machines (with the Modbus DDoS attackers) sending high frequency DDoS Modbus-TCP request to jam the Modbus channel `Train Control HMI` => `Train Control PLC` (as shown in the below diagram).
 
-The effected VMs in the OT network is shown below attack path: 
+The effected VMs in the OT network is shown in below attack path: 
 
 ![](img/ddos/attackPath.png)
 
@@ -179,16 +184,16 @@ The PLC will ignore the Modbus-TCP request source which not in the 2 white lists
 
 ##### Modbus-TCP request handling  mechanisms
 
-The attack programs will try to full filling the PLC’s requests buffer queue via large amount of Modbus-TCP request, so when the  operation room HQ `Train Control HMI` sends the control request to PLC, the HMI’s request may be ignored by the PLC because of the queue full. 
+The attack programs will try to full filling the PLC’s requests buffer queue via large amount of Modbus-TCP request, so when the  operation room HQ `Train Control HMI` sends the control request to PLC, the HMI’s request may be ignored by the PLC because of the queue full. (as shown in the below diagram)
 
 ![](img/ddos/plcQueuesystem.png)
 
 When a Modbus-TCP request is sent from HMI or other control device and reach to the PLC, the PLC firmware program will follow below sequence to process the request : 
 
-1. The Modus-TCP request will be save in the OS socket buffer. 
-2. PLC program (firmware) will fetch the Modbus-TCP data and enqueue the request (so the PLC can handle the  request from different peers in sequential)
-3. When the PLC dequeue the request, the filter function will drop the not valid request (read request but request peer is not in allow read list or write request but peer is not in allow write list)
-4. PLC will execute the ladder diagram based on the Modbus request and PLC electrical I/O signal, the generate the related response for the request and send the response to the related peer(source). 
+1. The Modus-TCP request will be saved in the OS socket buffer. 
+2. PLC program (firmware) will fetch the Modbus-TCP data and enqueue the request (so the PLC can handle the  request from different peers in sequential).
+3. When the PLC dequeue the request, the filter function will drop the not valid request (data read request but request peer is not in allow read list or write request but peer is not in allow write list)
+4. PLC will execute the ladder diagram based on the validated Modbus request and PLC electrical I/O signal, the generate the related response for the request and send the response to the related peer (source). 
 
 
 
@@ -200,11 +205,11 @@ Given that the red team attackers operate outside the railway cyber range networ
 
 **Attack Pre-Condition 1**
 
-The DDoS attackers are installed by the previous IT-system-attack. The victim machines which do the DDoS attack are not in the PLC ‘s R/W white list. For each ddos attacker, in Modbus-TCP protocol is selected in their attack config file as shown below:
+The DDoS attackers are pre-installed by the previous IT-system-attack. The victim machines which do the DDoS attack are not in the PLC ‘s R/W white list. For each DDoS attacker, the Modbus-TCP protocol is selected in their attack config file as shown below:
 
 ```
 # This is the config file template for the module <ddosAttacker.py>
-# Setup the paramter with below format (every line follows <key>:<val> format, the
+# Setup the parameter with below format (every line follows <key>:<val> format, the
 # key can not be changed):
 
 # Own unique id used to register in the control hub.
@@ -258,11 +263,11 @@ TARGET:{
 
 **Attack Pre-Condition 2**
 
-As the PLC requests buffer queue is big and the verification process is also very fast ( less than several nano seconds). We need more than one attacker (the more the better) to do the attack to make the attack successful. During the demo, we manually added a small delay in the PLC request verification code to pull down the verification speed ,so we can be easier to observe the attack happens: 
+As the PLC requests buffer queue is big and the verification process is also very fast ( less than several nano seconds). We need more attackers  to do the attack to make the attack successful. During the demo, we manually added a small delay in the PLC request verification code to pull down the verification speed ,so we can be easier to observe the attack happens: 
 
 ![](img/ddos/precondition2.png)
 
-After added the delay, packet lost will be observed when the DDoS packet sending rate reach to about 80k ~ 100K requests / second. 
+After added the delay, packet lost will be observed when the DDoS packet sending rate reach to about 80k ~ 100K requests / min. 
 
 ##### Launch the DDoS Attack 
 
