@@ -14,11 +14,11 @@
 
 The cyber attack case study comprises three sub-projects we developed:
 
-- Railway[Metro] IT/OT System Mini Cyber Range System [> Link of project document](https://github.com/LiuYuancheng/Railway_IT_OT_System_Cyber_Security_Platform)
-- Red Team C2 Emulation system [link of project document](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/c2Emulator)
-- Ettercap Wrapper MITM attack program [link of project document](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/ettercapWrapper)
+- Railway[Metro] IT/OT System Mini Cyber Range System [> Link of sub-project document](https://github.com/LiuYuancheng/Railway_IT_OT_System_Cyber_Security_Platform)
+- Red Team C2 Emulation system [> Link of sub-project document](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/c2Emulator)
+- Ettercap Wrapper MITM attack program [> Link of sub-project document](https://github.com/LiuYuancheng/Python_Malwares_Repo/tree/main/src/ettercapWrapper)
 
-In this case study, we envision a scenario where a red team attacker/hacker successfully implants the packet parser and data replacer (a wrapper program of MITM Tool Ettercap) via an IT-Network-Attack (such as employing a phishing email) which targeting one of the maintenance computers in the SCADA supervision network.  The attack case study will illustrate how a red team attacker ( who is external of the railway mini cyber range ) executes Ettercap wrapper to launch the ARP spoofing attack first, then applying the Modbus packet parser to find the specific HMI to PLC control data stream and use the data replacer to modify the PLC coils' control bytes to reverse the final real world electrical signal. This will be accomplished by utilizing the Red Team C2 Emulation system from the internet and successfully bypassing the firewall's detection mechanisms.
+In this case study, we envision a scenario where a red team attacker/hacker has successfully implanted the packet parser and data replacer (a wrapper program of MITM Tool Ettercap) via an IT-Network-Attack (such as employing a phishing email) which targeting one of the maintenance computers in the SCADA supervision network.  The attack case study will illustrate how a red team attacker ( who is external of the railway mini cyber range ) executes Ettercap wrapper to launch the ARP spoofing attack first, then applying the Modbus packet parser to find the specific HMI to PLC control data stream and use the data replacer to modify the PLC coils' control bytes to reverse the final real world electrical signal. This will be accomplished by utilizing the Red Team C2 Emulation system from the internet and successfully bypassing the firewall's detection mechanisms.
 
 The cyber attack detailed road map is shown below : 
 
