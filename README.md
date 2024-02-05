@@ -30,7 +30,28 @@ We are glad to share that the Railway [Metro] IT/OT Emulation System Cyber Secur
 
 **Table of Contents**
 
-
+- [Railway[Metro] IT/OT System Cyber Security Test Platform ( mini cyber range)](#railway-metro--it-ot-system-cyber-security-test-platform---mini-cyber-range-)
+        * [Project Use Case](#project-use-case)
+    + [Introduction](#introduction)
+    + [Detailed Sub-System Design](#detailed-sub-system-design)
+      - [1. 2D Railway[Metro] System Real-world Emulator](#1-2d-railway-metro--system-real-world-emulator)
+      - [2. Railway System SCADA HMI](#2-railway-system-scada-hmi)
+      - [3. Railway System Trains Controller HMI](#3-railway-system-trains-controller-hmi)
+      - [4. Railway Junctions Sensor-Signal System Control PLC Simulator](#4-railway-junctions-sensor-signal-system-control-plc-simulator)
+      - [5. Railway Stations Sensor-Signal System Control PLC Simulator](#5-railway-stations-sensor-signal-system-control-plc-simulator)
+      - [6. Railway Trains Sensor-Power System Control PLC Simulator](#6-railway-trains-sensor-power-system-control-plc-simulator)
+    + [System Network Design](#system-network-design)
+      - [Main cyber range network design](#main-cyber-range-network-design)
+      - [OT cyber range network design](#ot-cyber-range-network-design)
+    + [Cyber Attack Demonstration Case Study](#cyber-attack-demonstration-case-study)
+      - [IT system cyber attack case study](#it-system-cyber-attack-case-study)
+        * [IT system cyber attack case 1: Phishing and backdoor trojan](#it-system-cyber-attack-case-1--phishing-and-backdoor-trojan)
+      - [OT system cyber attack case study](#ot-system-cyber-attack-case-study)
+        * [OT Cyber Attack Demo on PLC [Case Study 01] : False Data / Cmd Injection Attack Case](#ot-cyber-attack-demo-on-plc--case-study-01----false-data---cmd-injection-attack-case)
+        * [OT Cyber Attack Demo on HMI  [Case Study 02] : ARP Spoofing Attack Case](#ot-cyber-attack-demo-on-hmi---case-study-02----arp-spoofing-attack-case)
+        * [OT Cyber Attack Demo on PLC [ Case Study 03 ] : DDoS Attack Case](#ot-cyber-attack-demo-on-plc---case-study-03-----ddos-attack-case)
+        * [OT Cyber Attack Demo on HMI-PLC control Chain [ Case Study 04 ] : Man in the middle Attack Case](#ot-cyber-attack-demo-on-hmi-plc-control-chain---case-study-04-----man-in-the-middle-attack-case)
+      - [Problem and Solution](#problem-and-solution)
 
 ------
 
@@ -133,7 +154,7 @@ Code base: https://github.com/LiuYuancheng/Metro_emulator/tree/main/src
 
 #### Main cyber range network design
 
-![](doc/img/network mapping.png)
+![](doc/img/network_mapping.png)
 
 #### OT cyber range network design
 
