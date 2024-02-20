@@ -28,7 +28,7 @@
         * [Initiating False Data Injection Attack](#initiating-false-data-injection-attack)
         * [Initiating False Command Injection Attack](#initiating-false-command-injection-attack)
         * [Attack Demo Video](#attack-demo-video)
-      
+        
       - [Problem and Solution](#problem-and-solution)
 
 ------
@@ -299,9 +299,33 @@ https://www.youtube.com/watch?v=J0qpOhigNL8&t=16s
 
 ------
 
-#### Problem and Solution
+### Problem and Solution
 
 Refer to `doc/ProblemAndSolution.md`
+
+
+
+------
+
+### Massachusetts Institute of Technology Research and Engineering (MITRE) matching
+
+To mapping to the MITRE Framework for better attack TTP search and utilization, I think the FDI and FCI on PLC system attack scenario can fall under MITRE's classification system known as CWE (Common Weakness Enumeration) CWE-77: Improper Neutralization of Special Elements used in a Command ('Command Injection') and for MITRE ATT&CK it would likely fall under the category of "Command and Scripting Interpreter" (T1059).
+
+##### MITRE CWE(Common Weakness Enumeration)
+
+**CWE-77: Improper Neutralization of Special Elements used in a Command ('Command Injection')**
+
+Link: https://cwe.mitre.org/data/definitions/77.html
+
+The product constructs all or part of a command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended command when it is sent to a downstream component.
+
+##### MITRE ATT&CK 
+
+TA0002 [Execution] > [T1059](https://attack.mitre.org/techniques/T1059) [Command and Scripting Interpreter] > .008 [Network Device Cli]
+
+FCI and FDI could be part of the broader tactic of "Execution" (TA0002) use the network device client to do the command interpreter attack, which involves techniques used by adversaries to run malicious code on / targeting a victim's system. Within this tactic, "Command and Scripting Interpreter" (T1059) could be considered the closest match, as it involves the exploitation of command-line interpreters, which is similar to the concept of injecting commands.
+
+Link: https://attack.mitre.org/tactics/TA0002/
 
 
 
