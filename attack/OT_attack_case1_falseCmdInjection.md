@@ -1,14 +1,18 @@
-# OT Cyber Attack Demo on PLC [Case Study 01] : False Data / Cmd Injection Attack Case
+# OT Cyber Attack Demo on PLC [Case Study 01] : False Data / CMD Injection Attack Case
 
 **Project Design Purpose** : The objective of this case study is to develop a demonstration and workshop utilizing the Railway (Metro) IT/OT System Cyber Security Test Platform, the Red Team Command and Control (C2) System, and the Modbus false data injector program for FDI & FCI attack on OT system. Our aim is to showcase how a hacker (red team member) could potentially launch an Operational Technology (OT) Cyber Attack on the programmable logic controllers (PLCs) governing railway train control, with the potential consequence of causing a collision accident between two trains. This particular attack scenario is proposed as one of the demonstration cases for the Cross Sword 2023 Test-Run, providing a realistic and controlled environment to assess the cybersecurity resilience of the railway infrastructure.
 
-**Attacker Vector** :  Modbus False Data / Command Injection
+**Attacker Vector** :  `Modbus False Data` , `Command Injection`
+
+**Matched MIRTE-CWD**: `CWE-77`, `CWE-400`
+
+**Mapped MITRE-ATT&CK-TTP**: `T1059.008` , `T1573.001`
 
 > Important : The demonstrated attack case is used for education and training for different level of IT-OT cyber security ICS course, please don't apply it on any real world system.
 
-[TOC]
-
 **Table of Contents**
+
+[TOC]
 
 - [OT Cyber Attack Demo on PLC [Case Study 01] : False Data / Cmd Injection Attack Case](#ot-cyber-attack-demo-on-plc--case-study-01----false-data---cmd-injection-attack-case)
     + [Introduction](#introduction)
@@ -28,8 +32,14 @@
         * [Initiating False Data Injection Attack](#initiating-false-data-injection-attack)
         * [Initiating False Command Injection Attack](#initiating-false-command-injection-attack)
         * [Attack Demo Video](#attack-demo-video)
-        
-      - [Problem and Solution](#problem-and-solution)
+    + [Problem and Solution](#problem-and-solution)
+    + [MITRE CWE Matching and ATT&CK Mapping](#mitre-cwe-matching-and-att-ck-mapping)
+      - [MITRE CWE(Common Weakness Enumeration) Matching](#mitre-cwe-common-weakness-enumeration--matching)
+      - [MITRE ATT&CK (Adversarial Tactics, Techniques, and Common Knowledge) Mapping](#mitre-att-ck--adversarial-tactics--techniques--and-common-knowledge--mapping)
+        * [T1059.008: Network Device Client Command and Scripting Interpreter](#t1059008--network-device-client-command-and-scripting-interpreter)
+        * [T1573.001: Encrypted Channel: Symmetric Cryptography](#t1573001--encrypted-channel--symmetric-cryptography)
+
+
 
 ------
 
@@ -307,27 +317,50 @@ Refer to `doc/ProblemAndSolution.md`
 
 ------
 
-### Massachusetts Institute of Technology Research and Engineering (MITRE) matching
+### MITRE CWE Matching and ATT&CK Mapping
 
-To mapping to the MITRE Framework for better attack TTP search and utilization, I think the FDI and FCI on PLC system attack scenario can fall under MITRE's classification system known as CWE (Common Weakness Enumeration) CWE-77: Improper Neutralization of Special Elements used in a Command ('Command Injection') and for MITRE ATT&CK it would likely fall under the category of "Command and Scripting Interpreter" (T1059).
+Massachusetts Institute of Technology Research and Engineering (MITRE) 
 
-##### MITRE CWE(Common Weakness Enumeration)
-
-**CWE-77: Improper Neutralization of Special Elements used in a Command ('Command Injection')**
-
-Link: https://cwe.mitre.org/data/definitions/77.html
-
-The product constructs all or part of a command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended command when it is sent to a downstream component.
-
-##### MITRE ATT&CK 
-
-TA0002 [Execution] > [T1059](https://attack.mitre.org/techniques/T1059) [Command and Scripting Interpreter] > .008 [Network Device Cli]
-
-FCI and FDI could be part of the broader tactic of "Execution" (TA0002) use the network device client to do the command interpreter attack, which involves techniques used by adversaries to run malicious code on / targeting a victim's system. Within this tactic, "Command and Scripting Interpreter" (T1059) could be considered the closest match, as it involves the exploitation of command-line interpreters, which is similar to the concept of injecting commands.
-
-Link: https://attack.mitre.org/tactics/TA0002/
+#### MITRE CWE(Common Weakness Enumeration) Matching
 
 
+
+**CWE-77**
+
+- **CWE Name**: Improper Neutralization of Special Elements used in a Command ('Command Injection')
+- **CWE Match**: In the case study scenario, the attacker may exploit vulnerabilities in the Modbus communication protocol to forge requests to the PLC from the traffic capture file, injecting false data and commands. This weakness security action can match to the `CWE-77: Improper Neutralization of Special Elements used in a Command ('Command Injection')`. 
+- **CWE Detail**: This CWE relates OT product constructs all or part of a command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special elements that could modify the intended command when it is sent to a downstream component. Link: https://cwe.mitre.org/data/definitions/77.html
+
+
+
+**CWE-400** 
+
+- **CWE Name**: Uncontrolled Resource Consumption ('Resource Exhaustion')
+
+- **CWE Match**: In this case study scenario, the attacker may overwhelm the PLC's resources (connected input sensor's value) with false data or commands, causing disruption or manipulation of train control operations. This weakness security state can match to the `CWE-400: Uncontrolled Resource Consumption ('Resource Exhaustion')`
+
+- **CWE Detail**: This CWE involves attackers exploiting weaknesses in the target system's resource management, leading to resource exhaustion and potential denial of service or system instability.  Link: https://cwe.mitre.org/data/definitions/400.html
+
+  
+
+#### MITRE ATT&CK (Adversarial Tactics, Techniques, and Common Knowledge) Mapping
+
+##### T1059.008: Network Device Client Command and Scripting Interpreter
+
+- FCI and FDI could be part of the broader tactic of "Execution" (TA0002) use the network device client to do the command interpreter attack, which involves techniques used by adversaries to run malicious code on / targeting a victim's system. Within this tactic, "Command and Scripting Interpreter" (T1059) could be considered the closest match, as it involves the exploitation of command-line interpreters, which is similar to the concept of injecting commands.
+
+- Link: https://attack.mitre.org/techniques/T1059/008/
+
+
+
+
+##### T1573.001: Encrypted Channel: Symmetric Cryptography
+
+- The attacker use https symmetric cryptography to encrypt communications between the False data injection program and the Red Team C2 system. This technique involves adversaries using symmetric cryptography to establish encrypted channels for command and control (C2) communication. 
+
+- Link: https://attack.mitre.org/techniques/T1573/001/
+
+  
 
 ------
 
