@@ -256,4 +256,46 @@ Refer to `doc/ProblemAndSolution.md`
 
 ------
 
+### MITRE CWE Matching and ATT&CK Mapping
+
+Massachusetts Institute of Technology Research and Engineering (MITRE) 
+
+#### MITRE CWE(Common Weakness Enumeration) Matching
+
+
+
+**CWE-284**
+
+- **CWE Name**: Improper Access Control
+- **CWE Match**: In this scenario, the attacker exploits improper access control to broadcast fake ARP messages through the HQ Operation Room's switch and apply Modbus-TCP packet filters, leading to disruption of communication between the HMI and PLCs. The security weakness can match to the  `CWE-284: Improper Access Control`
+- **CWE Detail**: This CWE involves vulnerabilities related to inadequate access control mechanisms, allowing unauthorized users to access or manipulate resources. Link: https://cwe.mitre.org/data/definitions/284.html
+
+
+
+**WE-494**
+
+- **CWE Name**: Download of Code Without Integrity Check
+- **CWE Match**:  In this scenario, the attacker may use the Red Team C2 system remote control the victim(maintenance engineer's laptop) to download and execute the packet dropper filter for ARP spoofing without integrity checks by the OT subnet firewall. The security weakness can match to the `CWE-494: Download of Code Without Integrity Check`
+- **CWE Detail**: This CWE involves vulnerabilities where an attacker can cause the download of code from the internet without proper integrity checks, potentially allowing the execution of malicious code. Link: https://cwe.mitre.org/data/definitions/494.html
+
+
+
+**CWE-300**
+
+- **CWE Name**: Channel Accessible by Non-Endpoint ('Man-in-the-Middle')
+
+- **CWE Match**:  In this scenario, the attacker uses a man-in-the-middle tool Ettercap to perform ARP attack by intercepting and modifying ARP messages, leading to the disruption of communication between the HMI and PLCs. The security weakness can match to the `CWE-300: Channel Accessible by Non-Endpoint ('Man-in-the-Middle')`
+
+- **CWE Detail**: This CWE involves vulnerabilities where attackers can intercept or modify communication between two parties without their knowledge. Link: https://cwe.mitre.org/data/definitions/300.html
+
+  
+
+
+
+
+
+
+
+------
+
 > Last edit by LiuYuancheng(liu_yuan_cheng@hotmail.com) at 13/01/2024, if you have any problem, please send me a message.  Copyright (c) 2023 LiuYuancheng
