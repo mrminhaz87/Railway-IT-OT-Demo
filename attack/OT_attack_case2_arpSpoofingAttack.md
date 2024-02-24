@@ -2,18 +2,22 @@
 
 **Project Design Purpose** : The objective of this case study is to develop a workshop which utilizing the Railway (Metro) IT/OT System Cyber Security Test Platform (mini cyber range), the Red Team Command and Control (C2) System and the Ettercap Wrapper for demonstrating the APR Spoofing attack on OT system.  Our aim is to showcase how a hacker (cyber range red team member) could potentially launch an ARP Spoofing Attack on the OT system Human Machine Interface (HMI) which caused the part of the Operation Room HQ service offline.  This particular attack scenario is proposed as one of the demonstration cases for the Cross Sword 2023 Test-Run, providing a realistic and controlled environment to assess the cybersecurity resilience of the railway infrastructure.
 
-**Attacker Vector** :  ARP Spoofing / Network Traffic Blocking / DoS.
+**Attacker Vector** :  `ARP Spoofing` , `Network Traffic Blocking` , `DoS`
+
+**Matched MIRTE-CWD**:  `CWE-284` , `CWE-494` , `CWE-300` , `CWE-937`
+
+**Mapped MITRE-ATT&CK-TTP**: `T1562.001` , `T1573.002`, `T1499.002`
 
 > Important : The demonstrated attack case is used for education and training for different level of IT-OT cyber security ICS course, please don't apply it on any real world system.
 
-[TOC]
-
 **Table of Contents**
 
+[TOC]
+
 - [OT Cyber Attack Demo on HMI  [Case Study 02] : ARP Spoofing Attack Case](#ot-cyber-attack-demo-on-hmi---case-study-02----arp-spoofing-attack-case)
-  
+    
     + [Introduction](#introduction)
-      
+        
         * [Key Tactics, techniques, and procedures (TTP) of the attack](#key-tactics--techniques--and-procedures--ttp--of-the-attack)
     + [Background Knowledge](#background-knowledge)
         * [ARP Spoofing Attack](#arp-spoofing-attack)
@@ -26,8 +30,11 @@
     + [Red Team Attack Detail Steps](#red-team-attack-detail-steps)
         * [Start APR Spoofing Packet Drop Attack from C2](#start-apr-spoofing-packet-drop-attack-from-c2)
         * [Attack Demo Video](#attack-demo-video)
-        
+      
       - [Problem and Solution](#problem-and-solution)
+    + [MITRE CWE Matching and ATT&CK Mapping](#mitre-cwe-matching-and-att-ck-mapping)
+      - [MITRE CWE(Common Weakness Enumeration) Matching](#mitre-cwe-common-weakness-enumeration--matching)
+      - [MITRE ATT&CK (Adversarial Tactics, Techniques, and Common Knowledge) Mapping](#mitre-att-ck--adversarial-tactics--techniques--and-common-knowledge--mapping)
 
 
 
@@ -272,7 +279,7 @@ Massachusetts Institute of Technology Research and Engineering (MITRE)
 
 
 
-**WE-494**
+**CWE-494**
 
 - **CWE Name**: Download of Code Without Integrity Check
 - **CWE Match**:  In this scenario, the attacker may use the Red Team C2 system remote control the victim(maintenance engineer's laptop) to download and execute the packet dropper filter for ARP spoofing without integrity checks by the OT subnet firewall. The security weakness can match to the `CWE-494: Download of Code Without Integrity Check`
@@ -290,9 +297,32 @@ Massachusetts Institute of Technology Research and Engineering (MITRE)
 
   
 
+**CWE-937**
 
+- **CWE Name**: OWASP Top Ten 2013 Category A5 - Security Misconfiguration
 
+- **CWE Match**: In the scenario, the attacker's ability to  bypass firewall detection mechanisms and manipulate subnet's switch and victim's ARP tables, this exploit the security misconfigurations in the firewall and network infrastructure. The security weakness can match to the `CWE-937: OWASP Top Ten 2013 Category A5 - Security Misconfiguration`
 
+- **CWE Detail**: This CWE involves weaknesses related to security misconfigurations, such as default configurations, insecure configurations, or incomplete configurations, which can lead to security vulnerabilities or operational failures. Link: https://cwe.mitre.org/data/definitions/937.html
+
+  
+
+#### MITRE ATT&CK (Adversarial Tactics, Techniques, and Common Knowledge) Mapping
+
+**Initial Access (TA0001) > T1562.001: Impair Defenses: Disable or Modify Tools**
+
+- The attacker modifies network traffic using MITM attack tool Ettercap to disrupt communication between the HMI and PLCs, impairing defenses and gaining initial access to the network. 
+- Link: https://attack.mitre.org/techniques/T1562/001/
+
+**Command and Control (TA0002) > T1573.002: Encrypted Channel: Asymmetric Cryptography**
+
+- The attacker and the ARP Spoofing program utilizes encrypted channels to communicate with the Red Team C2 system, maintaining stealth and security during the attack.
+- Link: https://attack.mitre.org/techniques/T1573/002/
+
+**Impact (TA0004) > T1499.002: Endpoint Denial of Service**
+
+- The attacker disrupts communication between the HMI and PLCs by dropping specific Modbus-TCP communication data, causing the railway Sensor-Signal-HMI in the Operation Room to go offline.
+- Link: https://attack.mitre.org/techniques/T1499/
 
 
 

@@ -35,11 +35,10 @@
     + [Problem and Solution](#problem-and-solution)
     + [MITRE CWE Matching and ATT&CK Mapping](#mitre-cwe-matching-and-att-ck-mapping)
       - [MITRE CWE(Common Weakness Enumeration) Matching](#mitre-cwe-common-weakness-enumeration--matching)
+
       - [MITRE ATT&CK (Adversarial Tactics, Techniques, and Common Knowledge) Mapping](#mitre-att-ck--adversarial-tactics--techniques--and-common-knowledge--mapping)
-        * [T1059.008: Network Device Client Command and Scripting Interpreter](#t1059008--network-device-client-command-and-scripting-interpreter)
-        * [T1573.001: Encrypted Channel: Symmetric Cryptography](#t1573001--encrypted-channel--symmetric-cryptography)
 
-
+        
 
 ------
 
@@ -345,7 +344,7 @@ Massachusetts Institute of Technology Research and Engineering (MITRE)
 
 #### MITRE ATT&CK (Adversarial Tactics, Techniques, and Common Knowledge) Mapping
 
-##### T1059.008: Network Device Client Command and Scripting Interpreter
+**T1059.008: Network Device Client Command and Scripting Interpreter**
 
 - FCI and FDI could be part of the broader tactic of "Execution" (TA0002) use the network device client to do the command interpreter attack, which involves techniques used by adversaries to run malicious code on / targeting a victim's system. Within this tactic, "Command and Scripting Interpreter" (T1059) could be considered the closest match, as it involves the exploitation of command-line interpreters, which is similar to the concept of injecting commands.
 
@@ -353,8 +352,7 @@ Massachusetts Institute of Technology Research and Engineering (MITRE)
 
 
 
-
-##### T1573.001: Encrypted Channel: Symmetric Cryptography
+**T1573.001: Encrypted Channel: Symmetric Cryptography**
 
 - The attacker use https symmetric cryptography to encrypt communications between the False data injection program and the Red Team C2 system. This technique involves adversaries using symmetric cryptography to establish encrypted channels for command and control (C2) communication. 
 
