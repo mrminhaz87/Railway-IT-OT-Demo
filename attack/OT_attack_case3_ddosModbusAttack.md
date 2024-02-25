@@ -2,9 +2,17 @@
 
 **Project Design Purpose** : The objective of this case study is to develop a workshop which utilizing the Railway (Metro) IT/OT System Cyber Security Test Platform (mini cyber range) , DDoS Attack Management System and DDoS PLC (Modbus-TCP) Attacker Program for demonstrating how the IT distributed denial-of-service attack can make influence on the OT system. Our aim is to showcase how a hacker (cyber range red team member) could potentially launch a DDoS attack targets to the OT Programable Logic Controller which caused interruption on the SCADA-HMI-PLC control chain. This particular attack scenario is proposed as one of the demonstration cases for the Cross Sword 2023 Test/Partners-Run, providing a realistic and controlled environment to assess the cybersecurity resilience of the railway infrastructure.
 
-**Attacker Vector** :  Distributed denial-of-service attack
+**Attacker Vector** :  `Distributed denial-of-service attack`
+
+**Matched MIRTE-CWD**: `CWD-399` , `CWD-284`, `CWD-287`
+
+**Mapped MITRE-ATT&CK-TTP**: `T1498` , `T1046`
 
 >  Important : The demonstrated attack case is used for education and training for different level of IT-OT cyber security ICS course, please don't apply it on any real world system.
+
+
+
+**Table of Contents**
 
 [TOC]
 
@@ -304,6 +312,51 @@ Online Video link: https://youtu.be/ZG5Y1A3nbKY?si=SUaIlcsEaps-SSDS
 #### Problem and Solution
 
 Refer to `doc/ProblemAndSolution.md`
+
+
+
+------
+
+### MITRE CWE Matching and ATT&CK Mapping
+
+Massachusetts Institute of Technology Research and Engineering (MITRE) 
+
+#### MITRE CWE(Common Weakness Enumeration) Matching
+
+**CWE-399**
+
+- **CWE Name**: Resource Management Errors
+- **CWE Match**: In this scenario, launching multiple DDoS Modbus-TCP requests simultaneously may exploit network resource management errors to overwhelm the targeted HMI-PLC control chain, causing it to become unresponsive or unavailable. The security weakness can match to the `CWE-399: Resource Management Errors`
+- **CWE Detail**: This CWE involves weaknesses related to errors in managing system resources, which can lead to resource exhaustion, denial of service, or other operational disruptions. Link: https://cwe.mitre.org/data/definitions/399.html
+
+**CWE-284**
+
+- **CWE Name**: Improper Access Control
+
+- **CWE Match**:  In this scenario, the attacker's ability to control multiple DDoS attacker programs externally to the railway mini cyber range may involve exploiting weaknesses in access control mechanisms to gain unauthorized access. The production network firewall should have the access control which only all the specific SCADA network node to access the related node(PLC) in the production network. The security weakness can match to the `CWE-284: Improper Access Control`
+- **CWE Detail**: This CWE involves weaknesses related to insufficient or improper access control mechanisms, which can allow unauthorized entities to access or manipulate sensitive resources. Link: https://cwe.mitre.org/data/definitions/284.html
+
+**CWE-287**
+
+- **CWE Name**: Improper Authentication
+
+-  **CWE Match**: In this scenario, the attacker may exploit weaknesses in authentication mechanisms of the supervision network firewall which allows the DDoS attack programs connect to the Red Team C2 DDoS Attack Management System network which located outside the railway company . The security weakness can match to the `CWE-287: Improper Authentication`
+
+- **CWE Detail**: This CWE involves weaknesses related to insufficient or improper authentication mechanisms, which can allow unauthorized entities to access or manipulate sensitive resources. Link : https://cwe.mitre.org/data/definitions/287.html
+
+  
+
+#### MITRE ATT&CK (Adversarial Tactics, Techniques, and Common Knowledge) Mapping
+
+**Execution (TA0002) > T1046: Network Service Scanning** 
+
+- The attacker scans the SCADA network to identify the accessible services and potential targets for the DDoS attack. In this case study scenario, the attacker perform network service scanning to identify the accessible PLC as the target for the DDoS Modbus-TCP requests attack.
+- Link: https://attack.mitre.org/techniques/T1046/
+
+**Impact (TA0040) > T1498: Network Denial of Service**
+
+-  The attacker conducts network denial-of-service attacks to disrupt normal operations or services. In this scenario, the primary impact is the interruption of the normally OT HMI-PLC control chain due to the DDoS Modbus-TCP requests attack.
+- Link: https://attack.mitre.org/techniques/T1498/
 
 
 
