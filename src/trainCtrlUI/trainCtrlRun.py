@@ -54,6 +54,7 @@ class UIFrame(wx.Frame):
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.periodic)
         self.timer.Start(gv.PERIODIC)  # every 500 ms
+        self.Bind(wx.EVT_CLOSE, self.onClose)
 
 #-----------------------------------------------------------------------------
     def _initGlobals(self):
@@ -402,6 +403,23 @@ class UIFrame(wx.Frame):
                 val = self.caCombo.GetSelection() == 0
                 TrainTgtPlcID = 'PLC-06'
                 gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, 10, val)
+
+#-----------------------------------------------------------------------------
+    def onClose(self, evt):
+        """ Pop up the confirm close dialog when the user close the UI from 'x'."""
+        try:
+            fCanVeto = evt.CanVeto()
+            if fCanVeto:
+                confirm = wx.MessageDialog(self, 'Click OK to close this program, or click Cancel to ignore close request',
+                                            'Quit request', wx.OK | wx.CANCEL| wx.ICON_WARNING).ShowModal()
+                if confirm == wx.ID_CANCEL:
+                    evt.Veto(True)
+                    return
+                if gv.idataMgr: gv.idataMgr.stop()
+                self.timer.Stop()
+                self.Destroy()
+        except Exception as err:
+            gv.gDebugPrint("Error to close the UI: %s" %str(err), logType=gv.LOG_ERR)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

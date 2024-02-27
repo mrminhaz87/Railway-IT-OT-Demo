@@ -245,3 +245,9 @@ class DataManager(object):
                            logType=gv.LOG_INFO)
             self.plcClients[plcid].setCoilsBit(idx, val)
             time.sleep(0.1)
+    
+    #-----------------------------------------------------------------------------
+    def stop(self):
+        for client in self.plcClients.values():
+            client.close()
+        gv.gDebugPrint('DataManager: Stopped all PLC clients', logType=gv.LOG_INFO)

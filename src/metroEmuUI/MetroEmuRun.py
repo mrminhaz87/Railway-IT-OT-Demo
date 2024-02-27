@@ -209,9 +209,20 @@ class UIFrame(wx.Frame):
 
 #-----------------------------------------------------------------------------
     def onClose(self, evt):
-        gv.iDataMgr.stop()
-        self.timer.Stop()
-        self.Destroy()
+        """ Pop up the confirm close dialog when the user close the UI from 'x'."""
+        try:
+            fCanVeto = evt.CanVeto()
+            if fCanVeto:
+                confirm = wx.MessageDialog(self, 'Click OK to close this program, or click Cancel to ignore close request',
+                                            'Quit request', wx.OK | wx.CANCEL| wx.ICON_WARNING).ShowModal()
+                if confirm == wx.ID_CANCEL:
+                    evt.Veto(True)
+                    return
+                if gv.iDataMgr: gv.iDataMgr.stop()
+                self.timer.Stop()
+                self.Destroy()
+        except Exception as err:
+            gv.gDebugPrint("Error to close the UI: %s" %str(err), logType=gv.LOG_ERR)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

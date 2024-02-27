@@ -7,8 +7,8 @@
 #
 # Created:     2023/06/21
 # Version:     v_0.1
-# Copyright:   
-# License:     
+# Copyright:   Copyright (c) 2019 LiuYuancheng
+# License:     MIT License 
 #-----------------------------------------------------------------------------
 
 import time
