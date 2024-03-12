@@ -4,9 +4,9 @@
 
 **Railway Company IT-System Cyber Range**
 
-This IT-network cyber range project will simulate the normal cooperation network of the railway company, we will use the [Custer User Emulation](https://github.com/LiuYuancheng/Windows_User_Simulator) system to automate simulate different kinds of staff's daily work such as IT-Support-Engineer, Officer Staff, Railway HQ operator, Train driver / safety checker. The main components includes: 
+This IT-network cyber range project will simulate the normal corporate network of the railway company, we will use the [Custer User Emulation](https://github.com/LiuYuancheng/Windows_User_Simulator) system to automate simulate different kinds of staff's daily work such as IT-Support-Engineer, Officer Staff, Railway HQ operator, Train driver / safety checker. The main components includes: 
 
-- Railway company cooperation network environment (virtual hardware: computer,  node, firewall, router, switches)
+- Railway company corporate network environment (virtual hardware: computer,  node, firewall, router, switches)
 - Railway company staff activities auto generator (virtual staff: IT-Support-Engineer, Officer Staff, Railway HQ operator, Train driver / safety checker)
 
 **Railway System OT-System Cyber Range**
@@ -61,7 +61,7 @@ The Railway[Metro] IT/OT System Security Test Platform serves as a miniature rai
 
 ![](doc/img/Components.png)
 
-1. **Cooperate network**: This subnet replicates a typical railway company's corporate IT network, encompassing various functional servers (email, DMZ, staff management) and a production management workstation. This workstation hosts essential components such as the production log archiving database, internal document server, and operator manuals.
+1. **Corporate network**: This subnet replicates a typical railway company's corporate IT network, encompassing various functional servers (email, DMZ, staff management) and a production management workstation. This workstation hosts essential components such as the production log archiving database, internal document server, and operator manuals.
 2. **Supervision SCADA network**: Simulating the SCADA system network, this subnet features distinct SCADA data/historian servers, multiple HMI computers for system operators, and maintenance computers dedicated to ICS/OT-system engineers.
 3. **Production network**: This subnet host all PLC simulator programs, contributing to a realistic representation of the production environment within the railway system.
 4. **Physical real-world emulation network**: In this subnet, railway real-world components are emulated to demonstrate the tangible effects of actual items in the real working environment.
