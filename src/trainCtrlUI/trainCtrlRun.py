@@ -369,11 +369,14 @@ class UIFrame(wx.Frame):
         """
         regdataList = gv.idataMgr.getAllPlcRegsData()
         coildataList = gv.idataMgr.getAllPlcCoisData()
+        rtuDataDict = gv.idataMgr.getAllRtuDataDict()
         for key in gv.gTrackConfig.keys():
             rsIdx, reIdx = gv.gTrackConfig[key]['trainHregIdx']
-            gv.iMapMgr.updateTrainsSpeed(key, regdataList[rsIdx:reIdx])
+            gv.iMapMgr.updateTrainsThrottle(key, regdataList[rsIdx:reIdx])
             csIdx, ceIdx = gv.gTrackConfig[key]['trainCoilIdx']
-            gv.iMapMgr.updateTrainsPwr(key, coildataList[csIdx:ceIdx] )
+            gv.iMapMgr.updateTrainsPwr(key, coildataList[csIdx:ceIdx])
+            gv.iMapMgr.updateTrainsSensor(key, rtuDataDict[key])
+
 
 #-----------------------------------------------------------------------------
     def updateTrainsPanels(self):

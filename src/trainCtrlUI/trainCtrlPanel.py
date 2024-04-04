@@ -288,7 +288,7 @@ class PanelTrain(wx.Panel):
             startIdx = gv.gTrackConfig[self.trackId]['trainCoilIdx'][0]
             idx = startIdx + int(self.trainId)
             # pop up a power change confirm message box
-            dlg = wx.MessageDialog(None, "Confirm Power on %s" %'-'.join((self.trackId, str(self.trainId))),
+            dlg = wx.MessageDialog(None, "Confirm Power Turn ON: %s" %'-'.join((self.trackId, str(self.trainId))),
                                    'Train Pwr Change',wx.YES_NO | wx.ICON_WARNING)
             result = dlg.ShowModal()
             if result == wx.ID_YES: gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, True)
@@ -301,7 +301,7 @@ class PanelTrain(wx.Panel):
             startIdx = gv.gTrackConfig[self.trackId]['trainCoilIdx'][0]
             idx = startIdx + int(self.trainId)
             # pop up a power change confirm message box
-            dlg = wx.MessageDialog(None, "Confirm Power on %s" %'-'.join((self.trackId, str(self.trainId))),
+            dlg = wx.MessageDialog(None, "Confirm Power Turon OFF: %s" %'-'.join((self.trackId, str(self.trainId))),
                                    'Train Pwr Change',wx.YES_NO | wx.ICON_WARNING)
             result = dlg.ShowModal()
             if result == wx.ID_YES: gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, False)

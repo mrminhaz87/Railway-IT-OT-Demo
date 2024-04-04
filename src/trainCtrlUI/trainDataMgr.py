@@ -39,11 +39,14 @@ class TrainAgent(object):
                 designVoltage (int): trains operating voltage.
         """
         self.id = trainID
-        self.speed = 0 if not gv.TEST_MD else 1
+        self.throttleOn = 0
+        self.speed = 0 
+        self.vlotage = 0 
         self.current = 0
         self.designVoltage = designVoltage
         self.powerFlag = False if not gv.TEST_MD else True
         self.dataRanFlg = dataRandFlg
+        self.fsensorTriggered = False
 
 #-----------------------------------------------------------------------------
 # Define all the get() function here
@@ -58,39 +61,33 @@ class TrainAgent(object):
                 'power': self.powerFlag
             }
         """
-        result = None
-        if not self.powerFlag:
-            result = {
-                'id': self.id,
-                'speed': 0,
-                'current': 0,
-                'voltage': self.designVoltage + randint(0, 50) if self.dataRanFlg  else 0,
-                'power': self.powerFlag
-            }
-        else:
-            if self.speed == 0:
-                result = {
-                    'id': self.id,
-                    'speed': randint(0, 5) if self.dataRanFlg  else 0,
-                    'current': randint(10, 30) if self.dataRanFlg  else 10,
-                    'voltage': int(self.designVoltage - randint(0, 20)) if self.dataRanFlg else self.designVoltage,
-                    'power': self.powerFlag
-                }
-            else:
-                result = {
-                    'id': self.id,
-                    'speed': randint(56, 100) if self.dataRanFlg  else 78,
-                    'current': randint(150, 200) if self.dataRanFlg  else 150,
-                    'voltage': int(self.designVoltage - randint(20, 50)) if self.dataRanFlg else self.designVoltage,
-                    'power': self.powerFlag
-                }
+        result = {
+            'id': self.id,
+            'speed': self.speed,
+            'voltage': self.vlotage,
+            'current': self.current,
+            'fsensor': self.fsensorTriggered,
+            'power': self.powerFlag
+        }
         return result
 
 #-----------------------------------------------------------------------------
 # Define all the set function() here.
-    def setSpeed(self, speed):
-        self.speed = speed
+    def setThrottle(self, throttleState):
+        self.throttleOn = throttleState
 
+    def setFsensorVal(self, sensorState):
+        self.fsensorTriggered = sensorState
+
+    def setSpeed(self, speed):
+        self.speed = int(speed)
+
+    def setVoltage(self, voltage):
+        self.vlotage = int(voltage)
+
+    def setCurrent(self, current):
+        self.current = int(current)
+    
     def setPower(self, state):
         self.powerFlag = state
 
@@ -129,12 +126,12 @@ class MapManager(object):
         self._initTrain(trackID, trainNum, designVoltage)
 
 #-----------------------------------------------------------------------------
-    def updateTrainsSpeed(self, trackID, speedList):
+    def updateTrainsThrottle(self, trackID, speedList):
         if trackID in self.trainsAgentDict.keys():
             idxRange = min(len(speedList), len(self.trainsAgentDict[trackID]))
             for idx in range(idxRange):
                 train = self.trainsAgentDict[trackID][idx]
-                train.setSpeed(speedList[idx])
+                train.setThrottle(speedList[idx])
 
 #-----------------------------------------------------------------------------
     def updateTrainsPwr(self, trackID, speedList):
@@ -143,6 +140,17 @@ class MapManager(object):
             for idx in range(idxRange):
                 train = self.trainsAgentDict[trackID][idx]
                 train.setPower(speedList[idx])
+
+    def updateTrainsSensor(self, trackID, rtuDataList):
+        if trackID in self.trainsAgentDict.keys():
+            for idx in range(len(rtuDataList)):
+                train = self.trainsAgentDict[trackID][idx]
+                byteData = rtuDataList[idx]
+                # data sequence: [state['fsensor'], state['speed'], state['voltage'], state['current']]
+                train.setFsensorVal(snap7.util.get_bool(byteData, 0, 0))
+                train.setSpeed(snap7.util.get_int(byteData, 2))
+                train.setVoltage(snap7.util.get_int(byteData, 4))
+                train.setCurrent(snap7.util.get_int(byteData, 6))
 
 #-----------------------------------------------------------------------------
     def getTrainsInfo(self, trackID):
@@ -209,6 +217,7 @@ class DataManager(object):
         gv.gDebugPrint('DataManager: try to get RTU information', logType=gv.LOG_INFO)
         self.fetchRTUdata()
 
+    #-----------------------------------------------------------------------------
     def fetchRTUdata(self):
         for key in gv.gTrackConfig.keys():
             memoryIdxList = gv.gTrackConfig[key]['rtuMemIdxList']
@@ -216,6 +225,9 @@ class DataManager(object):
                 rtuByteData = self.rtuClient.readAddressVal(memIdx, 0, dataType=None)
                 self.rtuDataList[key][idx] = rtuByteData
         print(self.rtuDataList)
+
+    def getAllRtuDataDict(self):
+        return self.rtuDataList
 
     #-----------------------------------------------------------------------------
     # define all the get() function here.
