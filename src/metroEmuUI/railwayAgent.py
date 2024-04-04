@@ -16,6 +16,7 @@
 
 import math
 import random
+from random import randint
 import metroEmuGobal as gv
 
 #-----------------------------------------------------------------------------
@@ -422,6 +423,17 @@ class AgentTrain(AgentTarget):
         self.collsionFlg = False        # Flag to identify whether Train collsion happens.
         self.emgStop = False if gv.gTestMD else True   # emergency stop.
 
+        self.rfrtSensorFlg = False # realworld detected the front train sensor state
+        # real world train information dict.
+        self.rwInfoDict = {
+            'train_id': self.id,
+            'power': 0,
+            'speed': 0,
+            'voltage': 0,
+            'current': 0,
+            'fsensor': self.rfrtSensorFlg,
+        }
+
 #-----------------------------------------------------------------------------
     def _buildTrainPos(self):
         x, y = self.initPos
@@ -497,9 +509,11 @@ class AgentTrain(AgentTarget):
         if self.checkNear(ftTail[0], ftTail[1], threshold):
             if self.trainSpeed >= 0 and self.dockCount==0:
                 self.trainSpeed = 0
+            self.rfrtSensorFlg = True
             return True # detected will be collision to the front train
         elif self.trainSpeed == 0 and self.dockCount <= 1:
             self.setTrainSpeed(10)
+        self.rfrtSensorFlg = False
         return False
 
 #--AgentTrain------------------------------------------------------------------
@@ -542,6 +556,10 @@ class AgentTrain(AgentTarget):
 
     def getTrainSpeed(self):
         return self.trainSpeed
+
+    def getTrainRealInfo(self):
+        """ Generate the trian's realworld information"""
+        return self.rwInfoDict
 
     def getEmgStop(self):
         return self.emgStop
@@ -622,7 +640,13 @@ class AgentTrain(AgentTarget):
         else:  # Train stop at the station.
             self.dockCount -= 1
 
-
-
-
+#--AgentTrain------------------------------------------------------------------
+    def updateRealWordInfo(self):
+        """ Update the own real world information."""
+        rSpeedVal = randint(0, 5) if self.trainSpeed == 0 else randint(56, 100)
+        self.rwInfoDict['power'] = 0 if self.emgStop or self.collsionFlg else 1
+        self.rwInfoDict['speed'] = 0 if self.emgStop or self.collsionFlg else rSpeedVal
+        self.rwInfoDict['voltage'] = 0 if self.emgStop or self.collsionFlg else 750 - randint(0, 20)
+        self.rwInfoDict['current'] = 0 if self.emgStop or self.collsionFlg else randint(150, 200)
+        self.rwInfoDict['fsensor'] = self.rfrtSensorFlg
         

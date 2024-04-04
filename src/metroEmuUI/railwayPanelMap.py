@@ -175,7 +175,6 @@ class PanelMap(wx.Panel):
         trainDict = gv.iMapMgr.getTrains()
         for key, val in trainDict.items():
             for i, train in enumerate(val):
-                
                 trainColor = '#CE8349' if train.getTrainSpeed() == 0 else 'GREEN'
                 if train.getEmgStop():
                     trainColor = 'RED'
@@ -187,7 +186,16 @@ class PanelMap(wx.Panel):
                 pos = train.getTrainPos(idx=0)
                 # Draw the collsion Icon if collision happens.
                 if self.toggle and train.getCollsionFlg(): dc.DrawBitmap(self.bitMaps['alert'], pos[0]-20, pos[1]-20)
-                dc.DrawText( key+'-'+str(i), pos[0]+5, pos[1]+5)
+                #dc.DrawText(key+'-'+str(i), pos[0]+5, pos[1]+5)
+                dc.DrawText(key+'-'+str(i), pos[0]+5, pos[1]+5)
+                if gv.gShowTrainRWInfo:
+                    trainInfo = train.getTrainRealInfo()
+                    dc.SetFont(wx.Font(8, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
+                    dc.DrawText('- power: %s' %str('on' if trainInfo['power'] else 'off'), pos[0]+5, pos[1]+15)
+                    dc.DrawText('- speed: %s km/h' %str(trainInfo['speed']), pos[0]+5, pos[1]+25)
+                    dc.DrawText('- voltage: %s V' %str(trainInfo['voltage']), pos[0]+5, pos[1]+35)
+                    dc.DrawText('- current: %s A' %str(trainInfo['current']), pos[0]+5, pos[1]+45)
+                    dc.DrawText('- fsensor: %s' %str('detected' if trainInfo['fsensor'] else 'none'), pos[0]+5, pos[1]+55)
 
 #-----------------------------------------------------------------------------
     def _drawSensors(self, dc):

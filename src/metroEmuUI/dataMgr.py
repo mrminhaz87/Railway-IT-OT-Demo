@@ -279,7 +279,7 @@ class DataManager(threading.Thread):
     #-----------------------------------------------------------------------------
     def updateTrainsData(self):
         if gv.iMapMgr:
-            for key in self.stationsDict.keys():
+            for key in self.trainsDict.keys():
                 self.trainsDict[key] = []
                 for train in gv.iMapMgr.getTrains(trackID=key):
                     state = 0 if train.getTrainSpeed() == 0 else 1

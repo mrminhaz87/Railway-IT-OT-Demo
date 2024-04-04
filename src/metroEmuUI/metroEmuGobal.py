@@ -128,6 +128,7 @@ gTrackConfig = OrderedDict()
 #gCollsionTestFlg = CONFIG_DICT['TEST_JC_COLLISION'] # flag used to enable test the train collision at the junction.
 #gTrainDistTestFlag = CONFIG_DICT['TEST_TR_DISTANCE'] # flag used to see if the minimum distance between trains are observed
 gTrainCfgDir = os.path.join(dirpath, CFGDIR, CONFIG_DICT['TR_CFG_FOLDER'])
+gShowTrainRWInfo = False # flag to identify whether show the train real world information.
 
 #-------<GLOBAL PARAMTERS>-----------------------------------------------------
 iMainFrame = None   # UI MainFrame.

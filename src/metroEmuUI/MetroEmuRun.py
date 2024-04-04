@@ -155,6 +155,12 @@ class UIFrame(wx.Frame):
         self.collisionCB.SetValue(gv.gCollAvoid)
         self.collisionCB.Bind(wx.EVT_CHECKBOX, self.onCollisionSet)
         vbox0.Add(self.collisionCB, flag=flagsL, border=2)
+        
+        self.showTRWInfoCB = wx.CheckBox(self, label = 'Show Trains Realworld Info')
+        self.showTRWInfoCB.SetValue(gv.gShowTrainRWInfo)
+        self.showTRWInfoCB.Bind(wx.EVT_CHECKBOX, self.onShowTRWInfoSet)
+        vbox0.Add(self.showTRWInfoCB, flag=flagsL, border=2)
+
         return vbox0
 
 #--UIFrame---------------------------------------------------------------------
@@ -174,6 +180,10 @@ class UIFrame(wx.Frame):
         gv.gCollAvoid = self.collisionCB.IsChecked()
         gv.gDebugPrint("Trains automated collision avoidance enable: %s" %str(gv.gCollAvoid), logType=gv.LOG_INFO)
 
+    def onShowTRWInfoSet(self, event):
+        gv.gShowTrainRWInfo = self.showTRWInfoCB.IsChecked()
+        gv.gDebugPrint("Show Train realworld information enable: %s" %str(gv.gShowTrainRWInfo), logType=gv.LOG_INFO)
+    
     def changeCAcheckboxState(self, state):
         self.collisionCB.SetValue(state)
 

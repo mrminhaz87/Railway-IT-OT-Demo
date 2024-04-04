@@ -509,6 +509,7 @@ class MapMgr(object):
                 # stop the train if it got collision at any junction.
                 if collsionTrainsDict and i in collsionTrainsDict[key]:
                     if not gv.gJuncAvoid: train.setEmgStop(True)
+                train.updateRealWordInfo()
                 train.updateTrainPos()               
             # update all the track's sensors state afte all the trains have moved.
             self.sensors[key].updateActive(val)
