@@ -156,7 +156,7 @@ class UIFrame(wx.Frame):
         self.collisionCB.Bind(wx.EVT_CHECKBOX, self.onCollisionSet)
         vbox0.Add(self.collisionCB, flag=flagsL, border=2)
         
-        self.showTRWInfoCB = wx.CheckBox(self, label = 'Show Trains Realworld Info')
+        self.showTRWInfoCB = wx.CheckBox(self, label = 'Show trains information')
         self.showTRWInfoCB.SetValue(gv.gShowTrainRWInfo)
         self.showTRWInfoCB.Bind(wx.EVT_CHECKBOX, self.onShowTRWInfoSet)
         vbox0.Add(self.showTRWInfoCB, flag=flagsL, border=2)

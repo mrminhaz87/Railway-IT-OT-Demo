@@ -46,10 +46,15 @@ class trainPowerRtu(rtuSimulator.rtuSimuInterface):
     def _initRealWorldConnectionParm(self):
         self.regSRWfetchKey = gv.gRealWorldKey
 
+
     def _initMemoryAddrs(self):
         """ overwrite this function to add the memory init address setting here
             example:
         """
+        self.regsStateRW = OrderedDict()
+        self.regsStateRW['weline'] = [1,2,3,4]
+        self.regsStateRW['nsline'] = [5,6,7]
+        self.regsStateRW['ccline'] = [8,9,10]
         s7commServer = self.s7Service.getS7ServerRef()
         # memory for weline trains
         s7commServer.initNewMemoryAddr(1, [0, 2, 4, 6], [BOOL_TYPE, INT_TYPE, INT_TYPE, INT_TYPE])

@@ -63,7 +63,7 @@ class RealWorldConnector(object):
         self.rwConnector = udpCom.udpClient((self.realwordInfo['ip'], self.realwordInfo['port']))
         self.recoonectCount = RECON_INT
         # Test login the real world emulator
-        self.plcID = self.parent.getPlcID()
+        self.plcID = self.parent.getID()
         self.realworldOnline = self._loginRealWord(plcID= self.plcID)
         connMsg = 'Login the realworld successfully' if self.realworldOnline else 'Cannot connect to the realworld emulator'
         Log.info(connMsg)
@@ -205,7 +205,8 @@ class rtuSimuInterface(object):
     def __init__(self, parent, rtuID, addressInfoDict, dllPath=None, updateInt=0.5):
         self.parent = parent
         self.rtuID = rtuID
-        
+        self.regsStateRW = {}
+        self.updateInt = updateInt
         # Init the UDP connector to connect to the realworld and test the connection.
         self.regSRWfetchKey = None 
         self.realworldAddr = addressInfoDict['realworld'] if 'realworld' in addressInfoDict.keys() else ('127.0.0.1', 3001)
@@ -215,14 +216,14 @@ class rtuSimuInterface(object):
         self.s7commAddr = addressInfoDict['hostaddress'] if 'hostaddress' in addressInfoDict.keys() else ('localhost', 502)
         self.s7Service = s7CommService(self, 1, dllpath=dllPath,
                                        hostIP=self.s7commAddr[0], 
-                                       port=self.s7commAddr[1])
+                                       hostPort=self.s7commAddr[1])
         self._initMemoryAddrs()
         self._initMemoryDefaultVals()
         self._initLadderHandler()
 
         self.s7Service.start()
         self.terminate = False
-        Log.info('Finished init the RTU: %s' %str(self.id))
+        Log.info('Finished init the RTU: %s' %str(self.rtuID))
 
     def _initRealWorldConnectionParm(self):
         self.regSRWfetchKey = None
@@ -255,8 +256,8 @@ class rtuSimuInterface(object):
         pass
 
 #-----------------------------------------------------------------------------
-    def getRtuID(self):
-        return self.id
+    def getID(self):
+        return self.rtuID
 
 #-----------------------------------------------------------------------------
     def getRWInputInfo(self):

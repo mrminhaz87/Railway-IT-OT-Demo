@@ -561,6 +561,9 @@ class AgentTrain(AgentTarget):
         """ Generate the trian's realworld information"""
         return self.rwInfoDict
 
+    def getPowerState(self):
+        return not (self.emgStop or self.collsionFlg)
+
     def getEmgStop(self):
         return self.emgStop
 
@@ -607,6 +610,14 @@ class AgentTrain(AgentTarget):
         self.isWaiting = False
         self.trainSpeed = gv.gTrainDefSpeed
         self.dockCount = 0
+        self.rwInfoDict = {
+            'train_id': self.id,
+            'power': 0,
+            'speed': 0,
+            'voltage': 0,
+            'current': 0,
+            'fsensor': self.rfrtSensorFlg,
+        }
 
 #--AgentTrain------------------------------------------------------------------
     def updateTrainPos(self):
@@ -644,9 +655,9 @@ class AgentTrain(AgentTarget):
     def updateRealWordInfo(self):
         """ Update the own real world information."""
         rSpeedVal = randint(0, 5) if self.trainSpeed == 0 else randint(56, 100)
-        self.rwInfoDict['power'] = 0 if self.emgStop or self.collsionFlg else 1
-        self.rwInfoDict['speed'] = 0 if self.emgStop or self.collsionFlg else rSpeedVal
-        self.rwInfoDict['voltage'] = 0 if self.emgStop or self.collsionFlg else 750 - randint(0, 20)
-        self.rwInfoDict['current'] = 0 if self.emgStop or self.collsionFlg else randint(150, 200)
+        self.rwInfoDict['speed'] = rSpeedVal if self.getPowerState() else 0
+        self.rwInfoDict['voltage'] = 750 - randint(0, 20) if self.getPowerState() else 0
+        rCrtVal = randint(10, 30) if self.trainSpeed == 0 else randint(150, 200)
+        self.rwInfoDict['current'] = rCrtVal if self.getPowerState() else 0
         self.rwInfoDict['fsensor'] = self.rfrtSensorFlg
         

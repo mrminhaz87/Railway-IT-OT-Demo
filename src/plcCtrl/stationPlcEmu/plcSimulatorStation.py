@@ -106,7 +106,7 @@ def main():
     gv.iLadderLogic = directConnLadderLogic(None, ladderName='Direct_connection')
     addressInfoDict = {
         'hostaddress': gv.gModBusIP,
-        'realworld':gv.gRealWordIP, 
+        'realworld':gv.gRealWorldIP, 
         'allowread':gv.ALLOW_R_L,
         'allowwrite': gv.ALLOW_W_L
     }

@@ -150,7 +150,7 @@ def main():
     gv.iLadderLogic = tFlipFlopLadderLogic(None, ladderName='T_flipflop_logic_set')
     addressInfoDict = {
         'hostaddress': gv.gModBusIP,
-        'realworld':gv.gRealWordIP, 
+        'realworld':gv.gRealWorldIP, 
         'allowread':gv.ALLOW_R_L,
         'allowwrite': gv.ALLOW_W_L
     }

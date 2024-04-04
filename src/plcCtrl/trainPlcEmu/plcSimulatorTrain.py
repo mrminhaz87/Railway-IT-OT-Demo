@@ -71,7 +71,7 @@ class trainPowerPlcSet(plcSimulator.plcSimuInterface):
 
     def initInputState(self):
         self.regsAddrs = (0, 10)
-        self.regSRWfetchKey = 'trains'
+        self.regSRWfetchKey = gv.gRealWorldKey
         self.regs2RWmap = OrderedDict()
         self.regs2RWmap['weline'] = (0, 4)
         self.regs2RWmap['nsline'] = (4, 7)
@@ -83,7 +83,7 @@ class trainPowerPlcSet(plcSimulator.plcSimuInterface):
 
     def initCoilState(self):
         self.coilsAddrs = (0, 11)
-        self.coilsRWSetKey = 'trains'
+        self.coilsRWSetKey = gv.gRealWorldKey
         self.coils2RWMap = OrderedDict()
         self.coils2RWMap['weline'] = (0, 4)
         self.coils2RWMap['nsline'] = (4, 7)
@@ -102,7 +102,7 @@ def main():
     gv.iLadderLogic = onlyCoilLadderLogic(None, ladderName='only_coil_control')
     addressInfoDict = {
         'hostaddress': gv.gModBusIP,
-        'realworld':gv.gRealWordIP, 
+        'realworld':gv.gRealWorldIP, 
         'allowread':gv.ALLOW_R_L,
         'allowwrite': gv.ALLOW_W_L
     }

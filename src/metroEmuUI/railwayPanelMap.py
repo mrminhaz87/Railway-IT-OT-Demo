@@ -191,7 +191,7 @@ class PanelMap(wx.Panel):
                 if gv.gShowTrainRWInfo:
                     trainInfo = train.getTrainRealInfo()
                     dc.SetFont(wx.Font(8, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
-                    dc.DrawText('- power: %s' %str('on' if trainInfo['power'] else 'off'), pos[0]+5, pos[1]+15)
+                    dc.DrawText('- power: %s' %str('on' if train.getPowerState() else 'off'), pos[0]+5, pos[1]+15)
                     dc.DrawText('- speed: %s km/h' %str(trainInfo['speed']), pos[0]+5, pos[1]+25)
                     dc.DrawText('- voltage: %s V' %str(trainInfo['voltage']), pos[0]+5, pos[1]+35)
                     dc.DrawText('- current: %s A' %str(trainInfo['current']), pos[0]+5, pos[1]+45)

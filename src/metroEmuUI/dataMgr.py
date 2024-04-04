@@ -76,7 +76,7 @@ class DataManager(threading.Thread):
             'mtline': None
         }
         self.stationPlcUpdateT = 0
-        # init the local train speed state dictionary
+        # init the local train power state dictionary
         self.trainsDict = {
             'weline': None,
             'nsline': None, 
@@ -84,6 +84,16 @@ class DataManager(threading.Thread):
             'mtline': None
         }
         self.trainPlcUpdateT= 0
+
+        # init the remote train sensor state dictionary
+        self.trainsRtuDict = {
+            'weline': None,
+            'nsline': None, 
+            'ccline': None,
+            'mtline': None
+        }
+        self.trainRtuUpdateT = 0
+
         gv.gDebugPrint("datamanager init finished.", logType=gv.LOG_INFO)
 
     #-----------------------------------------------------------------------------
@@ -119,18 +129,34 @@ class DataManager(threading.Thread):
         return respStr
 
     #-----------------------------------------------------------------------------
-    def fetchTrainInfo(self, reqJsonStr):
+    def fetchTrainPwrInfo(self, reqJsonStr):
         respStr = json.dumps({'result': 'failed'})
         try:
             reqDict = json.loads(reqJsonStr)
             self.trainPlcUpdateT = time.time()
-            self.updateTrainsData()
+            self.updateTrainsPwrData()
             for key in reqDict.keys():
                 if key in self.trainsDict.keys(): reqDict[key] = self.trainsDict[key]
             respStr = json.dumps(reqDict)
         except Exception as err:
-            gv.gDebugPrint("fetchTrainInfo() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
+            gv.gDebugPrint("fetchTrainPwrInfo() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
         return respStr
+
+    def fetchTrainSensInfo(self, reqJsonStr):
+        respStr = json.dumps({'result': 'failed'})
+        try:
+            reqDict = json.loads(reqJsonStr)
+            self.trainRtuUpdateT = time.time()
+            self.updateTrainsSenData()
+            for key in reqDict.keys():
+                if key in self.trainsDict.keys(): reqDict[key] = self.trainsDict[key]
+            respStr = json.dumps(reqDict)
+        except Exception as err:
+            gv.gDebugPrint("fetchTrainSenInfo() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
+        return respStr
+
+
+
 
     #-----------------------------------------------------------------------------
     def getLastPlcsConnectionState(self):
@@ -169,9 +195,12 @@ class DataManager(threading.Thread):
             elif reqType == 'stations':
                 respStr = self.fetchStationInfo(reqJsonStr)
                 resp =';'.join(('REP', 'stations', respStr))
-            elif reqType == 'trains':
-                respStr = self.fetchTrainInfo(reqJsonStr)
-                resp =';'.join(('REP', 'trains', respStr))
+            elif reqType == 'trainsPlc':
+                respStr = self.fetchTrainPwrInfo(reqJsonStr)
+                resp =';'.join(('REP', 'trainsPlc', respStr))
+            elif reqType == 'trainsRtu':
+                respStr = self.fetchTrainSensInfo(reqJsonStr)
+                resp =';'.join(('REP', 'trainsRtu', respStr))
             pass
         elif reqKey=='POST':
             if reqType == 'signals':
@@ -180,9 +209,9 @@ class DataManager(threading.Thread):
             elif reqType == 'stations':
                 respStr = self.setStationSignals(reqJsonStr)
                 resp =';'.join(('REP', 'stations', respStr))
-            elif reqType == 'trains':
+            elif reqType == 'trainsPlc':
                 respStr = self.setTrainsPower(reqJsonStr)
-                resp =';'.join(('REP', 'trains', respStr))
+                resp =';'.join(('REP', 'trainsPlc', respStr))
             pass
             # TODO: Handle all the control request here.
         if isinstance(resp, str): resp = resp.encode('utf-8')
@@ -277,14 +306,23 @@ class DataManager(threading.Thread):
                     self.stationsDict[key].append(state)
 
     #-----------------------------------------------------------------------------
-    def updateTrainsData(self):
+    def updateTrainsPwrData(self):
         if gv.iMapMgr:
             for key in self.trainsDict.keys():
                 self.trainsDict[key] = []
                 for train in gv.iMapMgr.getTrains(trackID=key):
-                    state = 0 if train.getTrainSpeed() == 0 else 1
+                    state = 0 if train.getPowerState() == 0 else 1
                     self.trainsDict[key].append(state)
                     
+    def updateTrainsSenData(self):
+        if gv.iMapMgr:
+            for key in self.trainsRtuDict.keys():
+                self.trainsDict[key] = []
+                for train in gv.iMapMgr.getTrains(trackID=key):
+                    state = train.getTrainRealInfo()
+                    self.trainsDict[key].append(state) 
+
+
     #-----------------------------------------------------------------------------
     def stop(self):
         """ Stop the thread."""
