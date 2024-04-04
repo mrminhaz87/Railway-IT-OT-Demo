@@ -149,14 +149,11 @@ class DataManager(threading.Thread):
             self.trainRtuUpdateT = time.time()
             self.updateTrainsSenData()
             for key in reqDict.keys():
-                if key in self.trainsDict.keys(): reqDict[key] = self.trainsDict[key]
+                if key in self.trainsDict.keys(): reqDict[key] = self.trainsRtuDict[key]
             respStr = json.dumps(reqDict)
         except Exception as err:
             gv.gDebugPrint("fetchTrainSenInfo() Error: %s" %str(err), logType=gv.LOG_EXCEPT)
         return respStr
-
-
-
 
     #-----------------------------------------------------------------------------
     def getLastPlcsConnectionState(self):
@@ -317,11 +314,11 @@ class DataManager(threading.Thread):
     def updateTrainsSenData(self):
         if gv.iMapMgr:
             for key in self.trainsRtuDict.keys():
-                self.trainsDict[key] = []
+                self.trainsRtuDict[key] = []
                 for train in gv.iMapMgr.getTrains(trackID=key):
                     state = train.getTrainRealInfo()
-                    self.trainsDict[key].append(state) 
-
+                    reuslt = [state['fsensor'], state['speed'], state['voltage'], state['current']]
+                    self.trainsRtuDict[key].append(reuslt) 
 
     #-----------------------------------------------------------------------------
     def stop(self):

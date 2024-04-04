@@ -14,11 +14,13 @@
 #-----------------------------------------------------------------------------
 
 import time
+import snap7
 from collections import OrderedDict
 from random import randint
 
 import trainCtrlGlobal as gv
 import modbusTcpCom
+import snap7Comm
 
 # flag to identify whether the train's data will be added a slight random change 
 # before show up on the UI to simulate the real-world scenario.
@@ -178,6 +180,16 @@ class DataManager(object):
                 self.plcConnectionState[key] = False
             self.regsDict[key] = []
             self.coilsDict[key] = []
+        
+        # Init the RTU client
+        self.rtuClient = snap7Comm.s7CommClient(gv.RTU_IP, rtuPort=gv.RTU_PORT, 
+                                                snapLibPath=gv.gS7snapDllPath)
+        self.rtuConnectionState = self.rtuClient.checkConn()
+        self.rtuDataList = {
+            'weline': [None, None, None, None],
+            'nsline': [None, None, None],
+            'ccline': [None, None, None],
+        }
         gv.gDebugPrint('TrainsHMI dataMgr inited', logType=gv.LOG_INFO)
 
     #-----------------------------------------------------------------------------
@@ -193,6 +205,18 @@ class DataManager(object):
                 self.plcConnectionState[key] = False
             else:
                 self.plcConnectionState[key] = True
+        time.sleep(0.1)
+        gv.gDebugPrint('DataManager: try to get RTU information', logType=gv.LOG_INFO)
+        self.fetchRTUdata()
+
+    def fetchRTUdata(self):
+        for key in gv.gTrackConfig.keys():
+            memoryIdxList = gv.gTrackConfig[key]['rtuMemIdxList']
+            for idx, memIdx in enumerate(memoryIdxList):
+                rtuByteData = self.rtuClient.readAddressVal(memIdx, 0, dataType=None)
+                self.rtuDataList[key][idx] = rtuByteData
+        print(self.rtuDataList)
+
     #-----------------------------------------------------------------------------
     # define all the get() function here.
     def getPlcHRegsData(self, plcid, startIdx, endIdx):
@@ -232,6 +256,7 @@ class DataManager(object):
             result += val
         return result
     
+
     #-----------------------------------------------------------------------------
     def setPlcCoilsData(self, plcid, idx, val):
         """ Set the PLC coils state

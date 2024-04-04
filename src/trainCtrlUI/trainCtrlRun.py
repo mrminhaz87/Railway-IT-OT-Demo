@@ -62,18 +62,21 @@ class UIFrame(wx.Frame):
         gv.gTrackConfig['weline'] = {'id': 'weline', 'num': 4,
                                      'trainHregIdx': (0, 4),
                                      'trainCoilIdx': (0, 4),
+                                     'rtuMemIdxList': [1, 2, 3, 4],
                                      'color': wx.Colour(52, 169, 129),
                                      'icon': 'welabel.png'}
 
         gv.gTrackConfig['nsline'] = {'id': 'nsline', 'num': 3,
                                      'trainHregIdx': (4, 7),
                                      'trainCoilIdx': (4, 7),
+                                     'rtuMemIdxList': [5, 6, 7],
                                      'color': wx.Colour(233, 0, 97),
                                      'icon': 'nslabel.png'}
 
         gv.gTrackConfig['ccline'] = {'id': 'ccline', 'num': 3,
                                      'trainHregIdx': (7, 10),
                                      'trainCoilIdx': (7, 10),
+                                     'rtuMemIdxList': [8, 9, 10],
                                      'color': wx.Colour(255, 136, 0),
                                      'icon': 'cclabel.png'}
         # Init the display manager 

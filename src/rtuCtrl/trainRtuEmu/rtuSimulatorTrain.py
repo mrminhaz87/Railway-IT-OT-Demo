@@ -79,7 +79,15 @@ class trainPowerRtu(rtuSimulator.rtuSimuInterface):
     def _updateMemory(self, result):
         """ overwrite this function to update the memory state based on the realworld feed back
         """
-        print(result)
+        #print(result)
+        s7commServer = self.s7Service.getS7ServerRef()
+        for key, value in self.regsStateRW.items():
+            for idx, rstData in enumerate(result[key]):
+                memoryIdx = value[idx]
+                s7commServer.setMemoryVal(memoryIdx, 0, rstData[0])
+                s7commServer.setMemoryVal(memoryIdx, 2, rstData[1])
+                s7commServer.setMemoryVal(memoryIdx, 4, rstData[2])
+                s7commServer.setMemoryVal(memoryIdx, 6, rstData[3])
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -89,8 +97,8 @@ def main():
         'hostaddress': gv.gS7serverIP,
         'realworld':gv.gRealWorldIP, 
     }
-    plc = trainPowerRtu(None, gv.RTU_NAME, addressInfoDict, dllPath=gv.gS7snapDllPath)
-    plc.run()
+    rtu = trainPowerRtu(None, gv.RTU_NAME, addressInfoDict, dllPath=gv.gS7snapDllPath, updateInt=gv.gInterval)
+    rtu.run()
 
 if __name__ == "__main__":
     main()

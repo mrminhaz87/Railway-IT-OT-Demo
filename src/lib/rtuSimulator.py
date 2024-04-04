@@ -205,7 +205,7 @@ class rtuSimuInterface(object):
     def __init__(self, parent, rtuID, addressInfoDict, dllPath=None, updateInt=0.5):
         self.parent = parent
         self.rtuID = rtuID
-        self.regsStateRW = {}
+        self.regsStateRW = OrderedDict()
         self.updateInt = updateInt
         # Init the UDP connector to connect to the realworld and test the connection.
         self.regSRWfetchKey = None 

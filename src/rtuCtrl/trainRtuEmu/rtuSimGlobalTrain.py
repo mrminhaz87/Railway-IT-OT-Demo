@@ -73,7 +73,7 @@ RTU_NAME = CONFIG_DICT['PLC_NAME']
 gRealWorldIP = (CONFIG_DICT['RW_IP'], int(CONFIG_DICT['RW_PORT']))
 gRealWorldKey = 'trainsRtu'
 gInterval = float(CONFIG_DICT['CLK_INT'])
-gS7serverIP = (CONFIG_DICT['MD_BUS_IP'], int(CONFIG_DICT['MD_BUS_PORT']))
+gS7serverIP = (CONFIG_DICT['S7COMM_IP'], int(CONFIG_DICT['S7COMM_PORT']))
 
 def gDebugPrint(msg, prt=True, logType=None):
     if prt: print(msg)

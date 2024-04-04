@@ -19,6 +19,7 @@ For good coding practice, follow the following naming convention:
 """
 
 import os, sys
+import platform
 import json
 from collections import OrderedDict
 
@@ -46,6 +47,9 @@ for topdir in TOPDIRS:
     
 import Log
 Log.initLogger(gTopDir, 'Logs', APP_NAME[0], APP_NAME[1], historyCnt=100, fPutLogsUnderDate=True)
+
+# Set the S7comm dll lib
+gS7snapDllPath = os.path.join(dirpath, 'snap7.dll') if platform.system() == 'Windows' else None
 
 # Init the log type parameters.
 DEBUG_FLG   = False
@@ -84,6 +88,10 @@ PLC_ID = CONFIG_DICT['PLC_ID']
 PLC_IP = CONFIG_DICT['PLC_IP']
 PLC_PORT = int(CONFIG_DICT['PLC_PORT'])
 UI_TITLE = CONFIG_DICT['UI_TITLE']
+
+RTU_ID = CONFIG_DICT['RTU_ID']
+RTU_IP = CONFIG_DICT['RTU_IP']
+RTU_PORT = int(CONFIG_DICT['RTU_PORT'])
 
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.
