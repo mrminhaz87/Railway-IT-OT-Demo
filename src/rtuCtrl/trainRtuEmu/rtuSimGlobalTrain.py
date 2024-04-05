@@ -66,7 +66,7 @@ if iConfigLoader is None:
 CONFIG_DICT = iConfigLoader.getJson()
 
 # Init the PLC info.
-RTU_NAME = CONFIG_DICT['PLC_NAME']
+RTU_NAME = CONFIG_DICT['RTU_NAME']
 
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.

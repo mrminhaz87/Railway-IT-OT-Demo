@@ -116,7 +116,7 @@ class PanelMap(wx.Panel):
             textColor = wx.Colour('GREEN') if state else wx.Colour('RED')
             dc.SetTextForeground(textColor)
             connState = 'online' if state else 'offline'
-            dc.DrawText('- [ RTU-01-12 ]', 1140, 840)
+            dc.DrawText('- [ RTU-01-10 ]', 1140, 840)
             dc.DrawText('- Last Update Time: '+str(timeStr), 1140, 857)
             dc.DrawText('- Connection State: '+str(connState), 1140, 874)
 

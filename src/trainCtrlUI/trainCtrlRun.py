@@ -337,15 +337,18 @@ class UIFrame(wx.Frame):
                 gv.idataMgr.periodic(now)
                 # real module step 2: Update the Plc display
                 self.updatePlcConIndicator()
-                self.updatePlcPanels()
+                if self.plcOnline: self.updatePlcPanels()
                 # real module step 3: mapping the plc info to trains info.
-                if self.plcOnline: self.updateTrainsInfo()
-
+                self.updateRtuConIndicator()
+                if self.rtuOnline: self.updateTrainsInfo()
 
             # Update the train inforation grid.
-            if gv.iMapMgr and self.plcOnline: 
+            if gv.iMapMgr and self.rtuOnline: 
                 gv.iInfoPanel.updateTrainInfoGrid()
                 self.updateTrainsPanels()
+            if (not gv.TEST_MD) and self.rtuOnline:
+                gv.iRtuPanel.updateSenIndicator()
+            
             # update time display
             timeStr = 'Date and time : ' + time.strftime(' %Y - %m - %d %H : %M : %S ',time.localtime(time.time()))
             self.timeInfo.SetLabel(timeStr)
@@ -354,11 +357,16 @@ class UIFrame(wx.Frame):
     def updatePlcConIndicator(self):
         """ Update the PLC's state panel connection state."""
         if gv.idataMgr is None: return False
-        self.plcOnline = gv.idataMgr.getConntionState(gv.PLC_ID)
+        self.plcOnline = gv.idataMgr.getPlcConntionState(gv.PLC_ID)
         for plcPanel in self.plcPnls.values():
             plcPanel.setConnection(self.plcOnline)
         return True
     
+    def updateRtuConIndicator(self):
+        if gv.idataMgr is None: return False 
+        self.rtuOnline = gv.idataMgr.getRtuConnectionState()
+        gv.iRtuPanel.setConnection(self.rtuOnline)
+
 #-----------------------------------------------------------------------------
     def updatePlcPanels(self):
         if gv.idataMgr is None: return False
@@ -389,7 +397,6 @@ class UIFrame(wx.Frame):
             csIdx, ceIdx = gv.gTrackConfig[key]['trainCoilIdx']
             gv.iMapMgr.updateTrainsPwr(key, coildataList[csIdx:ceIdx])
             gv.iMapMgr.updateTrainsSensor(key, rtuDataDict[key])
-
 
 #-----------------------------------------------------------------------------
     def updateTrainsPanels(self):
@@ -429,7 +436,7 @@ class UIFrame(wx.Frame):
         try:
             fCanVeto = evt.CanVeto()
             if fCanVeto:
-                confirm = wx.MessageDialog(self, 'Click OK to close this program, or click Cancel to ignore close request',
+                confirm = wx.MessageDialog(self, 'Click [ OK ] to close this program, or click [ Cancel ] to ignore close request',
                                             'Quit request', wx.OK | wx.CANCEL| wx.ICON_WARNING).ShowModal()
                 if confirm == wx.ID_CANCEL:
                     evt.Veto(True)

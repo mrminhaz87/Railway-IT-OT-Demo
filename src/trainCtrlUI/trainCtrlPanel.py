@@ -324,7 +324,7 @@ class PanelRTU(wx.Panel):
         self.rtuName = name
         self.ipAddr = ipAddr
         self.connectedFlg = False
-
+        self.rtuSensorIndicators = []
         # Init the UI.
         img = os.path.join(gv.IMG_FD, 'rtuIcon.png')
         self.lbBmap = wx.Image(img, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
@@ -337,11 +337,11 @@ class PanelRTU(wx.Panel):
         # Row idx = 0 : set the basic PLC informaiton.
         titleSZ = self._buildTitleSizer()
         mSizer.Add(titleSZ, flag=flagsR, border=5)
-        mSizer.AddSpacer(10)
+        mSizer.AddSpacer(5)
 
         mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(-1, 60),
                                  style=wx.LI_VERTICAL), flag=flagsR, border=5)
-        mSizer.AddSpacer(10)
+        mSizer.AddSpacer(6)
         indicatorsSZ = self._buildFsenserSizer()
         mSizer.Add(indicatorsSZ, flag=flagsR, border=5)
         mSizer.AddSpacer(10)
@@ -368,12 +368,31 @@ class PanelRTU(wx.Panel):
 
     def _buildFsenserSizer(self):
         szier = wx.GridSizer(3, 4, 2, 2)
-        self.rtuSensorIndicators = []
         for idx in range(1, 13):
             sensBt = wx.Button(self, label="TF-Sen-%02d" %(idx,), size=(70, 20))
-            sensBt.SetBackgroundColour(wx.Colour("GOLD")) 
+            #sensBt.SetBackgroundColour(wx.Colour("GOLD")) 
+            self.rtuSensorIndicators.append(sensBt)
             szier.Add(sensBt)
         return szier
+
+    def setConnection(self, state):
+        """ Update the connection state on the UI."""
+        self.connectedFlg = state
+        self.connLb.SetLabel(' Connected ' if self.connectedFlg else ' Unconnected ')
+        self.connLb.SetBackgroundColour(
+            wx.Colour('GREEN') if self.connectedFlg else wx.Colour(120, 120, 120))
+        self.Refresh(False)
+
+    def updateSenIndicator(self):
+        resultList = []
+        for key in gv.gTrackConfig.keys():
+            trainsInfo = gv.iMapMgr.getTrainsInfo(key)
+            for data in trainsInfo:
+                resultList.append(data['fsensor'])
+        for idx, val in enumerate(resultList):
+            color = wx.Colour('GOLD') if val else wx.Colour('FOREST GREEN')
+            self.rtuSensorIndicators[idx].SetBackgroundColour(color)
+        self.Refresh(False)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

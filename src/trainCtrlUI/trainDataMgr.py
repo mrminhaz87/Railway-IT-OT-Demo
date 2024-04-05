@@ -224,7 +224,7 @@ class DataManager(object):
             for idx, memIdx in enumerate(memoryIdxList):
                 rtuByteData = self.rtuClient.readAddressVal(memIdx, 0, dataType=None)
                 self.rtuDataList[key][idx] = rtuByteData
-        print(self.rtuDataList)
+        #print(self.rtuDataList)
 
     def getAllRtuDataDict(self):
         return self.rtuDataList
@@ -245,10 +245,13 @@ class DataManager(object):
         return None
 
     #-----------------------------------------------------------------------------
-    def getConntionState(self, plcID):
+    def getPlcConntionState(self, plcID):
         if plcID in self.plcClients.keys():
             return self.plcClients[plcID].checkConn() and self.plcConnectionState[plcID]
         return False
+
+    def getRtuConnectionState(self):
+        return self.rtuConnectionState
 
     #-----------------------------------------------------------------------------
     def getAllPlcRegsData(self):
@@ -268,7 +271,6 @@ class DataManager(object):
             result += val
         return result
     
-
     #-----------------------------------------------------------------------------
     def setPlcCoilsData(self, plcid, idx, val):
         """ Set the PLC coils state
