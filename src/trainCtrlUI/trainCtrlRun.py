@@ -43,6 +43,7 @@ class UIFrame(wx.Frame):
         # Init the local parameters:
         self.updateLock = False
         self.plcOnline = True if gv.TEST_MD else False
+        self.rtuOnline = True if gv.TEST_MD else False
         # Turn on all the trains power during init.
         self.loadTrainsPwrConfig()
         # Load the auto collision config setting 
@@ -161,24 +162,34 @@ class UIFrame(wx.Frame):
         vbox0 = wx.BoxSizer(wx.VERTICAL)
         vbox0.AddSpacer(5)
         # c1,r0 : time display
-        font = wx.Font(16, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
+        font = wx.Font(12, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
         timeStr = 'Date and Time : ' + time.strftime(' %Y - %m - %d %H : %M : %S ',time.localtime(time.time()))
         self.timeInfo = wx.StaticText(self, label=timeStr)
         self.timeInfo.SetFont(font)
         self.timeInfo.SetForegroundColour(wx.Colour("WHITE"))
         vbox0.Add(self.timeInfo, flag=flagsL, border=2)
-        vbox0.AddSpacer(10)
+        vbox0.AddSpacer(5)
+
+        #
+        label2 = wx.StaticText(self, label="RTU [S7Comm] Monitor Panel")
+        label2.SetFont(font)
+        label2.SetForegroundColour(wx.Colour("WHITE"))
+        vbox0.Add(label2, flag=flagsL, border=2)
+        vbox0.AddSpacer(5)
+        gv.iRtuPanel = pnlFunction.PanelRTU(self, gv.RTU_ID, gv.RTU_IP+ ' : ' + str(gv.RTU_PORT))
+        vbox0.Add(gv.iRtuPanel, flag=flagsL, border=2)
+        
         # c1, r1: information panel.
         gv.iInfoPanel = pnlFunction.PanelTrainInfo(self)
         vbox0.Add(gv.iInfoPanel, flag=flagsL, border=2)
-        vbox0.AddSpacer(10)
+        vbox0.AddSpacer(5)
         # c1, r2: Plca dispaly sizer
         self.plcPnls = {}
         self._initElectricalLbs()
-        plcSZ = self._buildPlcPnlsSizer("PLC Monitor Panels [Trains]", 
+        plcSZ = self._buildPlcPnlsSizer("PLC [Modbus] Monitor Panels", 
                                     ('PLC-06', 'PLC-07'))
         vbox0.Add(plcSZ, flag=flagsL, border=2)
-        vbox0.AddSpacer(10)
+        vbox0.AddSpacer(5)
         # # c1, r3: config change control sizer.
         ctrlSZ = self._buildControlSizer()
         vbox0.Add(ctrlSZ, flag=flagsL, border=2)
@@ -197,7 +208,7 @@ class UIFrame(wx.Frame):
         vbox0 = wx.BoxSizer(wx.VERTICAL)
         vbox0.AddSpacer(5)
         # Add the label
-        label = wx.StaticText(self, label="Trains State")
+        label = wx.StaticText(self, label="Trains Operational State")
         label.SetFont(font)
         label.SetForegroundColour(wx.Colour("WHITE"))
         vbox0.Add(label, flag=flagsL, border=2)
@@ -220,7 +231,7 @@ class UIFrame(wx.Frame):
                     if placeholder: hbox.Add(placeholder, flag=flagsL, border=2)
                 hbox.AddSpacer(5)
             vbox0.Add(hbox, flag=flagsL, border=2)
-            vbox0.AddSpacer(5)
+            vbox0.AddSpacer(10)
         return vbox0
 
 #-----------------------------------------------------------------------------
@@ -329,6 +340,8 @@ class UIFrame(wx.Frame):
                 self.updatePlcPanels()
                 # real module step 3: mapping the plc info to trains info.
                 if self.plcOnline: self.updateTrainsInfo()
+
+
             # Update the train inforation grid.
             if gv.iMapMgr and self.plcOnline: 
                 gv.iInfoPanel.updateTrainInfoGrid()

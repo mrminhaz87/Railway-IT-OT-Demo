@@ -317,9 +317,10 @@ class MapMgr(object):
                    {'id':'CityHall-01', 'img':'city_2.png', 'pos':(750, 520), 'size':(90, 80)},
                    {'id':'CityHall-02', 'img':'city_1.png', 'pos':(850, 600), 'size':(80, 60)},
                    {'id':'Legend', 'img':'legend.png', 'pos':(1450, 820), 'size':(200, 150)},
-                   {'id':'Sensor-Signal-PLCs[PLC-00, PLC-01, PLC-02]', 'img': 'plcIcon.png', 'pos':(50, 750), 'size':(50,30)},
-                   {'id':'Station-PLCs[PLC-03, PLC-04, PLC-05]', 'img': 'plcIcon.png', 'pos':(50, 810), 'size':(50,30)},
-                   {'id':'Train-PLCs[PLC-06, PLC-07]', 'img': 'plcIcon.png', 'pos':(50, 870), 'size':(50,30)},
+                   {'id':'Track-Sensor-Signal-PLCs', 'img': 'plcIcon2.png', 'pos':(250, 780), 'size':(60,50)},
+                   {'id':'Track-Station-PLCs', 'img': 'plcIcon2.png', 'pos':(250, 860), 'size':(60,50)},
+                   {'id':'Train-Ctrl-PLCs', 'img': 'plcIcon2.png', 'pos':(1100, 780), 'size':(60,50)},
+                   {'id':'Train-Ctrl-RTUs', 'img': 'rtuIcon2.png', 'pos':(1100, 860), 'size':(60,50)},
                    {'id':'Date & Time', 'img': 'time.png', 'pos':(1270, 50), 'size':(30,30)}
                    ]
         for info in envCfg:

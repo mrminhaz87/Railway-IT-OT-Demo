@@ -8,7 +8,7 @@
 # Author:      Yuancheng Liu
 #
 # Created:     2023/07/12
-# Version:     v0.1.2
+# Version:     v0.1.3
 # Copyright:   Copyright (c) 2023 LiuYuancheng
 # License:     MIT License  
 #-----------------------------------------------------------------------------
@@ -43,7 +43,7 @@ class PanelTrainInfo(wx.Panel):
         sizer.AddSpacer(5)
         # Row 0: Set the panel label
         font = wx.Font(12, wx.DECORATIVE, wx.NORMAL, wx.BOLD)
-        label = wx.StaticText(self, label="Trains Information")
+        label = wx.StaticText(self, label="Trains Information [RTU]")
         label.SetFont(font)
         label.SetForegroundColour(wx.Colour("WHITE"))
         sizer.Add(label, flag=flagsL, border=2)
@@ -306,6 +306,74 @@ class PanelTrain(wx.Panel):
             result = dlg.ShowModal()
             if result == wx.ID_YES: gv.idataMgr.setPlcCoilsData(TrainTgtPlcID, idx, False)
 
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+class PanelRTU(wx.Panel):
+    """_summary_
+
+    Args:
+        wx (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    def __init__(self, parent, name, ipAddr, icon=None):
+        """ Init the panel."""
+        wx.Panel.__init__(self, parent)
+        self.SetBackgroundColour(wx.Colour(200, 200, 200))
+        self.rtuName = name
+        self.ipAddr = ipAddr
+        self.connectedFlg = False
+
+        # Init the UI.
+        img = os.path.join(gv.IMG_FD, 'rtuIcon.png')
+        self.lbBmap = wx.Image(img, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        self.SetSizer(self.buidUISizer())
+
+    def buidUISizer(self):
+        """ Build the UI sizer."""
+        mSizer = wx.BoxSizer(wx.HORIZONTAL) # main sizer
+        flagsR = wx.LEFT
+        # Row idx = 0 : set the basic PLC informaiton.
+        titleSZ = self._buildTitleSizer()
+        mSizer.Add(titleSZ, flag=flagsR, border=5)
+        mSizer.AddSpacer(10)
+
+        mSizer.Add(wx.StaticLine(self, wx.ID_ANY, size=(-1, 60),
+                                 style=wx.LI_VERTICAL), flag=flagsR, border=5)
+        mSizer.AddSpacer(10)
+        indicatorsSZ = self._buildFsenserSizer()
+        mSizer.Add(indicatorsSZ, flag=flagsR, border=5)
+        mSizer.AddSpacer(10)
+        return mSizer
+
+    def _buildTitleSizer(self):
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
+        flagsR = wx.LEFT
+        btnSample = wx.StaticBitmap(self, -1, self.lbBmap, (0, 0), (self.lbBmap.GetWidth(), self.lbBmap.GetHeight()))
+        hsizer.Add(btnSample, flag=flagsR, border=5)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
+        self.nameLb = wx.StaticText(self, label=" RTU Name: ".ljust(15)+self.rtuName)
+        vsizer.Add(self.nameLb, flag=flagsR, border=5)
+        self.ipaddrLb = wx.StaticText( self, label=" RTU IPaddr: ".ljust(15)+self.ipAddr)
+        vsizer.Add(self.ipaddrLb, flag=flagsR, border=5)
+        hbox0 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox0.Add(wx.StaticText(self, label=" Connection:".ljust(15)), flag=flagsR)
+        self.connLb = wx.StaticText(self, label=' Connected ' if self.connectedFlg else ' Unconnected ')
+        self.connLb.SetBackgroundColour( wx.Colour('GREEN') if self.connectedFlg else wx.Colour(120, 120, 120))
+        hbox0.Add(self.connLb, flag=flagsR, border=5)
+        vsizer.Add(hbox0, flag=flagsR, border=5)
+        hsizer.Add(vsizer, flag=flagsR, border=5)
+        return hsizer
+
+    def _buildFsenserSizer(self):
+        szier = wx.GridSizer(3, 4, 2, 2)
+        self.rtuSensorIndicators = []
+        for idx in range(1, 13):
+            sensBt = wx.Button(self, label="TF-Sen-%02d" %(idx,), size=(70, 20))
+            sensBt.SetBackgroundColour(wx.Colour("GOLD")) 
+            szier.Add(sensBt)
+        return szier
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

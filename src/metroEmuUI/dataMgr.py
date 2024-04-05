@@ -168,6 +168,13 @@ class DataManager(threading.Thread):
             'trains': (time.strftime("%H:%M:%S", time.localtime(self.trainPlcUpdateT)), trainPlcOnline), 
         }
 
+    def getLastRtusConnectionState(self):
+        crtTime = time.time()
+        trainRtuOnline = crtTime - self.trainRtuUpdateT < gv.gPlcTimeout
+        return {
+            'trains': (time.strftime("%H:%M:%S", time.localtime(self.trainRtuUpdateT)), trainRtuOnline), 
+        }
+
     #-----------------------------------------------------------------------------
     def msgHandler(self, msg):
         """ Function to handle the data-fetch/control request from the monitor-hub.

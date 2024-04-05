@@ -81,31 +81,44 @@ class PanelMap(wx.Panel):
         
         # Draw the PLC state:
         if gv.iDataMgr:
-            dc.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.BOLD))
+            dc.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL))
             plcStateDict = gv.iDataMgr.getLastPlcsConnectionState()
+            rtuStateDict = gv.iDataMgr.getLastRtusConnectionState()
             # draw sensor plc state
             timeStr, state = plcStateDict['sensors']
             textColor = wx.Colour('GREEN') if state else wx.Colour('RED')
             dc.SetTextForeground(textColor)
             connState = 'online' if state else 'offline'
-            dc.DrawText('Last update Time: '+str(timeStr), 80, 740)
-            dc.DrawText('Connection State: '+str(connState), 80, 755)
+            dc.DrawText('- [ PLC-00, PLC-01, PLC-02 ]', 290, 760)
+            dc.DrawText('- Last Update Time: '+str(timeStr), 290, 777)
+            dc.DrawText('- Connection State: '+str(connState), 290, 794)
 
             # draw sensor plc state
             timeStr, state = plcStateDict['stations']
             textColor = wx.Colour('GREEN') if state else wx.Colour('RED')
             dc.SetTextForeground(textColor)
             connState = 'online' if state else 'offline'
-            dc.DrawText('Last update Time: '+str(timeStr), 80, 800)
-            dc.DrawText('Connection State: '+str(connState), 80, 815)
+            dc.DrawText('- [ PLC-03, PLC-04, PLC-05 ]', 290, 840)
+            dc.DrawText('- Last Update Time: '+str(timeStr), 290, 857)
+            dc.DrawText('- Connection State: '+str(connState), 290, 874)
 
             # draw trains plc state
             timeStr, state = plcStateDict['trains']
             textColor = wx.Colour('GREEN') if state else wx.Colour('RED')
             dc.SetTextForeground(textColor)
             connState = 'online' if state else 'offline'
-            dc.DrawText('Last update Time: '+str(timeStr), 80, 860)
-            dc.DrawText('Connection State: '+str(connState), 80, 875)
+            dc.DrawText('- [ PLC-06, PLC-07 ]', 1140, 760)
+            dc.DrawText('- Last Update Time: '+str(timeStr), 1140, 777)
+            dc.DrawText('- Connection State: '+str(connState), 1140, 794)
+
+            # draw trains plc state
+            timeStr, state = rtuStateDict['trains']
+            textColor = wx.Colour('GREEN') if state else wx.Colour('RED')
+            dc.SetTextForeground(textColor)
+            connState = 'online' if state else 'offline'
+            dc.DrawText('- [ RTU-01-12 ]', 1140, 840)
+            dc.DrawText('- Last Update Time: '+str(timeStr), 1140, 857)
+            dc.DrawText('- Connection State: '+str(connState), 1140, 874)
 
 #-----------------------------------------------------------------------------
     def _drawJunction(self, dc):
