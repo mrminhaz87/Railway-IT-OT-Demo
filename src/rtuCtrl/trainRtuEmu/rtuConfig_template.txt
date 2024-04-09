@@ -1,4 +1,4 @@
- This is the config file template for the module <rtuSimulatorTrain.py>
+# This is the config file template for the module <rtuSimulatorTrain.py>
 # Setup the paramter with below format (every line follow <key>:<val> format, the
 # key can not be changed):
 

@@ -17,6 +17,17 @@ PLC_IP:127.0.0.1
 
 # Target PLC modbus TCP port (defualt 502)
 PLC_PORT:504
+# PLC_PORT:502
+
+#-----------------------------------------------------------------------------
+# Init the RTU(need to connect) information 
+RTU_ID:RTU-01-10
+
+# Target RTU IP address 
+RTU_IP:127.0.0.1
+
+# Target RTU Port (default 102) 
+RTU_PORT:102
 
 #-----------------------------------------------------------------------------
 # Define all the HMI UI config paramters

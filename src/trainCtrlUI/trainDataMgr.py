@@ -21,6 +21,8 @@ from random import randint
 import trainCtrlGlobal as gv
 import modbusTcpCom
 import snap7Comm
+from snap7Comm import BOOL_TYPE, INT_TYPE, REAL_TYPE
+
 
 # flag to identify whether the train's data will be added a slight random change 
 # before show up on the UI to simulate the real-world scenario.
@@ -145,12 +147,12 @@ class MapManager(object):
         if trackID in self.trainsAgentDict.keys():
             for idx in range(len(rtuDataList)):
                 train = self.trainsAgentDict[trackID][idx]
-                byteData = rtuDataList[idx]
+                dataList = rtuDataList[idx]
                 # data sequence: [state['fsensor'], state['speed'], state['voltage'], state['current']]
-                train.setFsensorVal(snap7.util.get_bool(byteData, 0, 0))
-                train.setSpeed(snap7.util.get_int(byteData, 2))
-                train.setVoltage(snap7.util.get_int(byteData, 4))
-                train.setCurrent(snap7.util.get_int(byteData, 6))
+                train.setFsensorVal(dataList[0])
+                train.setSpeed(dataList[1])
+                train.setVoltage(dataList[2])
+                train.setCurrent(dataList[3])
 
 #-----------------------------------------------------------------------------
     def getTrainsInfo(self, trackID):
@@ -222,8 +224,9 @@ class DataManager(object):
         for key in gv.gTrackConfig.keys():
             memoryIdxList = gv.gTrackConfig[key]['rtuMemIdxList']
             for idx, memIdx in enumerate(memoryIdxList):
-                rtuByteData = self.rtuClient.readAddressVal(memIdx, 0, dataType=None)
-                self.rtuDataList[key][idx] = rtuByteData
+                rtuDataList = self.rtuClient.readAddressVal(memIdx, dataIdxList = (0, 2, 4, 6), 
+                                                            dataTypeList=[BOOL_TYPE, INT_TYPE, INT_TYPE, INT_TYPE])
+                self.rtuDataList[key][idx] = rtuDataList
         #print(self.rtuDataList)
 
     def getAllRtuDataDict(self):

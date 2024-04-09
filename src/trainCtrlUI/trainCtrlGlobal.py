@@ -83,15 +83,17 @@ CONFIG_DICT = iConfigLoader.getJson()
 IMG_FD = os.path.join(dirpath, 'img')
 ICO_PATH = os.path.join(IMG_FD, "metro.ico")
 TEST_MD = CONFIG_DICT['TEST_MD']    # test mode flag, True: the simulator will operate with control logic itself. 
-PERIODIC = 500      # update the main in every 300ms
+PERIODIC = 500      # update the main in every 500ms
+
 PLC_ID = CONFIG_DICT['PLC_ID']
 PLC_IP = CONFIG_DICT['PLC_IP']
 PLC_PORT = int(CONFIG_DICT['PLC_PORT'])
-UI_TITLE = CONFIG_DICT['UI_TITLE']
 
 RTU_ID = CONFIG_DICT['RTU_ID']
 RTU_IP = CONFIG_DICT['RTU_IP']
 RTU_PORT = int(CONFIG_DICT['RTU_PORT'])
+
+UI_TITLE = CONFIG_DICT['UI_TITLE']
 
 #-------<GLOBAL VARIABLES (start with "g")>------------------------------------
 # VARIABLES are the built in data type.

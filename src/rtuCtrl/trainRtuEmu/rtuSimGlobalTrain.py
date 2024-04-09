@@ -1,14 +1,14 @@
 #-----------------------------------------------------------------------------
-# Name:        plcSimuGlobal.py
+# Name:        rtuSimuGlobal.py
 #
 # Purpose:     This module is used as a local config file to set constants, 
 #              global parameters which will be used in the other modules.
 #              
 # Author:      Yuancheng Liu
 #
-# Created:     2010/08/26
+# Created:     2024/04/03
 # Version:     v0.1.2
-# Copyright:   Copyright (c) 2023 Singapore National Cybersecurity R&D Lab LiuYuancheng
+# Copyright:   Copyright (c) 2024 LiuYuancheng
 # License:     MIT License
 #-----------------------------------------------------------------------------
 """
@@ -37,7 +37,7 @@ for topdir in TOPDIRS:
     # Config the lib folder 
     gLibDir = os.path.join(gTopDir, LIBDIR)
     if os.path.exists(gLibDir):
-        print("Import all the lib-module from folder : %s" %str(gLibDir))
+        print("Import all the lib-modules from folder : %s" %str(gLibDir))
         sys.path.insert(0, gLibDir)
         break
 
@@ -87,6 +87,3 @@ def gDebugPrint(msg, prt=True, logType=None):
         Log.info(msg)
 
 #-------<GLOBAL PARAMTERS>-----------------------------------------------------
-iMBhandler = None   # modbus TCP data handler.
-iMBservice = None   # modbus TCP service
-iLadderLogic = None
