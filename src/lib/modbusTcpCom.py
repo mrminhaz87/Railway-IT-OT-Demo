@@ -10,7 +10,7 @@
 # Author:      Yuancheng Liu
 #
 # Created:     2023/06/11
-# Version:     v_0.1
+# Version:     v_0.1.3
 # Copyright:   Copyright (c) 2023 LiuYuancheng
 # License:     MIT License
 #-----------------------------------------------------------------------------
@@ -22,7 +22,7 @@
     
     Four modules will be provided in this module: 
 
-    - ladderLogic: An obj class hold the ladder logic calculation algorithm, it will take the 
+    - ladderLogic: An interface class hold the ladder logic calculation algorithm, it will take the 
         holding register's state, source coils state then generate the destination coils states.
         For example below ladder logic:
         --|reg-00|--|reg-01|----------------------(src-coil-00)------------(dest-coil-02)---
@@ -47,7 +47,7 @@
 
     - modbusTcpServer: Modbus-TCP server module will be used by PLC module to handle the modbus 
         data read/set request. If the input data handler is None, the server will create and keep 
-        one empt databank inside.
+        one empty databank inside.
 """
 
 import time
@@ -60,8 +60,8 @@ from pyModbusTCP.constants import EXP_ILLEGAL_FUNCTION
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class ladderLogic(object):
-    """ The ladder logic object used by data handler, details refer to the < Program 
-        Design > part.
+    """ The PLC ladder logic object used by data handler, details refer to the 
+        < Program Design > part.
     """
 
     def __init__(self, parent, ladderName=None) -> None:
@@ -373,12 +373,12 @@ class modbusTcpServer(object):
     """ Modbus-TCP server, used by PLC module to handle the modbus data read/set 
         request.
     """
-    def __init__(self, hostIp='localhost', hostPort=502, dataHandler=None) -> None:
+    def __init__(self, hostIp='0.0.0.0', hostPort=502, dataHandler=None) -> None:
         """Init example:
             dataMgr = modbusTcpCom.plcDataHandler(allowRipList=ALLOW_R_L, allowWipList=ALLOW_W_L)
             server = modbusTcpCom.modbusTcpServer(hostIp=hostIp, hostPort=hostPort, dataHandler=dataMgr)
         Args:
-            hostIp (str, optional): '0.0.0.0' or 'localhost'. Defaults to 'localhost'.
+            hostIp (str, optional): '0.0.0.0' or 'localhost'. Defaults to '0.0.0.0'.
             hostPort (int, optional): modbus port. Defaults to 502.
             dataHandler (<plcDataHandler>, optional): The handler object to auto process 
                 register and coils change. Defaults to None.

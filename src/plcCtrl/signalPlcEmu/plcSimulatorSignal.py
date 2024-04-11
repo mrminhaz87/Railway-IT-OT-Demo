@@ -119,7 +119,7 @@ class signalPlcSet(plcSimulator.plcSimuInterface):
     def __init__(self, parent, plcID, addressInfoDict, ladderObj, updateInt=0.6):
         super().__init__(parent, plcID, addressInfoDict, ladderObj, updateInt=updateInt)
 
-    def initInputState(self):
+    def _initInputState(self):
         self.regsAddrs = (0, 39)
         self.regSRWfetchKey = 'sensors'
         self.regs2RWmap = OrderedDict()
@@ -131,7 +131,7 @@ class signalPlcSet(plcSimulator.plcSimuInterface):
         self.regsStateRW['nsline'] = [0]*14
         self.regsStateRW['ccline'] = [0]*8
 
-    def initCoilState(self):
+    def _initCoilState(self):
         self.coilsAddrs = (0, 19)
         self.coilsRWSetKey = 'signals'
         self.coils2RWMap = OrderedDict()
