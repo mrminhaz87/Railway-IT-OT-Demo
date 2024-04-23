@@ -1,6 +1,6 @@
 # Mini Railway Cyber Range 
 
-#### Railway [Metro] IT-OT System Cyber Security Test Platform
+### Railway [Metro] IT-OT System Cyber Security Test Platform
 
 ![](doc/img/logo/logo_mini_size.png)
 
@@ -8,14 +8,14 @@
 
 **Project Design Purpose :** Our objective is to develop a miniature cyber range capable of simulating the IT-OT environment of a railway company/system. This platform serves multiple purposes including cyber exercises, professional training, IT-OT security project research, development and testing. It will provide a simplified and straightforward digital-twin style Operational Technology (OT) environments emulation platform for the railway signaling systems. This platform will simulate the operations of multiple trains on various tracks, each equipped with distinct sensor-signal controls. Additionally, it will emulate a normal corporate network with various user activities to simulate the Information Technology (IT) environment. The program will offer several different modules to simulate Level 0 (Physical Process Field I/O device) to Level 5 (Internet DMZ Zone) of an IT-OT environment, as illustrated below:
 
-![](doc/img/logo/IT_OT_Level.png)
+![](doc/img/RmImg/rm_01_syslvl.png)
 
 This platform serves as a cyber range for conducting cyber security exercises to demonstrate and assess the impact of various IT attacks on OT systems. The system comprises four primary components: 
 
-1. 2D Railway [Metro] System Physical-world Emulator
-2.  Railway OT field controller simulation (PLC & RTU) programs
-3. Railway SCADA system simulator 
-4. Simulation of the railway company's corporate network environment
+1. 2D Railway [Metro] System Physical-world Emulator. 
+2.  Railway OT-Field-Controller Simulation (PLC & RTU) Programs.
+3. Railway SCADA System Simulator. 
+4. Railway Company's Corporate Environment Simulation. 
 
 ```
 # version:     v0.1.4
@@ -29,7 +29,9 @@ This platform serves as a cyber range for conducting cyber security exercises to
 [TOC]
 
 - [Railway[Metro] IT/OT System Cyber Security Test Platform ( mini cyber range)](#railway-metro--it-ot-system-cyber-security-test-platform---mini-cyber-range-)
+  
       * [Project Use Case](#project-use-case)
+  
   + [Introduction](#introduction)
   + [Detailed Sub-System Design](#detailed-sub-system-design)
     - [1. 2D Railway[Metro] System Real-world Emulator](#1-2d-railway-metro--system-real-world-emulator)
@@ -57,19 +59,45 @@ This platform serves as a cyber range for conducting cyber security exercises to
 
 ### Introduction
 
-**Railway Company IT-System Cyber Range**
+The Mini Railway Cyber Range ( Railway [Metro] IT-OT System Cyber Security Test Platform ) serves as a miniature railway IT/OT network emulation system designed to empower ICS researchers in testing their IT/OT attack and defense solutions on our cyber range. Additionally, it also provides different IT and OT cyber attack cases for the ICS security training and education purposes. The entire system is composed of below contents: 
 
-This IT-network cyber range project will simulate the normal corporate network of the railway company, we will use the [Custer User Emulation](https://github.com/LiuYuancheng/Windows_User_Simulator) system to automate simulate different kinds of staff's daily work such as IT-Support-Engineer, Officer Staff, Railway HQ operator, Train driver / safety checker. The main components includes: 
+- **Two sub cyber ranges**: Railway Company IT-System Cyber Range and Railway System OT-System Cyber Range
+- **Four main network components**:  Corporate network, Supervision SCADA network, Production network and Physical real-world emulation network. 
+- **Nine program set**: 2D Railway [Metro] System Real-world Emulator, Railway System SCADA HMI, Railway System Trains Controller HMI, Railway junction and station Sensor-Signal System Control PLC Simulators, Train control PLC simulators, Train monitoring RTU simulators, Railway company staff activities auto generator and cyber attack scenario simulation program.
 
-- Railway company corporate network environment (virtual hardware: computer,  node, firewall, router, switches)
-- Railway company staff activities auto generator (virtual staff: IT-Support-Engineer, Officer Staff, Railway HQ operator, Train driver / safety checker)
 
-**Railway System OT-System Cyber Range**
 
-The OT Cyber range will enumerate all the railway system's supervision SCADA network, the OT-production network and the physical real-world.  The main components includes: 
+#### Introduction of the cyber range networks
 
-- 2D Railway [Metro] System Real-world Emulator
-- Railway System SCADA HMI
+The cyber range provide four different network to simulate the IT-OT environment from level0 to level5, the overview of the network is shown below:
+
+![](doc/img/RmImg/rm_02_network.png)
+
+`version v0.1.4 (2024)`
+
+1. **Corporate network**: This subnet replicates a typical railway company's corporate IT system network, encompassing various functional servers (wen, email, DMZ, staff management...) and a production management workstation. This workstation hosts essential components such as the production log archiving database, internal document server, and operator manuals. It will simulate the `Level 5 Internet DMZ Zone` and `Level 4 Enterprise Zone`  of the IT-OT environment.
+2. **Supervision SCADA network**: A subnet simulating the OT environment SCADA system network, this subnet features distinct SCADA data/historian servers, multiple HMI computers for system operators, and maintenance computers dedicated to ICS/OT-system engineers. It will simulate the `Level 3 Operations Management Zone`  and  `Level 2 Control Center (HQ) Processing LAN` of the OT environment.
+3. **Production network**: This subnet host all ICS field device PLC & RTU simulator programs, contributing to a realistic representation of the production environment within the railway system. It will simulate the `Level 1 Controller LAN` of the OT environment.  
+4. **Physical real-world emulation network**: In this subnet, railway real-world components are emulated to demonstrate the tangible effects of actual physical items / device (sensors, moto, switch ...) in the real working environment, all the device simulation program will running in this subnet to generate the "virtual" electrical signal and feed the signal in the PLC and RTU in the production network. This network will simulate the `Level 0 Physical Process Field I/O devices` of the OT environment. 
+
+
+
+#### Introduction of railway company IT-system cyber range
+
+The sub IT-network cyber range project will simulate the normal corporate network of the railway company, we will use the [Custer User Emulation System](https://github.com/LiuYuancheng/Windows_User_Simulator)  to automate simulate different kinds staff (blue team)'s daily work such as IT-Support-Engineer, Officer Staff, Railway HQ operator, Train driver / safety checker. It also provide the malicious activities (red teaming) generation program for simulate the attack scenario.  The main components includes: 
+
+- Railway company corporate network environment (virtual hardware: computer,  node, firewall, router, switches). [> Detail Example Link](https://github.com/LiuYuancheng/Cross-Sword-2023-Nato-Event/tree/main/ansibleVM)
+- Railway company staff (blue team) activities auto generator (virtual staff: IT-Support-Engineer, Officer Staff, Railway HQ operator, Train driver / safety checker). [> Detail Example Link ](https://github.com/LiuYuancheng/Lockshield_202X_NCL/tree/main/LS2024/deployment)
+- Attacker/Hacker (red team) malicious activates auto generator (Hack implement different attack such as : phishing email, FDI, FCI, MITM, DDOs). [> Detail Example Link](https://github.com/LiuYuancheng/Lockshield_202X_NCL/tree/main/LS2024/src/Hackers)
+
+
+
+#### Introduction of railway system OT-system cyber range
+
+The OT cyber range will enumerate all the railway system's supervision SCADA network, the OT-production network and the physical real-world. The main components includes: 
+
+- 2D Railway [Metro] System Physical Real-world Emulator : [> Detailed Program Doc](src/metroEmuUI/readme.md)
+- Railway System SCADA (HQ Track Management) HMI: [> Detailed Program Doc](src/scadaEmuUI/readme.md)
 - Railway System Trains Controller HMI
 - Railway Junctions Sensor-Signal System Control PLC Simulator
 - Railway Stations Sensor-Signal System Control PLC Simulator
@@ -80,17 +108,6 @@ The OT Cyber range will enumerate all the railway system's supervision SCADA net
 We are glad to share that the Railway [Metro] IT/OT Emulation System Cyber Security Test Platform we developed this year was used for building one part of the cyber-attack target training system in the NATO CCDCOE Cross Sword 2023 offensive cyber exercise. CCDCOE LinkedIn POST: [ > link](https://www.linkedin.com/posts/natoccdcoe_crossedswords-activity-7140986334961217536-7dM5/?utm_source=share&utm_medium=member_desktop)
 
 ![](doc/img/linkedinpost2.png)
-
-
-
-The Railway[Metro] IT/OT System Security Test Platform serves as a miniature railway IT/OT network emulation system, designed to empower ICS researchers in testing their IT/OT attack and defense solutions on our cyber range. Additionally, it also provides different IT/OT cyber attack cases for the ICS security training and education purposes. The entire system is composed of four main network components, as illustrated in the diagram below:
-
-![](doc/img/Components.png)
-
-1. **Corporate network**: This subnet replicates a typical railway company's corporate IT network, encompassing various functional servers (email, DMZ, staff management) and a production management workstation. This workstation hosts essential components such as the production log archiving database, internal document server, and operator manuals.
-2. **Supervision SCADA network**: Simulating the SCADA system network, this subnet features distinct SCADA data/historian servers, multiple HMI computers for system operators, and maintenance computers dedicated to ICS/OT-system engineers.
-3. **Production network**: This subnet host all PLC simulator programs, contributing to a realistic representation of the production environment within the railway system.
-4. **Physical real-world emulation network**: In this subnet, railway real-world components are emulated to demonstrate the tangible effects of actual items in the real working environment.
 
 
 
