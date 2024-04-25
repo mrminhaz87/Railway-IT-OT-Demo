@@ -27,3 +27,12 @@ UI_TITLE:Railway System SCADA HMI
 
 # Define update clock interval
 CLK_INT:2
+
+#-----------------------------------------------------------------------------
+# Station config json file
+#WE_STATION_CFG:welineStations.json
+#NC_STATION_CFG:nslineStations.json
+#CC_STATION_CFG:cclineStations.json
+WE_STATION_CFG:welineStations_new.json
+NC_STATION_CFG:nslineStations_new.json
+CC_STATION_CFG:cclineStations_new.json

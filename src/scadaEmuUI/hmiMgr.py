@@ -13,6 +13,7 @@
 # License:     MIT License
 #-----------------------------------------------------------------------------
 
+import json
 import scadaGobal as gv
 from collections import OrderedDict
 
@@ -228,16 +229,39 @@ class MapMgr(object):
         # weline (top)
         y = 100
         key = 'weline'
-        trackStation_we = [{'id': 'Tuas_Link', 'pos': (80+100*0+60, y), 'layout': gv.LAY_D},
-                    {'id': 'Jurong_East', 'pos': (80+100*2+60, y), 'layout': gv.LAY_U},
-                    {'id': 'Outram_Park', 'pos': (80+100*4+60, y), 'layout': gv.LAY_U},
-                    {'id': 'City_Hall', 'pos': (80+100*6+30, y), 'layout': gv.LAY_U, },
-                    {'id': 'Paya_Lebar', 'pos': (80+100*6+60, y), 'layout': gv.LAY_D },
-                    {'id': 'Changi_Airport', 'pos': (80+100*8+60, y), 'layout': gv.LAY_U, },
-                    {'id': 'Lavender', 'pos': (80+100*10+60, y), 'layout': gv.LAY_U},
-                    {'id': 'Raffles_Place', 'pos': (80+100*12+60, y), 'layout': gv.LAY_U},
-                    {'id': 'Clementi', 'pos': (80+100*14+60, y), 'layout': gv.LAY_U},
-                    {'id': 'Boon_Lay', 'pos': (80+100*15+60, y), 'layout': gv.LAY_D}]
+        # load the station name config file
+        trackStation_we = None 
+        try:
+            with open(gv.gWeStationFile, 'r') as f:
+                weStataionNameList = json.load(f)
+                trackStation_we = [
+                        {'id': weStataionNameList[0]['id'], 'pos': (80+100*0+60, y),    'layout': gv.LAY_D},
+                        {'id': weStataionNameList[1]['id'], 'pos': (80+100*2+60, y),    'layout': gv.LAY_U},
+                        {'id': weStataionNameList[2]['id'], 'pos': (80+100*4+60, y),    'layout': gv.LAY_U},
+                        {'id': weStataionNameList[3]['id'], 'pos': (80+100*6+30, y),    'layout': gv.LAY_U},
+                        {'id': weStataionNameList[4]['id'], 'pos': (80+100*6+60, y),    'layout': gv.LAY_D},
+                        {'id': weStataionNameList[5]['id'], 'pos': (80+100*8+60, y),    'layout': gv.LAY_U},
+                        {'id': weStataionNameList[6]['id'], 'pos': (80+100*10+60, y),   'layout': gv.LAY_U},
+                        {'id': weStataionNameList[7]['id'], 'pos': (80+100*12+60, y),   'layout': gv.LAY_U},
+                        {'id': weStataionNameList[8]['id'], 'pos': (80+100*14+60, y),   'layout': gv.LAY_U},
+                        {'id': weStataionNameList[9]['id'], 'pos': (80+100*15+60, y),   'layout': gv.LAY_D}
+                    ]
+        except Exception as error:
+            gv.gDebugPrint("Error to load the station config file: %s" % error)
+            # Use the default setting.
+            trackStation_we = [
+                        {'id': 'Tuas_Link',     'pos': (80+100*0+60, y),    'layout': gv.LAY_D},
+                        {'id': 'Jurong_East',   'pos': (80+100*2+60, y),    'layout': gv.LAY_U},
+                        {'id': 'Outram_Park',   'pos': (80+100*4+60, y),    'layout': gv.LAY_U},
+                        {'id': 'City_Hall',     'pos': (80+100*6+30, y),    'layout': gv.LAY_U},
+                        {'id': 'Paya_Lebar',    'pos': (80+100*6+60, y),    'layout': gv.LAY_D},
+                        {'id': 'Changi_Airport','pos': (80+100*8+60, y),    'layout': gv.LAY_U},
+                        {'id': 'Lavender',      'pos': (80+100*10+60, y),   'layout': gv.LAY_U},
+                        {'id': 'Raffles_Place', 'pos': (80+100*12+60, y),   'layout': gv.LAY_U},
+                        {'id': 'Clementi',      'pos': (80+100*14+60, y),   'layout': gv.LAY_U},
+                        {'id': 'Boon_Lay',      'pos': (80+100*15+60, y),   'layout': gv.LAY_D}
+                    ]
+        
         self.stations[key] = []
         for stationInfo in trackStation_we:
             station = AgentStation(self, stationInfo['id'], stationInfo['pos'], labelLayout=stationInfo['layout'])
@@ -245,13 +269,28 @@ class MapMgr(object):
         # ccline (mid)
         y += 160
         key = 'ccline'
-        trackStation_cc = [
-                    {'id': 'Buona_Vista', 'pos': (80+120*11+40, y), 'layout': gv.LAY_D},
-                    {'id': 'Farrer_Road', 'pos': (80+120*12+80, y), 'layout': gv.LAY_D},
-                    {'id': 'Serangoon', 'pos': (80+120*3+80, y), 'layout': gv.LAY_U},
-                    {'id': 'Nicoll_Highway', 'pos': (80+120*7+40, y), 'layout': gv.LAY_U},
-                    {'id': 'Bayfront', 'pos': (80+120*7+80, y),'layout': gv.LAY_D},
-                    {'id': 'Harbourfront', 'pos': (80+120*9+80, y),'layout': gv.LAY_D}]
+        trackStation_cc = None
+        try:
+            with open(gv.gCcStationFile, 'r') as f:
+                ccStataionNameList = json.load(f)
+                trackStation_cc = [
+                        {'id': ccStataionNameList[0]['id'], 'pos': (80+120*11+40, y),   'layout': gv.LAY_D},
+                        {'id': ccStataionNameList[1]['id'], 'pos': (80+120*12+80, y),   'layout': gv.LAY_D},
+                        {'id': ccStataionNameList[2]['id'], 'pos': (80+120*3+80, y),    'layout': gv.LAY_U},
+                        {'id': ccStataionNameList[3]['id'], 'pos': (80+120*7+40, y),    'layout': gv.LAY_U},
+                        {'id': ccStataionNameList[4]['id'], 'pos': (80+120*7+80, y),    'layout': gv.LAY_D},
+                        {'id': ccStataionNameList[5]['id'], 'pos': (80+120*9+80, y),    'layout': gv.LAY_D}
+                    ]
+        except Exception as error:
+            gv.gDebugPrint("Error to load the station config file: %s" % error)
+            trackStation_cc = [
+                    {'id': 'Buona_Vista',   'pos': (80+120*11+40, y),   'layout': gv.LAY_D},
+                    {'id': 'Farrer_Road',   'pos': (80+120*12+80, y),   'layout': gv.LAY_D},
+                    {'id': 'Serangoon',     'pos': (80+120*3+80, y),    'layout': gv.LAY_U},
+                    {'id': 'Nicoll_Highway','pos': (80+120*7+40, y),    'layout': gv.LAY_U},
+                    {'id': 'Bayfront',      'pos': (80+120*7+80, y),    'layout': gv.LAY_D},
+                    {'id': 'Harbourfront',  'pos': (80+120*9+80, y),    'layout': gv.LAY_D}
+                ]
         self.stations[key] = []
         for stationInfo in trackStation_cc:
             station = AgentStation(self, stationInfo['id'], stationInfo['pos'], labelLayout=stationInfo['layout'])
@@ -259,12 +298,28 @@ class MapMgr(object):
         # nsline (btm)
         y += 160
         key = 'nsline'
-        trackStation_ns = [{'id': 'Jurong_East', 'pos': (80+210*6+140, y), 'layout': gv.LAY_D},
-                           {'id': 'Woodlands', 'pos': (80+210*1+70, y), 'layout': gv.LAY_U},
-                           {'id': 'Yishun', 'pos': (80+210*1+140, y), 'layout': gv.LAY_D},
-                           {'id': 'Orchard', 'pos': (80+210*3+70, y), 'layout': gv.LAY_U},
-                           {'id': 'City_Hall', 'pos': (80+210*3+140, y), 'layout': gv.LAY_D},
-                           {'id': 'Bishan', 'pos': (80+210*5+140, y), 'layout': gv.LAY_D}]
+        trackStation_ns = None 
+        try:
+            with open(gv.gNsStationFile, 'r') as f:
+                nsStataionNameList = json.load(f)
+                trackStation_ns = [
+                        {'id': nsStataionNameList[0]['id'], 'pos': (80+210*6+140, y),  'layout': gv.LAY_D},
+                        {'id': nsStataionNameList[1]['id'], 'pos': (80+210*1+70, y),   'layout': gv.LAY_U},
+                        {'id': nsStataionNameList[2]['id'], 'pos': (80+210*1+140, y),  'layout': gv.LAY_D},
+                        {'id': nsStataionNameList[3]['id'], 'pos': (80+210*3+70, y),   'layout': gv.LAY_U},
+                        {'id': nsStataionNameList[4]['id'], 'pos': (80+210*3+140, y),  'layout': gv.LAY_D},
+                        {'id': nsStataionNameList[5]['id'], 'pos': (80+210*5+140, y),  'layout': gv.LAY_D}
+                    ]
+        except Exception as error:
+            gv.gDebugPrint("Error to load the station config file: %s" % error)
+            trackStation_ns = [
+                    {'id': 'Jurong_East',   'pos': (80+210*6+140, y),   'layout': gv.LAY_D},
+                    {'id': 'Woodlands',     'pos': (80+210*1+70, y),    'layout': gv.LAY_U},
+                    {'id': 'Yishun',        'pos': (80+210*1+140, y),   'layout': gv.LAY_D},
+                    {'id': 'Orchard',       'pos': (80+210*3+70, y),    'layout': gv.LAY_U},
+                    {'id': 'City_Hall',     'pos': (80+210*3+140, y),   'layout': gv.LAY_D},
+                    {'id': 'Bishan',        'pos': (80+210*5+140, y),   'layout': gv.LAY_D}
+                ]
         self.stations[key] = []
         for stationInfo in trackStation_ns:
             station = AgentStation(self, stationInfo['id'], stationInfo['pos'], labelLayout=stationInfo['layout'])

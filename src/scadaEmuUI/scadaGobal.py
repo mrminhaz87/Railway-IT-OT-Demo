@@ -29,6 +29,7 @@ APP_NAME = ('SCADAEmu', 'HMI')
 TOPDIRS = ['src', 'rail']
 LIBDIR = 'lib'
 CONFIG_FILE_NAME = 'scadaHMIConfig.txt'
+CONFIG_DIR_NAME = 'configFiles'
 
 #-----------------------------------------------------------------------------
 # Init the logger:
@@ -141,6 +142,13 @@ gPlcPnlInfo['PLC-05'] = {'id': 'PLC-05', 'label': 'PLC-05[Slave:slot-2]',
                          'tgt': 'PLC-03', 'hRegsInfo': (16, 22), 'coilsInfo': (16, 22)}
 
 gUpdateRate = float(CONFIG_DICT['CLK_INT'])    # main frame update rate 1 sec.
+
+
+gStataionNameDict = {}
+gWeStationFile = os.path.join(DIR_PATH, CONFIG_DIR_NAME, CONFIG_DICT['WE_STATION_CFG'])
+gNsStationFile = os.path.join(DIR_PATH, CONFIG_DIR_NAME, CONFIG_DICT['NC_STATION_CFG'])
+gCcStationFile = os.path.join(DIR_PATH, CONFIG_DIR_NAME, CONFIG_DICT['CC_STATION_CFG'])
+
 
 #-------<GLOBAL PARAMTERS>-----------------------------------------------------
 iMainFrame = None   # UI MainFrame.
