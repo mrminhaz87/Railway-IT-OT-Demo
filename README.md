@@ -107,7 +107,7 @@ In this section we will introduce the general design of each sub system, for the
 
 #### Design of the Railway Track OT Signaling System 
 
-The Track Signaling Simulation System forms an integral part of the OT network, leveraging PLCs to control track junctions and railway stations. The PLC simulators continuously gather simulated electrical signals from a Physical-real-world simulation program (Such as trains' position detection sensor state and track control signals state). These data are utilized to automate control over track, junction, and station signals, achieving the following objectives:
+The Track Signaling Simulation System forms the track control part of the railway system OT network, leveraging PLCs to control track junctions and railway stations. The PLC simulators continuously gather simulated electrical signals from a Physical-real-world simulation program (Such as trains' position detection sensor state and track control signals state). These data are utilized to automate control over track, junction, and station signals, achieving the following objectives:
 
 1. Simulating the railway fixed block signaling control mechanism in the track-train management .
 2. Managing train passage through different tracks junction areas to ensure safety operation.
@@ -121,7 +121,7 @@ Key components of the system (as marked with idx number in the system diagram) :
 
 | Idx  | Key Components                            | Component Function Description                               | IT-OT level |
 | ---- | ----------------------------------------- | ------------------------------------------------------------ | ----------- |
-| 1    | One electrical signal simulation subnet   | facilitating virtual communication between the physical device simulation program and the PLCs. | lvl-0       |
+| 1    | One electrical signal simulation subnet   | Facilitating virtual electrical communication between the physical device simulation program and the OT-Field devices ( PLC). | lvl-0       |
 | 2    | 22 station train detection sensors        | Detect the train location inside and outside the station.    | lvl-0       |
 | 3    | 22 station train control signals          | Guide trains docking and departure the railway station.      | lvl-01      |
 | 4    | 1 Station PLC subnet with 3 PLCs          | Three master-slave configured PLC simulators with pre-set ladder logic for automatic track train sensor reading and station signal adjustment. | lvl-1       |
@@ -133,23 +133,49 @@ Key components of the system (as marked with idx number in the system diagram) :
 
 
 
-**Railway Company OT-System Cyber Range Introduction**
+#### Design of the Railway Train OT Signaling System 
 
-The OT-System Cyber Range is designed to replicate the tangible, physical hardware aspects of a railway system. It will emulate the railway control center featuring a supervisory SCADA network, the Sensor Signal PLC network governing railway and train control in the production environment and emulate the physical wire connections that constitute the real-world infrastructure
+The Train Signaling Simulation System forms the trains control part of the railway system OT network, utilizing PLCs and RTUs for efficient trains management. PLCs are responsible for controlling the 3rd track power supply, signaling to trains, and implementing auto collision avoidance mechanisms. RTUs will automatically gather operational sensor data from trains, such as throttle/break percentage, input voltage, motor current, and speed. Together, the PLCs and RTUs facilitate following objectives:
 
-![](doc/img/networkCommDesign.png)
+1. Automated detection of track signal states to control train passage through junctions and station docking/departure.
+2. Collision avoidance by monitoring the front train and fixed blocking states of railway tracks.
+3. Data transmission to railway HQ and train driver consoles for monitoring and control purposes.
 
-Included components: 
+The system comprises two sets of PLCs and one set of RTUs. One PLC set (with 2 PLCs) controls the 3rd track power, while another set (also with 2 PLCs) manages critical train controls like throttle, brake, and power. The RTU set consists of 10 units to monitor train information. Additionally, two types of HMIs are integrated into the system:
 
-- One real world emulator
-- One HQ HMI (master mode) 
-- N train dispatcher HMI (slave mode )
-- 2 train control PLC
-- 3 Junction signal control PLC
-- 3 Station control PLC
-- One train operator HMI (master mode)
-- N train driver HMI
-- N train safety checker HMI
+- **On-train driver console**: the train local HMI will connect to on-train PLCs and RTUs then allow train drivers to monitor automated operations and control trains,
+- **Railway HQ train HMI**: the HQ remote HMI will  connect  the 3rd track control PLCs and on-train RTUs via wireless connection. then enable monitoring of general train operations and control of the 3rd track power. 
+
+The system diagram below illustrates its components and structure:
+
+![](doc/img/RmImg/rm_06_trainOTnetwork.png)
+
+Key components of the system (as marked with idx number in the system diagram) : 
+
+| Idx  | Key Components                        | Component Function Description                               | IT-OT level |
+| ---- | ------------------------------------- | ------------------------------------------------------------ | ----------- |
+| 0    | Electrical signal simulation subnet   | Facilitating virtual electrical communication between the physical device simulation program and the OT-Field devices ( PLC). | lvl-0       |
+| 1    | 10 third-track power control switches | Virtual switches in the physical real-world simulator control the power supply from the railway system's 3rd track power to trains. | lvl-0       |
+| 2    | One 3rd-track PLC subnet with 2 PLCs  | Two master-slave configured PLC simulators control track power supply and accept commands from railway HQ train HMIs via Modbus. | lvl-1       |
+| 3    | 10 train front sensors                | Train front sensor to detect the track signal state and front trans distance. | lvl-0       |
+| 4    | 20 train control switches             | Virtual switches in 10 train simulators control basic train operations and accept Modbus commands from train driver consoles. | lvl-0       |
+| 5    | 50 train data sensors                 | Virtual sensors in 10 train simulators generate train data such as throttle/break percentage, input voltage, motor current, and speed. | lvl-0       |
+| 6    | One on train PLC subnet with 2 PLCs   | Two master-slave configured PLC simulators simulate on-train Modbus to control train operations based on track signaling and accept commands from train driver consoles. | lvl-1       |
+| 7    | One on train RTU subnet with 10 RTUs  | A subnet with 10 RTU simulators collects data from ten trains' 50 sensors. | lvl-1       |
+| 8    | 10 Train driver consoles              | Train driver console enable train drivers to monitor automated operations and control trains, connecting to on-train PLCs and RTUs. | lvl-2       |
+| 9    | 1 railway HQ train HMI                | Monitors general train operations and controls 3rd track power, connecting to 3rd track control PLCs and on-train RTUs via wireless connection. | lvl-2       |
+
+
+
+####  Design of Train PLC and RTU Control
+
+In the train control system, we employ one PLC simulator to manage the third railway track's power supply, along with a Train RTU tasked with reading sensor data onboard the train. Additionally, we utilize another on-board Train PLC to read essential functions such as motor throttle, braking, front collision radar, and the auto-collision avoidance mechanism. The system workflow is depicted below:
+
+![](doc/img/RmImg/rm_07_trainCtrlDesign.png)
+
+The railway dispatches power control PLC sends signals to the Human-Machine Interface (HMI) via Modbus-TCP, while the on-board RTU transmits train data to the HMI using S7Comm through a wireless connection. All the on train PLC and RTU will also be controlled by the train driver console.
+
+
 
 
 
