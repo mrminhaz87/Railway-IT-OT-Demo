@@ -1,4 +1,4 @@
-Mini Railway Cyber Range 
+# Mini Railway Cyber Range 
 
 ### Railway [Metro] IT-OT System Cyber Security Test Platform
 
@@ -101,7 +101,35 @@ Currently we use our the cyber range provide different demo and hands-on trainin
 
 ### System Design 
 
+In this section we will introduce the general design of each sub system, for the detail design, please refer to the sub-system document in the doc folder. 
 
+
+
+#### Design of the Railway Track OT Signaling System 
+
+The Track Signaling Simulation System forms an integral part of the OT network, leveraging PLCs to control track junctions and railway stations. The PLC simulators continuously gather simulated electrical signals from a Physical-real-world simulation program (Such as trains' position detection sensor state and track control signals state). These data are utilized to automate control over track, junction, and station signals, achieving the following objectives:
+
+1. Simulating the railway fixed block signaling control mechanism in the track-train management .
+2. Managing train passage through different tracks junction areas to ensure safety operation.
+3. Guiding trains to dock and depart from the railway stations.
+
+The system comprises two sets of PLCs, totaling 6 PLCs each, which autonomously retrieve sensor data and adjust signals based on pre-configured ladder logic. Additionally, it offers a level 2 HMI for railway HQ operators to monitor and manage track operations, alongside multiple level 3 HMI for the maintenance engineers and operational safety personnel to oversee the signaling system. The system diagram below illustrates its components and structure:
+
+![](doc/img/RmImg/rm_05_trackOTnetwork.png)
+
+Key components of the system (as marked with idx number in the system diagram) : 
+
+| Idx  | Key Components                            | Component Function Description                               | IT-OT level |
+| ---- | ----------------------------------------- | ------------------------------------------------------------ | ----------- |
+| 1    | One electrical signal simulation subnet   | facilitating virtual communication between the physical device simulation program and the PLCs. | lvl-0       |
+| 2    | 22 station train detection sensors        | Detect the train location inside and outside the station.    | lvl-0       |
+| 3    | 22 station train control signals          | Guide trains docking and departure the railway station.      | lvl-01      |
+| 4    | 1 Station PLC subnet with 3 PLCs          | Three master-slave configured PLC simulators with pre-set ladder logic for automatic track train sensor reading and station signal adjustment. | lvl-1       |
+| 5    | 39 track train detection sensors          | Detect the trains position which is used for the fixed block signaling control mechanism. | lvl-0       |
+| 6    | 19 junction train controls signals        | Manage the track junction pass or block based on the trains trains sensors state. | lvl-0       |
+| 7    | 1 Junction PLC subnet with 3  PLCs        | Three master-slave configured PLC simulators with pre-set ladder logic for automatic track train sensor reading and junction signal adjustment. | lvl-1       |
+| 8    | 1 Modbus subnetwork featuring a SCADA HMI | One master HMI for railway HQ operator to monitor fixed signaling system state in real time, junction control sensor-signal state, station sensor-signal control state and do necessary override control of all the PLCs. | lvl-2       |
+| 9    | 1 HMI link subnetwork                     | One HMI link subnetwork with multiple slave management HMI to enabling other railway staff to get a general overview of the junction and station statuses. | lvl-2/3     |
 
 
 
