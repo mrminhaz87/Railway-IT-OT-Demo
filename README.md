@@ -6,18 +6,20 @@
 
 
 
-**Project Design Purpose :** Our objective is to develop a miniature cyber range capable of simulating the IT-OT environment of a railway company/system. This platform serves multiple purposes including cyber exercises, professional training, IT-OT security project research, development and testing. It will provide a simplified and straightforward digital-twin style Operational Technology (OT) environments emulation platform for the railway signaling systems. This platform will simulate the operations of multiple trains on various tracks, each equipped with distinct sensor-signal controls. Additionally, it will emulate a normal corporate network with various user activities to simulate the Information Technology (IT) environment. The program will offer several different modules to simulate Level 0 (Physical Process Field I/O device) to Level 5 (Internet DMZ Zone) of an IT-OT environment, as illustrated below:
+**Project Design Purpose:** Our objective is to develop a miniature cyber range capable of simulating the IT-OT environment of the railway company/system. It will provide a simplified and straightforward digital-twin style Operational Technology (OT) environments emulation solution for the railway signaling systems ( such as simulating the operations of multiple trains on various tracks, each equipped with distinct sensor-signal controls). Additionally, it will simulate a normal corporate network with various user activities to simulate the Information Technology (IT) environment. The program will offer several different modules to simulate Level 0 (Physical Process Field I/O device) to Level 5 (Internet DMZ Zone) of an IT-OT environment, as illustrated below:
 
 ![](doc/img/RmImg/rm_01_syslvl.png)
 
-`Figure-01: Mini_railway_cyber_range_IT-OT_layer_diagram, version v0.1.4 (2024)`
+` Figure-00: 5_layers_of_mini_railway_cyber_range_platfrom, version v0.1.4 (2024)`
 
-This platform serves as a cyber range for conducting cyber security exercises to demonstrate and assess the impact of various IT attacks on OT systems. The system comprises four primary components: 
+The platform comprises four primary components which cover different levels of the system requirement: 
 
-1. 2D Railway [Metro] System Physical-world Emulator. 
-2.  Railway OT-Field-Controller Simulation (PLC & RTU) Programs.
-3. Railway SCADA System Simulator. 
-4. Railway Company's Corporate Environment Simulation. 
+1. `Level 0` : 2D Railway [Metro] System Physical-world Simulation Program. 
+2. `Level 1`: Railway OT-Field-Controller Simulation (PLC & RTU) Programs.
+3. `Level 2 -3`: Railway Supervisory Control and Data Acquisition (SCADA)  System. 
+4. `Level 4 -5`: Railway Company's Corporate Environment Simulation System. 
+
+This cyber range platform serves multiple purposes including cyber exercises, professional training, IT-OT security project R&D, testing and demonstration (Such as conducting cyber security exercises to demonstrate and assess the impact of various IT attacks on OT systems). 
 
 ```
 # version:     v0.1.4
@@ -34,70 +36,92 @@ This platform serves as a cyber range for conducting cyber security exercises to
 
 ### Introduction
 
-The Mini Railway Cyber Range ( Railway [Metro] IT-OT System Cyber Security Test Platform ) serves as a miniature railway IT/OT network emulation system designed to empower ICS researchers in testing their IT/OT attack and defense solutions on our cyber range. Additionally, it also provides different IT and OT cyber attack cases for the ICS security training and education purposes. The entire system is composed of below contents: 
+Railway systems play a crucial role in modern transportation networks, facilitating the efficient movement of people and goods across vast distances. With the increasing reliance on technology, railway systems have evolved to incorporate complex operational technology (OT) components, such as track signaling systems, train control systems, and station management systems. While these advancements have enhanced safety, reliability, and efficiency, they have also introduced new cybersecurity challenges. The Mini Railway Cyber Range serves as a miniature railway IT-OT system simulation platform to show the fundamental operation logic of these systems. The entire platform is composed of below contents: 
 
 - **Two sub cyber ranges**: Railway Company IT-System Cyber Range and Railway System OT-System Cyber Range
 - **Four main network components**:  Corporate network, Supervision SCADA network, Production network and Physical real-world emulation network. 
 - **Nine program modules**: 2D Railway [Metro] System Real-world Emulator, Railway System SCADA HMI, Railway System Trains Controller HMI, Railway junction and station Sensor-Signal System Control PLC Simulators, Train control PLC simulators, Train monitoring RTU simulators, Railway company staff activities auto generator and cyber attack scenario simulation program.
 
+The platform over view is show below:
+
 ![](doc/img/RmImg/rm_03_overview.png)
 
-`version v0.1.4 (2024)`
+` Figure-1.0: Overview_of_mini_railway_cyber_range_platfrom, version v0.1.4 (2024)`
+
+Railway systems are vulnerable to a variety of OT threats, including unauthorized access, data breaches, malware attacks, and system manipulation. Therefore, it is imperative for railway operators to implement robust cybersecurity measures to protect their OT infrastructure and ensure the continued safety and reliability of railway operations. The Mini Railway Cyber Range serves as a cyber security test platform designed to empower ICS researchers in testing their IT/OT attack and defense solutions on it. Additionally, it also provides different IT and OT cyber attack cases for the ICS security training and education purposes. 
+
+
 
 #### Introduction of railway company IT-system cyber range
 
-The IT-network sub cyber range project will simulate the normal corporate network of the railway company ( lvl4~lvl5 in an IT-OT environment) , we will use the [Custer User Emulation System](https://github.com/LiuYuancheng/Windows_User_Simulator)  to automate simulate different kinds staff (blue team)'s daily work such as IT-Support-Engineer, Officer Staff, Railway HQ operator, Train driver / Train safety checker. It also provide the malicious activities (red teaming) generation program for simulate the attack scenario. The project consists of three primary components as shown below:
+The cyber range IT-environment will simulate the normal corporate network of the railway company ( lvl4~lvl5 in an IT-OT environment) , we will use the [Custer User Emulation System](https://github.com/LiuYuancheng/Windows_User_Simulator)  to automate simulate the daily work actions of different kinds group staff (blue team) as IT-Support-Engineer, Officer Staff, Railway HQ operator, Train driver and Train safety checker. It also provides the malicious activities (red teaming) generation program for simulating the attack scenarios. The project consists of three primary components as shown below:
 
 | Components Name                         | Components Description                                       | Reference links                                              |
 | --------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Corporate network environment           | A network with physical hardware / virtual machine (such as computer,  node, firewall, router, switches ... ) to simulate the railway company's IT-network. | [> Detail Example Link](https://github.com/LiuYuancheng/Cross-Sword-2023-Nato-Event/tree/main/ansibleVM) |
-| Company staff activities auto generator | A cluster user (blue team) activities generation system to simulate virtual staff (such as IT-Support-Engineer, Officer Staff, Railway HQ operator, Train driver / safety checker...) daily work activities and network traffic. | [> Detail Example Link ](https://github.com/LiuYuancheng/Lockshield_202X_NCL/tree/main/LS2024/deployment) |
-| Attack simulation system                | An attacker (red team) malicious activates generation system which can simulate hacker's attacking action such as phishing email, FDI, FCI, MITM, DDoS... | [> Detail Example Link](https://github.com/LiuYuancheng/Lockshield_202X_NCL/tree/main/LS2024/src/Hackers) |
+| Corporate network environment           | A network with physical hardware or virtual machine (such as computer,  node, firewall, router, switches ... ) to simulate the railway company's IT-network. | [> Detail Example Link](https://github.com/LiuYuancheng/Cross-Sword-2023-Nato-Event/tree/main/ansibleVM) |
+| Company staff activities auto generator | A cluster users (blue team) activities generation system to simulate virtual staff (such as IT-Support-Engineer, Officer Staff, Railway HQ operator, Train driver / safety checker...) daily work activities and network traffic. | [> Detail Example Link ](https://github.com/LiuYuancheng/Lockshield_202X_NCL/tree/main/LS2024/deployment) |
+| Attack simulation system                | An attackers (red team) malicious activates generation system which can simulate hacker's attacking action such as phishing email, FDI, FCI, MITM, DDoS... | [> Detail Example Link](https://github.com/LiuYuancheng/Lockshield_202X_NCL/tree/main/LS2024/src/Hackers) |
+
+
 
 #### Introduction of railway system OT-system cyber range
 
-The OT-environment cyber range will simulate the railway track signaling system and the train control system (lvl0 ~ lvl3 in an IT-OT environment) includes the the real-world physical device action, the OT-production network with the OT field device and the  railway system's supervision SCADA network. 
+The cyber range OT-environment will simulate the railway track signaling system and the train control system (lvl0 ~ lvl3 in an IT-OT environment) includes the the real-world physical devices' action, the OT-production network with the OT field devices and the  railway system's supervision SCADA network. 
 
-| Components Name                             | Level   | Components Description                                       | Document link                                      |
-| ------------------------------------------- | ------- | ------------------------------------------------------------ | -------------------------------------------------- |
-| 2D Physical Real-world Simulator            | Lvl-0   | A physical world components/device (track, train, signal sensor, city) simulation program with a 2D UI for user to view the real-world situation. | [> Detailed Program Doc](src/metroEmuUI/readme.md) |
-| Track Junctions Sensor-Signal PLC Simulator | Lvl-1   | A emulation program to simulate the function of multiple PLC devices in the track junction sensor-signal control part in the railway signaling system. |                                                    |
-| Stations Sensor-Signal PLC Simulator        | Lvl-1   | A emulation program to simulate the function of multiple PLC devices in the station train dock guiding sensor-signal control part in the station signaling system. |                                                    |
-| Train Sensor-Power PLC Simulator            | Lvl-1   | A emulation program to simulate the function of PLC device on Train to control the train's power and the motion. |                                                    |
-| Train Sensor RTU Simulator                  | Lvl-1   | A emulation program to simulate the function of RTU device on Train to read trains' sensor data and send back to the SCADA-HMI system |                                                    |
-| Trains Controller HMI                       | Lvl-2   | HMI to connect to the train control PLC and RTU to monitor train state and control the trains operation. | [> Detailed Program Doc](src/scadaEmuUI/readme.md) |
-| Railway Controller HMI                      | Lvl-2/3 | SCADA HMI in railway track management HQ to monitor and control the railway track operation. |                                                    |
+| Components Name                             | Level   | Components Description                                       | Document link                                           |
+| ------------------------------------------- | ------- | ------------------------------------------------------------ | ------------------------------------------------------- |
+| 2D Physical Real-world Simulator            | Lvl-0   | A physical world components/device (track, train, signal sensor, city) simulation program with a 2D UI for user to view the real-world situation. | [> Detailed Program Doc Link](src/metroEmuUI/readme.md) |
+| Track Junctions Sensor-Signal PLC Simulator | Lvl-1   | A emulation program to simulate the function of multiple PLC devices in the track junction sensor-signal control part in the railway signaling system. |                                                         |
+| Stations Sensor-Signal PLC Simulator        | Lvl-1   | A emulation program to simulate the function of multiple PLC devices in the station train dock guiding sensor-signal control part in the station signaling system. |                                                         |
+| Train Sensor-Power PLC Simulator            | Lvl-1   | A emulation program to simulate the function of PLC devices on Train to control the train's power and the motion. |                                                         |
+| Train Sensor RTU Simulator                  | Lvl-1   | A emulation program to simulate the function of RTU device on Train to read trains' sensor data and send back to the SCADA-HMI system |                                                         |
+| Trains Controller HMI                       | Lvl-2   | HMI to connect to the train control PLC and RTU to monitor train state and control the trains operation. | [> Detailed Program Doc](src/scadaEmuUI/readme.md)      |
+| Railway Controller HMI                      | Lvl-2/3 | SCADA HMI in railway track management HQ to monitor and control the railway track operation. |                                                         |
+
+
 
 #### Introduction of the cyber range networks
 
-The cyber range provide four different network to simulate the IT-OT environment from level0 to level5, the overview of the network is shown below:
+The cyber range provide four different layers of network to simulate the IT-OT environment, the overview of the network is shown below:
 
 ![](doc/img/RmImg/rm_02_network.png)
 
-`version v0.1.4 (2024)`
+` Figure-1.1: mini_railway_cyber_range_network_diagram, version v0.1.4 (2024)`
 
-1. **Corporate network**: This subnet replicates a typical railway company's corporate IT system network, encompassing various functional servers (wen, email, DMZ, staff management...) and a production management workstation. This workstation hosts essential components such as the production log archiving database, internal document server, and operator manuals. It will simulate the `Level 5 Internet DMZ Zone` and `Level 4 Enterprise Zone`  of the IT-OT environment.
+1. **Corporate network**: This subnet replicates a typical railway company's corporate IT system network, encompassing various functional servers (Web, Email, DMZ, Staff management...) and production management workstations. This workstation hosts essential components such as the production log archiving database, internal document server, and operator manuals. It will simulate the `Level 5 Internet DMZ Zone` and `Level 4 Enterprise Zone`  of the IT-OT environment.
 2. **Supervision SCADA network**: A subnet simulating the OT environment SCADA system network, this subnet features distinct SCADA data/historian servers, multiple HMI computers for system operators, and maintenance computers dedicated to ICS/OT-system engineers. It will simulate the `Level 3 Operations Management Zone`  and  `Level 2 Control Center (HQ) Processing LAN` of the OT environment.
-3. **Production network**: This subnet host all ICS field device PLC & RTU simulator programs, contributing to a realistic representation of the production environment within the railway system. It will simulate the `Level 1 Controller LAN` of the OT environment.  
-4. **Physical real-world emulation network**: In this subnet, railway real-world components are emulated to demonstrate the tangible effects of actual physical items / device (sensors, moto, switch ...) in the real working environment, all the device simulation program will running in this subnet to generate the "virtual" electrical signal and feed the signal in the PLC and RTU in the production network. This network will simulate the `Level 0 Physical Process Field I/O devices` of the OT environment. 
+3. **Production network**: This subnet host all ICS field device PLC & RTU simulator programs, contributing to a realistic representation of the production (Field Device Controllers) environment within the railway system. It will simulate the `Level 1 Controller LAN` of the OT environment.  
+4. **Physical real-world emulation network**: In this subnet, railway real-world components are emulated to demonstrate the tangible effects of actual physical items / device (sensors, motors, switches ...) in the real world, all the device simulation program will running in this subnet to generate the "virtual" electrical signal and feed the signal in the PLC and RTU in the production network. This network will simulate the `Level 0 Physical Process Field I/O devices` of the OT environment. 
 
 
 
 ------
 
-### Project Use Case
+### Project Use Cases
 
-**Cross Sword 2023**
+The system we developed has been used in several important world wide critical infrastructure cyber exercise as the attack target system or the digital forensics collection.
 
-We are glad to share that the Railway [Metro] IT/OT Emulation System Cyber Security Test Platform we developed this year was used for building one part of the cyber-attack target training system in the NATO CCDCOE Cross Sword 2023 offensive cyber exercise. CCDCOE LinkedIn POST: [ > link](https://www.linkedin.com/posts/natoccdcoe_crossedswords-activity-7140986334961217536-7dM5/?utm_source=share&utm_medium=member_desktop)
+##### CROSS SWORD 2023 (XS2023)
+
+We are glad to share that the Railway [Metro] IT/OT Emulation System Cyber Security Test Platform (version v0.1.3 2023) we developed  was used for building one part of the cyber-attack target training system in the NATO CCDCOE Cross Sword 2023 offensive cyber exercise. CCDCOE LinkedIn POST: [ > link](https://www.linkedin.com/posts/natoccdcoe_crossedswords-activity-7140986334961217536-7dM5/?utm_source=share&utm_medium=member_desktop)
 
 ![](doc/img/RmImg/rm_04_usecase01.png)
 
-`version v0.1.4 (2024)`
+` Figure-2.1: Screen Shot of the Cross Sword 2023 CCDCOE Linkedin post Dec 2023, version v0.1.3 (2023)`
 
-**OT Cyber exercise workshop case studies**
+##### Locked Shields 2024 (LS2024)
 
-Currently we use our the cyber range provide different demo and hands-on training  case study  for IT-OT cyber attack workshop.
+The Mini Railway Cyber Range (version v0.1.4) is used for contributing to a Forensic Evidence Trail in LS2024 ( Apr 2024 ), the project is used part of the Digital Forensics and Incident Response ( DFIR ) event. 
+
+##### IT-OT Cyber exercise workshop case studies
+
+Currently we use our the cyber range provide different demo and hands-on training  case study  for IT-OT cyber attack workshop. For the work shop detail, please refer to the doc: 
+
+- IT-OT Cyber Attack Workshop [ Case Study 00 ]: [Malicious Macro and Backdoor Trojan Attack on IT-network](https://www.linkedin.com/pulse/it-ot-cyber-attack-workshop-case-study-00-malicious-macro-liu-eceyc/?trackingId=P3b3LrGTBA5VXeJl2Sl3Ng%3D%3D)
+- OT Cyber Attack Workshop [ Case Study 01 ] : [False Data / Command Injection Attack on PLC](https://www.linkedin.com/pulse/ot-cyber-attack-workshop-case-study-01-false-data-command-liu-hqtac/?trackingId=SvN2%2FK%2FzyHbKytJZRGzUTQ%3D%3D)
+- OT Cyber Attack Workshop [ Case Study 02 ]: [Network ARP Spoofing Attack on HMI](https://www.linkedin.com/pulse/ot-cyber-attack-workshop-case-study-02-arp-spoofing-hmi-yuancheng-liu-howzc/?trackingId=0Vd3LiObg1Ybri2hhLKP3g%3D%3D)
+- OT Cyber Attack Workshop [ Case Study 03 ]: [DDoS Attack on PLC in OT system](https://www.linkedin.com/pulse/ot-cyber-attack-workshop-case-study-03-ddos-plc-yuancheng-liu-yi2cc/?trackingId=gVeCKQPhaGOlkvbtlRIpww%3D%3D)
+- OT Cyber Attack Workshop [ Case Study 04 ]: [MITM Attack on HMI-PLC Control Chain](https://www.linkedin.com/pulse/ot-cyber-attack-workshop-case-study-04-mitm-hmi-plc-control-liu-wcobc/?trackingId=woTAqB9Wsc4%2FjNukWHtlRA%3D%3D)
 
 
 
@@ -120,6 +144,8 @@ The Track Signaling Simulation System forms the track control part of the railwa
 The system comprises two sets of PLCs, totaling 6 PLCs each, which autonomously retrieve sensor data and adjust signals based on pre-configured ladder logic. Additionally, it offers a level 2 HMI for railway HQ operators to monitor and manage track operations, alongside multiple level 3 HMI for the maintenance engineers and operational safety personnel to oversee the signaling system. The system diagram below illustrates its components and structure:
 
 ![](doc/img/RmImg/rm_05_trackOTnetwork.png)
+
+` Figure-3.1: Railway_track_signaling_sysetm_design_diagram, version v0.1.4 (2024)`
 
 Key components of the system (as marked with idx number in the system diagram) : 
 
@@ -154,6 +180,8 @@ The system diagram below illustrates its components and structure:
 
 ![](doc/img/RmImg/rm_06_trainOTnetwork.png)
 
+` Figure-3.2: Railway_trains_control_sysetm_design_diagram, version v0.1.4 (2024)`
+
 Key components of the system (as marked with idx number in the system diagram) : 
 
 | Idx  | Key Components                        | Component Function Description                               | IT-OT level |
@@ -187,9 +215,9 @@ The railway dispatches power control PLC sends signals to the Human-Machine Inte
 
 The system provides three main graphic user interfaces for the user, cyber exercise participants and management team to monitor and control the system. 
 
-#### 2D Railway[Metro] System Real-world Emulator
+#### 2D Railway[Metro] System Real-world Emulator GUI
 
-The 2D Railway[Metro] System Real-world Emulator GUI serves as a tool for visualizing physical real-world scenarios through simple animations, such as trains traversing tracks and docking at stations. This emulator program depicts a railway system within a cityscape, featuring four tracks, ten trains, track junction signal control systems, and railway station control systems. This comprehensive design aims to deliver a realistic and dynamic railway simulation environment. Below is an overview of the GUI:
+The 2D Railway[Metro] System Real-world Emulator GUI serves as a tool for visualizing physical real-world scenarios through simple animations, such as trains traversing tracks and docking at stations. This emulator program depicts a railway system within a cityscape, featuring four tracks, ten trains, track junction signal control systems, and railway station control systems. This comprehensive design aims to deliver a realistic and dynamic railway simulation environment. Below is GUI overview:
 
 ![](doc/video/connectionHub5.gif)
 
@@ -199,17 +227,44 @@ The 2D Railway[Metro] System Real-world Emulator GUI serves as a tool for visual
 
 
 
+#### Railway Track Signaling SCADA HMI
+
+The railway track signaling SCADA HMI is used to facilitate the comprehensive monitoring and control of multiple railway junctions and stations. The HMI provides a visualization of the fixed block track signaling control for the railway HQ operator, it connects to the junction and station PLCs via Modbus-TCP protocol. Below is GUI overview:
+
+![](doc/video/scadaHmi.gif)
+
+The envisioned functionalities include:
+
+- Offering a PLC (Modbus TCP) connection interface for fetching and setting the PLCs' register and coil states.
+- Visualizing the current state of connected PLCs, including holding register states, coil states, and digital I/O states.
+- Providing a visual representation of the state of tracks, including sensor and signal states, along with an overview of the sensor-signal auto-controlling process.
+- Displaying the state of tracks and train-station sensors and signals, along with insights into the auto-controlling processes.
+- Implementing an overload control mechanism for sensor and signal states, accessible with appropriate administrative engineer debug permissions.
+
+> **Reference**: Railway System SCADA HMI detailed software design document [> link](doc/scadaHMI_readme.md)
 
 
 
+#### Railway System Trains Controller HMI
+
+The Trains Controller HMI offers comprehensive information visualization and control capabilities for multiple trains. It provides an efficient and user-friendly interface for real-time monitoring the trains throttle/break state, power status (voltage&current), trains speed and other operation parameters. The train drivers or HQ operator can also control the train via the HMI.  The trains controller HMI Connects the trains PLC via Modbus-TCP and trains RTU via S7Comm protocol. Below is GUI overview:
+
+![](doc/video/trainHMIhalf.gif)
+
+The key functions include:
+
+- Implementing a PLC (Modbus TCP) connection interface to facilitate the fetching and setting of PLC register and coil states.
+- Visualizing the current states of connected PLCs, including holding registers and coils.
+- Extracting data from trains control PLC sets to simulate a 750V-DC power trains system. This system will then display pertinent trains information such as speed, current, and voltage to the user.
+- Incorporating a Trains Power Control Panel, allowing users to effortlessly toggle the power states of individual trains.
+
+> **Reference**: Railway System Trains Controller HMI detailed software design document: [> link](doc/trainsCtrlHMI.md)
 
 
 
+------
 
-
-
-
-### Information Technology (IT) System Design
+### Information Technology (IT) System Overview
 
 This IT-network cyber range project will simulate the normal corporate network of the railway company with several different function servers and different life staff and users.  Within the IT System Cyber Range, our goal is to meticulously simulate not only the hardware infrastructure of the Company's network but also replicate the daily human activities of Railway Company staff.
 
@@ -264,51 +319,6 @@ Six kinds of different railway company staff human activity emulator:
 ### Detailed Sub-System Design
 
 The detail introduction of each component is shown below: 
-
-#### 1. 
-
-
-
-
-
-
-
-#### 2. Railway System SCADA HMI
-
-Our aim is to develop a Railway SCADA (Supervisory Control and Data Acquisition) program integrated with a Human Machine Interface (HMI) to facilitate the comprehensive monitoring and control of multiple railway junctions and stations. The envisioned functionalities include:
-
-- Offering a PLC (Modbus TCP) connection interface for fetching and setting the PLCs' register and coil states.
-- Visualizing the current state of connected PLCs, including holding register states, coil states, and digital I/O states.
-- Providing a visual representation of the state of tracks, including sensor and signal states, along with an overview of the sensor-signal auto-controlling process.
-- Displaying the state of tracks and train-station sensors and signals, along with insights into the auto-controlling processes.
-- Implementing an overload control mechanism for sensor and signal states, accessible with appropriate administrative engineer debug permissions.
-
-Railway System SCADA HMI UI :
-
-![](doc/video/scadaHmi.gif)
-
-Railway System SCADA HMI detailed software design document: [> link](doc/scadaHMI_readme.md)
-
-
-
-#### 3. Railway System Trains Controller HMI
-
-Our goal is to develop a Trains Controller Human Machine Interface (HMI) that offers comprehensive information visualization and control capabilities for multiple trains. The key functions include:
-
-- Implementing a PLC (Modbus TCP) connection interface to facilitate the fetching and setting of PLC register and coil states.
-- Visualizing the current states of connected PLCs, including holding registers and coils.
-- Extracting data from trains control PLC sets to simulate a 750V-DC power trains system. This system will then display pertinent trains information such as speed, current, and voltage to the user.
-- Incorporating a Trains Power Control Panel, allowing users to effortlessly toggle the power states of individual trains.
-
-This design ensures an efficient and user-friendly interface for monitoring and controlling multiple trains, offering real-time insights into their vital parameters and enabling seamless power management. 
-
-Railway System Trains Controller HMI UI:
-
-![](doc/video/trainHMIhalf.gif)
-
-Railway System Trains Controller HMI detailed software design document: [> link](doc/trainsCtrlHMI.md)
-
-
 
 #### 4. Railway Junctions Sensor-Signal System Control PLC Simulator
 
