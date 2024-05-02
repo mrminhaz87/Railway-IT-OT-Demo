@@ -10,6 +10,8 @@
 
 ![](doc/img/RmImg/rm_01_syslvl.png)
 
+`Figure-01: Mini_railway_cyber_range_IT-OT_layer_diagram, version v0.1.4 (2024)`
+
 This platform serves as a cyber range for conducting cyber security exercises to demonstrate and assess the impact of various IT attacks on OT systems. The system comprises four primary components: 
 
 1. 2D Railway [Metro] System Physical-world Emulator. 
@@ -91,6 +93,8 @@ We are glad to share that the Railway [Metro] IT/OT Emulation System Cyber Secur
 
 ![](doc/img/RmImg/rm_04_usecase01.png)
 
+`version v0.1.4 (2024)`
+
 **OT Cyber exercise workshop case studies**
 
 Currently we use our the cyber range provide different demo and hands-on training  case study  for IT-OT cyber attack workshop.
@@ -99,9 +103,9 @@ Currently we use our the cyber range provide different demo and hands-on trainin
 
 ------
 
-### System Design 
+### Operational Technology (OT) System Design 
 
-In this section we will introduce the general design of each sub system, for the detail design, please refer to the sub-system document in the doc folder. 
+In this section we will introduce the general design of each sub OT system includes the track signaling system, the train control system, OT-field device(PLC & RTU) design. For the detail design, please refer to the sub-system document in the doc folder. 
 
 
 
@@ -177,6 +181,59 @@ The railway dispatches power control PLC sends signals to the Human-Machine Inte
 
 
 
+------
+
+### User Interface Overview 
+
+The system provides three main graphic user interfaces for the user, cyber exercise participants and management team to monitor and control the system. 
+
+#### 2D Railway[Metro] System Real-world Emulator
+
+The 2D Railway[Metro] System Real-world Emulator GUI serves as a tool for visualizing physical real-world scenarios through simple animations, such as trains traversing tracks and docking at stations. This emulator program depicts a railway system within a cityscape, featuring four tracks, ten trains, track junction signal control systems, and railway station control systems. This comprehensive design aims to deliver a realistic and dynamic railway simulation environment. Below is an overview of the GUI:
+
+![](doc/video/connectionHub5.gif)
+
+
+
+>  **Reference**:  2D Railway[Metro] System real-world emulator UI detailed software design document [ > link](doc/metroEmuUI_readme.md)
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Information Technology (IT) System Design
+
+This IT-network cyber range project will simulate the normal corporate network of the railway company with several different function servers and different life staff and users.  Within the IT System Cyber Range, our goal is to meticulously simulate not only the hardware infrastructure of the Company's network but also replicate the daily human activities of Railway Company staff.
+
+
+
+
+
+
+
+, we will use the [Custer User Emulation] system to automate simulate different kinds of staff's daily work such as IT-Support-Engineer, Officer Staff, Railway HQ operator, Train driver / safety checker. The main components includes: 
+
+- Railway company corporate network environment (virtualize the railway company infrastructure: network, computer, node, firewall, router, switches), the company email server, web server document server and normal staff's laptops...
+- Railway company staff activities auto generator (virtual the railway company staff: IT-Support-Engineer, Officer Staff, Railway HQ operator, Train driver / safety checker, maintenance engineer)
+
+
+
+
+
+The IT system simulate a normal company's corporate network with several different function servers  
+
+
+
+
+
 
 
 **Railway Company IT-System Cyber Range** **Introduction**
@@ -194,7 +251,13 @@ Six kinds of different railway company staff human activity emulator:
 - Railway safety checker
 - Railway maintenance engineer
 
-`Version v0.3.1`
+
+
+
+
+
+
+
 
 ------
 
@@ -202,13 +265,11 @@ Six kinds of different railway company staff human activity emulator:
 
 The detail introduction of each component is shown below: 
 
-#### 1. 2D Railway[Metro] System Real-world Emulator
+#### 1. 
 
-Our objective is to develop a Railway system emulator that accurately simulates real-world scenarios, including trains navigating tracks, responding to signal systems, docking at stations, and being controlled by train drivers. The system encompasses four tracks, ten trains, a track junction signal control system, a station control system, and a train driver controller. Additionally, the emulator facilitates connectivity to three sets of PLC modules through a dedicated PLC interface. This comprehensive design aims to provide a realistic and dynamic railway simulation environment. 2D Railway[Metro] System real-world emulator UI: 
 
-![](doc/video/connectionHub5.gif)
 
-2D Railway[Metro] System real-world emulator UI detailed software design document: [ > link](doc/metroEmuUI_readme.md)
+
 
 
 
